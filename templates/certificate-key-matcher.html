@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate Key Matcher - NetHub Network Tools{% endblock %}
+{% block meta_title %}Certificate Key Matcher - Match SSL Certificates with Private Keys{% endblock %}
+{% block meta_description %}Match SSL certificates with their corresponding private keys to verify certificate-key pairs and ensure proper configuration.{% endblock %}
+{% block meta_keywords %}certificate key matcher, SSL key matching, certificate private key, key pair verification, SSL configuration{% endblock %}
+{% block og_title %}Certificate Key Matcher - Match SSL Certificates with Private Keys{% endblock %}
+{% block og_description %}Match SSL certificates with their corresponding private keys to verify certificate-key pairs and ensure proper configuration.{% endblock %}
+{% block canonical_url %}/certificate-key-matcher{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="bi bi-key-fill me-3"></i>Certificate Key Matcher
+            </h1>
+            <p class="card-text">Match SSL certificates with their corresponding private keys to verify certificate-key pairs and ensure proper configuration</p>
+        </div>
+
+        <!-- Key Matcher Form -->
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-key-fill me-2"></i>Certificate Key Matcher
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="key-matcher-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="certificate-input" class="form-label fw-bold">Certificate (PEM Format)</label>
+                            <textarea 
+                                id="certificate-input" 
+                                class="form-control" 
+                                rows="8" 
+                                placeholder="-----BEGIN CERTIFICATE-----
+MIIFjTCCA3WgAwIBAgIJAK...
+-----END CERTIFICATE-----"
+                                required
+                            ></textarea>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="private-key-input" class="form-label fw-bold">Private Key (PEM Format)</label>
+                            <textarea 
+                                id="private-key-input" 
+                                class="form-control" 
+                                rows="8" 
+                                placeholder="-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFA...
+-----END PRIVATE KEY-----"
+                                required
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="match-btn">
+                            <i class="bi bi-key-fill me-2"></i>Match Certificate & Key
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="d-none">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-circle me-2"></i>Key Matching Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="matching-results">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="d-none">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Matching Error
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="error-message" class="alert alert-danger mb-0">
+                        <!-- Error message will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Key Pair Verification</h5>
+                        <p class="card-text">Verify that the certificate and private key are a valid pair for secure SSL configuration.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-gear text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Configuration Check</h5>
+                        <p class="card-text">Ensure your SSL configuration is correct before deploying to production servers.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-exclamation-triangle text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Error Detection</h5>
+                        <p class="card-text">Identify mismatched certificate-key pairs that could cause SSL configuration issues.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vue.js App -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/static/certificate-key-matcher-app.js"></script>
+{% endblock %}

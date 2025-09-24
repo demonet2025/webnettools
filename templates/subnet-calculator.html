@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}IP Subnet Calculator - NetHub Network Tools{% endblock %}
+{% block meta_title %}IP Subnet Calculator - IPv4 and IPv6 Subnet Calculator{% endblock %}
+{% block meta_description %}Calculate IPv4 and IPv6 subnet information including network addresses, usable host ranges, subnet masks, and IP classes. Free online subnet calculator tool.{% endblock %}
+{% block meta_keywords %}subnet calculator, IP calculator, IPv4 calculator, IPv6 calculator, subnet mask, CIDR, network calculator, IP subnet tool{% endblock %}
+{% block og_title %}IP Subnet Calculator - IPv4 and IPv6 Subnet Calculator{% endblock %}
+{% block og_description %}Calculate IPv4 and IPv6 subnet information including network addresses, usable host ranges, subnet masks, and IP classes.{% endblock %}
+{% block canonical_url %}/subnet-calculator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="bi bi-calculator me-3"></i>IP Subnet Calculator
+            </h1>
+            <p class="lead text-muted">Calculate IPv4 and IPv6 subnet information including network addresses, usable host ranges, subnet masks, and IP classes</p>
+        </div>
+
+        <!-- IPv4 Subnet Calculator -->
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-ip me-2"></i>IPv4 Subnet Calculator
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="ipv4-calculator-form">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label for="ipv4-address" class="form-label fw-bold">IP Address</label>
+                            <input type="text" id="ipv4-address" class="form-control" placeholder="192.168.1.1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ipv4-subnet" class="form-label fw-bold">Subnet Mask / CIDR</label>
+                            <select id="ipv4-subnet" class="form-select">
+                                <option value="">Select subnet mask</option>
+                                <option value="/8">/8 (255.0.0.0) - Class A</option>
+                                <option value="/16">/16 (255.255.0.0) - Class B</option>
+                                <option value="/24">/24 (255.255.255.0) - Class C</option>
+                                <option value="/25">/25 (255.255.255.128)</option>
+                                <option value="/26">/26 (255.255.255.192)</option>
+                                <option value="/27">/27 (255.255.255.224)</option>
+                                <option value="/28">/28 (255.255.255.240)</option>
+                                <option value="/29">/29 (255.255.255.248)</option>
+                                <option value="/30">/30 (255.255.255.252)</option>
+                                <option value="/31">/31 (255.255.255.254)</option>
+                                <option value="/32">/32 (255.255.255.255)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ipv4-custom" class="form-label fw-bold">Custom CIDR</label>
+                            <input type="number" id="ipv4-custom" class="form-control" placeholder="24" min="0" max="32">
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="ipv4-calculate-btn">
+                            <i class="bi bi-calculator me-2"></i>Calculate IPv4 Subnet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- IPv6 Subnet Calculator -->
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-ip me-2"></i>IPv6 Subnet Calculator
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="ipv6-calculator-form">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="ipv6-address" class="form-label fw-bold">IPv6 Address</label>
+                            <input type="text" id="ipv6-address" class="form-control" placeholder="2001:db8:85a3::8a2e:370:7334" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ipv6-prefix" class="form-label fw-bold">Prefix Length</label>
+                            <select id="ipv6-prefix" class="form-select">
+                                <option value="">Select prefix length</option>
+                                <option value="64">/64 - Standard subnet</option>
+                                <option value="56">/56 - Large subnet</option>
+                                <option value="48">/48 - Site prefix</option>
+                                <option value="32">/32 - ISP allocation</option>
+                                <option value="128">/128 - Single host</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="ipv6-calculate-btn">
+                            <i class="bi bi-calculator me-2"></i>Calculate IPv6 Subnet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- IPv4 Results Section -->
+        <div id="ipv4-results-section" class="d-none">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-circle me-2"></i>IPv4 Subnet Calculation Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="ipv4-results">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IPv6 Results Section -->
+        <div id="ipv6-results-section" class="d-none">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-circle me-2"></i>IPv6 Subnet Calculation Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="ipv6-results">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="d-none">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Calculation Error
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="error-message" class="alert alert-danger mb-0">
+                        <!-- Error message will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-diagram-3 text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Network Information</h5>
+                        <p class="card-text">Get detailed network information including network address, broadcast address, and subnet mask.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-hdd-network text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Host Range</h5>
+                        <p class="card-text">Calculate usable host ranges, total hosts, and first/last available IP addresses.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-code-square text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Binary View</h5>
+                        <p class="card-text">View IP addresses and subnet masks in binary format for technical analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Subnets Reference -->
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-list-ul me-2"></i>Common IPv4 Subnets
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>CIDR</th>
+                                        <th>Subnet Mask</th>
+                                        <th>Usable Hosts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>/8</td><td>255.0.0.0</td><td>16,777,214</td></tr>
+                                    <tr><td>/16</td><td>255.255.0.0</td><td>65,534</td></tr>
+                                    <tr><td>/24</td><td>255.255.255.0</td><td>254</td></tr>
+                                    <tr><td>/25</td><td>255.255.255.128</td><td>126</td></tr>
+                                    <tr><td>/26</td><td>255.255.255.192</td><td>62</td></tr>
+                                    <tr><td>/27</td><td>255.255.255.224</td><td>30</td></tr>
+                                    <tr><td>/28</td><td>255.255.255.240</td><td>14</td></tr>
+                                    <tr><td>/29</td><td>255.255.255.248</td><td>6</td></tr>
+                                    <tr><td>/30</td><td>255.255.255.252</td><td>2</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-list-ul me-2"></i>Common IPv6 Prefixes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Prefix</th>
+                                        <th>Description</th>
+                                        <th>Hosts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>/64</td><td>Standard subnet</td><td>2^64</td></tr>
+                                    <tr><td>/56</td><td>Large subnet</td><td>2^72</td></tr>
+                                    <tr><td>/48</td><td>Site prefix</td><td>2^80</td></tr>
+                                    <tr><td>/32</td><td>ISP allocation</td><td>2^96</td></tr>
+                                    <tr><td>/128</td><td>Single host</td><td>1</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vue.js App -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/static/subnet-calculator-app.js"></script>
+{% endblock %}

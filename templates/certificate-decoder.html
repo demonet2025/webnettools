@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate Decoder - NetHub Network Tools{% endblock %}
+{% block meta_title %}Certificate Decoder - Decode SSL Certificates Online{% endblock %}
+{% block meta_description %}Decode SSL certificates to extract detailed information including subject, issuer, validity dates, public key details, and certificate chain analysis.{% endblock %}
+{% block meta_keywords %}certificate decoder, SSL certificate decode, certificate analysis, SSL decode, certificate details, public key, certificate chain{% endblock %}
+{% block og_title %}Certificate Decoder - Decode SSL Certificates Online{% endblock %}
+{% block og_description %}Decode SSL certificates to extract detailed information including subject, issuer, validity dates, and public key details.{% endblock %}
+{% block canonical_url %}/certificate-decoder{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="bi bi-file-earmark-code me-3"></i>Certificate Decoder
+            </h1>
+            <p class="lead text-muted">Decode SSL certificates to extract detailed information including subject, issuer, validity dates, and public key details</p>
+        </div>
+
+        <!-- Certificate Decoder Form -->
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-file-earmark-code me-2"></i>Certificate Decoder
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="certificate-decoder-form">
+                    <div class="mb-4">
+                        <label for="certificate-input" class="form-label fw-bold">Paste Certificate (PEM Format)</label>
+                        <textarea 
+                            id="certificate-input" 
+                            class="form-control" 
+                            rows="10" 
+                            placeholder="-----BEGIN CERTIFICATE-----
+MIIFjTCCA3WgAwIBAgIJAK...
+-----END CERTIFICATE-----"
+                            required
+                        ></textarea>
+                        <div class="form-text">Paste your SSL certificate in PEM format (including BEGIN and END lines)</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="decode-btn">
+                            <i class="bi bi-file-earmark-code me-2"></i>Decode Certificate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="d-none">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-circle me-2"></i>Certificate Decoded Successfully
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="certificate-results">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="d-none">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Decode Error
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="error-message" class="alert alert-danger mb-0">
+                        <!-- Error message will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-badge text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Subject Information</h5>
+                        <p class="card-text">Extract detailed subject information including common name, organization, and location details.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-building text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Issuer Details</h5>
+                        <p class="card-text">Get comprehensive issuer information including certificate authority details and validation.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-calendar-check text-primary" style="font-size: 2.5rem;"></i>
+                        <h5 class="card-title mt-3">Validity Period</h5>
+                        <p class="card-text">Check certificate validity dates, expiration status, and remaining validity period.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vue.js App -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/static/certificate-decoder-app.js"></script>
+{% endblock %}

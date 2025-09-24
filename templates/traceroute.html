@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Traceroute - Free Online Network Path Analysis | NetHub Network Tools{% endblock %}
+
+{% block meta_description %}Free online traceroute tool to trace the network path to any hostname or IP address. Analyze network routing and identify bottlenecks in your connection.{% endblock %}
+
+{% block meta_keywords %}traceroute, network path, routing analysis, network trace, hop analysis, network diagnostics, traceroute online{% endblock %}
+
+{% block og_url %}/traceroute{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-diagram-3 me-3"></i>Traceroute
+        </h1>
+        <p class="lead text-muted">Trace the network path to any hostname or IP address to analyze routing and identify bottlenecks</p>
+    </div>
+
+    <!-- Traceroute Form -->
+    <div class="card shadow-lg mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Traceroute Analysis</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/traceroute" class="row g-3">
+                <div class="col-md-8">
+                    <label for="hostname" class="form-label fw-bold">Hostname or IP Address</label>
+                    <input 
+                        type="text" 
+                        id="hostname" 
+                        name="hostname"
+                        value="{{ hostname or '' }}"
+                        class="form-control form-control-lg" 
+                        placeholder="example.com or 8.8.8.8" 
+                        required
+                    >
+                </div>
+                <div class="col-md-4">
+                    <label for="maxHops" class="form-label fw-bold">Max Hops</label>
+                    <select id="maxHops" name="max_hops" class="form-select form-select-lg">
+                        <option value="15" {% if max_hops == 15 %}selected{% endif %}>15 hops</option>
+                        <option value="30" {% if max_hops == 30 %}selected{% endif %}>30 hops</option>
+                        <option value="50" {% if max_hops == 50 %}selected{% endif %}>50 hops</option>
+                        <option value="64" {% if max_hops == 64 %}selected{% endif %}>64 hops</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-diagram-3 me-2"></i>Start Traceroute
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    {% if traceroute_results %}
+    <div class="card shadow-lg">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Traceroute Results</h5>
+        </div>
+        <div class="card-body">
+            {% if traceroute_results.hops and traceroute_results.hops|length > 0 %}
+            <div>
+                <h6 class="fw-bold text-primary">Network Path</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hop</th>
+                                <th>IP Address</th>
+                                <th>Hostname</th>
+                                <th>RTT (ms)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hop in traceroute_results.hops %}
+                            <tr>
+                                <td>{{ hop.hop_number }}</td>
+                                <td>{{ hop.ip_address or 'N/A' }}</td>
+                                <td>{{ hop.hostname or 'N/A' }}</td>
+                                <td>{{ hop.rtt + ' ms' if hop.rtt else 'N/A' }}</td>
+                                <td>
+                                    {% if hop.reachable %}
+                                    <span class="badge bg-success">Reachable</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Timeout</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if traceroute_results.summary %}
+            <div class="mt-4">
+                <h6 class="fw-bold text-primary">Summary</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h6 class="text-muted">Total Hops</h6>
+                            <h4 class="text-primary">{{ traceroute_results.summary.total_hops }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h6 class="text-muted">Reachable Hops</h6>
+                            <h4 class="text-success">{{ traceroute_results.summary.reachable_hops }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h6 class="text-muted">Average RTT</h6>
+                            <h4 class="text-info">{{ traceroute_results.summary.avg_rtt }} ms</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if traceroute_results.output %}
+            <div class="mt-4">
+                <h6 class="fw-bold text-primary">Raw Output</h6>
+                <pre class="bg-dark text-light p-3 rounded"><code>{{ traceroute_results.output }}</code></pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Error Message -->
+    {% if traceroute_results and traceroute_results.error %}
+    <div class="alert alert-danger mt-4" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Error:</strong> {{ traceroute_results.error }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

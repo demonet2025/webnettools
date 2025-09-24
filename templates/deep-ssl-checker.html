@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+
+{% block title %}Deep SSL Security Analysis - Comprehensive SSL/TLS Testing | NetHub Network Tools{% endblock %}
+
+{% block meta_description %}Comprehensive SSL/TLS security analysis tool. Deep certificate analysis, cipher suite testing, protocol support, and security recommendations for professional SSL assessment.{% endblock %}
+
+{% block meta_keywords %}deep SSL analysis, SSL security test, TLS analysis, cipher suite test, SSL configuration, SSL vulnerability scan, SSL security audit, SSL compliance check{% endblock %}
+
+{% block og_url %}/deep-ssl-checker{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-shield-lock me-3"></i>Deep SSL Security Analysis
+        </h1>
+        <p class="lead text-muted">Comprehensive SSL/TLS security analysis with detailed certificate inspection, cipher suite testing, and security recommendations</p>
+    </div>
+
+    <!-- Deep SSL Analysis Form -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-gradient-primary text-white border-0">
+            <div class="d-flex align-items-center">
+                <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
+                    <i class="bi bi-search text-white"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Deep SSL Security Analysis</h5>
+                    <small class="opacity-75">Comprehensive SSL/TLS security assessment</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="/deep-ssl-checker" class="row g-3">
+                <div class="col-12">
+                    <label for="hostname" class="form-label fw-bold">Domain or URL</label>
+                    <input 
+                        type="text" 
+                        id="hostname" 
+                        name="hostname"
+                        value="{{ hostname or '' }}"
+                        class="form-control form-control-lg" 
+                        placeholder="example.com or https://example.com" 
+                        required
+                    >
+                    <div class="form-text">Enter a domain (example.com) or full URL (https://example.com). HTTPS will be used automatically.</div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
+                        <i class="bi bi-search me-2"></i>Run Deep Analysis
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recent Searches -->
+    {% if recent_searches and recent_searches|length > 0 %}
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-gradient-info text-white border-0">
+            <div class="d-flex align-items-center">
+                <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
+                    <i class="bi bi-clock-history text-white"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Recent Searches</h5>
+                    <small class="opacity-75">Quick access to previously analyzed domains</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                {% for search in recent_searches %}
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <a href="/deep-ssl-checker/{{ search.domain }}" class="text-decoration-none">
+                        <div class="card border-0 bg-light h-100 recent-search-card">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-shield-lock text-primary"></i>
+                                </div>
+                                <h6 class="mb-1 text-primary">{{ search.domain[:3] }}***{{ search.domain[search.domain.rfind('.'):] }}</h6>
+                                <small class="text-muted">{{ search.domain }}</small>
+                                <div class="mt-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                        {{ search.search_count }}x
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Basic Results (Server-side rendered) -->
+    {% if ssl_results %}
+    <div class="ssl-results">
+        <!-- Basic SSL Information -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-gradient-success text-white border-0">
+                <div class="d-flex align-items-center">
+                    <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
+                        <i class="bi bi-check-circle text-white"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">Basic SSL Information</h5>
+                        <small class="opacity-75">Quick SSL certificate overview</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-3 bg-light rounded-3">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-globe text-primary"></i>
+                            </div>
+                            <h6 class="text-muted mb-1">Domain</h6>
+                            <h6 class="text-primary mb-0 fw-bold">{{ ssl_results.hostname }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-3 bg-light rounded-3">
+                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-building text-info"></i>
+                            </div>
+                            <h6 class="text-muted mb-1">Issuer</h6>
+                            <h6 class="text-info mb-0 fw-bold">{{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else 'Unknown' }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-3 bg-light rounded-3">
+                            <div class="bg-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %} bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-calendar-check text-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %}"></i>
+                            </div>
+                            <h6 class="text-muted mb-1">Expires In</h6>
+                            <h6 class="text-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %} mb-0 fw-bold">{{ ssl_results.certificate.days_until_expiry }} days</h6>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-3 bg-light rounded-3">
+                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-shield-check text-success"></i>
+                            </div>
+                            <h6 class="text-muted mb-1">Status</h6>
+                            <h6 class="text-success mb-0 fw-bold">Valid</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deep Analysis Button -->
+        <div class="text-center mb-4">
+            <button type="button" class="btn btn-outline-primary btn-lg" id="runDeepAnalysis">
+                <i class="bi bi-search me-2"></i>Run Comprehensive Deep Analysis
+            </button>
+        </div>
+
+        <!-- Deep Analysis Results (AJAX loaded) -->
+        <div id="deepAnalysisResults" class="d-none">
+            <!-- This will be populated by AJAX -->
+        </div>
+
+        <!-- Loading State for Deep Analysis -->
+        <div id="deepAnalysisLoading" class="d-none">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-5">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+                    <h5 class="text-muted">Running Deep SSL Analysis...</h5>
+                    <p class="text-muted">This may take a few moments as we analyze cipher suites, protocols, and security configurations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Welcome Message -->
+    {% if not ssl_results %}
+    <div class="text-center py-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-5">
+                <i class="bi bi-shield-lock text-primary" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-muted">Ready for Deep SSL Analysis</h4>
+                <p class="text-muted">Enter a domain or URL above to perform comprehensive SSL/TLS security analysis including certificate inspection, cipher suite testing, and security recommendations.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Features Section -->
+    <div class="card border-0 shadow-sm mt-5">
+        <div class="card-body p-4">
+            <h3 class="text-center mb-4">Deep SSL Analysis Features</h3>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="text-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-shield-check text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Certificate Analysis</h6>
+                        <p class="text-muted small">Detailed certificate inspection including validity, chain, and security features</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="text-center">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-key text-info" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Cipher Suite Testing</h6>
+                        <p class="text-muted small">Comprehensive testing of supported cipher suites and encryption algorithms</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="text-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-exclamation-triangle text-warning" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Vulnerability Scan</h6>
+                        <p class="text-muted small">Detection of common SSL/TLS vulnerabilities and security issues</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Protocol Support</h6>
+                        <p class="text-muted small">Testing of SSL/TLS protocol versions and configuration</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="text-center">
+                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-graph-up text-danger" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Performance Analysis</h6>
+                        <p class="text-muted small">SSL handshake performance and optimization recommendations</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="text-center">
+                        <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-list-check text-secondary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Compliance Check</h6>
+                        <p class="text-muted small">Verification against security standards and best practices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Custom CSS for modern design -->
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+    }
+    
+    .btn-outline-primary:hover {
+        transform: translateY(-1px);
+    }
+    
+    .deep-analysis-section {
+        animation: fadeInUp 0.5s ease-out;
+    }
+    
+    .recent-search-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .recent-search-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- Deep SSL Analysis JavaScript -->
+<script>
+$(document).ready(function() {
+    // Recent search card click handler
+    $('.recent-search-card').on('click', function() {
+        var $card = $(this);
+        $card.addClass('opacity-50');
+        $card.find('h6').html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
+    });
+    
+    // Deep analysis button click handler
+    $('#runDeepAnalysis').on('click', function() {
+        const hostname = $('#hostname').val();
+        if (!hostname) {
+            alert('Please enter a domain or URL first');
+            return;
+        }
+        
+        // Show loading state
+        $('#deepAnalysisLoading').removeClass('d-none');
+        $('#deepAnalysisResults').addClass('d-none');
+        $('#runDeepAnalysis').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Analyzing...');
+        
+        // Make AJAX request
+        $.ajax({
+            url: '/api/ssl/deep-analysis',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ hostname: hostname }),
+            success: function(data) {
+                // Hide loading state
+                $('#deepAnalysisLoading').addClass('d-none');
+                $('#runDeepAnalysis').prop('disabled', false).html('<i class="bi bi-search me-2"></i>Run Comprehensive Deep Analysis');
+                
+                // Display results
+                displayDeepAnalysisResults(data);
+                $('#deepAnalysisResults').removeClass('d-none').addClass('deep-analysis-section');
+            },
+            error: function(xhr, status, error) {
+                // Hide loading state
+                $('#deepAnalysisLoading').addClass('d-none');
+                $('#runDeepAnalysis').prop('disabled', false).html('<i class="bi bi-search me-2"></i>Run Comprehensive Deep Analysis');
+                
+                // Show error
+                $('#deepAnalysisResults').html(`
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center p-5">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                            <h5 class="text-danger mt-3">Analysis Failed</h5>
+                            <p class="text-muted">Unable to perform deep analysis. Please try again.</p>
+                        </div>
+                    </div>
+                `).removeClass('d-none');
+            }
+        });
+    });
+    
+    function displayDeepAnalysisResults(data) {
+        let html = `
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-info text-white border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
+                            <i class="bi bi-shield-lock text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Deep SSL Analysis Results</h5>
+                            <small class="opacity-75">Comprehensive security assessment for ${data.target || 'target'}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+        `;
+        
+        // Overall Grade
+        if (data.overallGrade) {
+            const gradeColor = data.overallGrade === 'A+' ? 'success' : 
+                             data.overallGrade === 'A' ? 'success' : 
+                             data.overallGrade === 'B' ? 'warning' : 'danger';
+            html += `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="text-center p-4 bg-light rounded-3">
+                            <h3 class="text-${gradeColor} mb-2">Overall Grade: ${data.overallGrade}</h3>
+                            <p class="text-muted">Security Score: ${data.score || 'N/A'}/100</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Protocol Support
+        if (data.protocols) {
+            html += `
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-diagram-3 me-2"></i>Protocol Support
+                    </h6>
+                    <div class="row g-3">
+            `;
+            for (const [protocol, info] of Object.entries(data.protocols)) {
+                const statusColor = info.supported ? 'success' : 'danger';
+                const statusIcon = info.supported ? 'check-circle' : 'x-circle';
+                html += `
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-${statusColor} bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-${statusIcon} text-${statusColor}"></i>
+                                </div>
+                                <h6 class="mb-1">${protocol}</h6>
+                                <span class="badge bg-${statusColor} bg-opacity-10 text-${statusColor} border border-${statusColor} border-opacity-25">
+                                    ${info.supported ? 'Supported' : 'Not Supported'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            html += `</div></div>`;
+        }
+        
+        // Vulnerabilities
+        if (data.vulnerabilities && data.vulnerabilities.length > 0) {
+            html += `
+                <div class="mb-4">
+                    <h6 class="fw-bold text-danger mb-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Security Vulnerabilities
+                    </h6>
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+            `;
+            data.vulnerabilities.forEach(vuln => {
+                html += `<li>${vuln}</li>`;
+            });
+            html += `</ul></div></div>`;
+        } else if (data.vulnerabilities) {
+            html += `
+                <div class="mb-4">
+                    <h6 class="fw-bold text-success mb-3">
+                        <i class="bi bi-check-circle me-2"></i>Security Status
+                    </h6>
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>No security vulnerabilities detected
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Recommendations
+        if (data.recommendations && data.recommendations.length > 0) {
+            html += `
+                <div class="mb-4">
+                    <h6 class="fw-bold text-info mb-3">
+                        <i class="bi bi-lightbulb me-2"></i>Recommendations
+                    </h6>
+                    <div class="alert alert-info">
+                        <ul class="mb-0">
+            `;
+            data.recommendations.forEach(rec => {
+                html += `<li>${rec}</li>`;
+            });
+            html += `</ul></div></div>`;
+        }
+        
+        html += `</div></div>`;
+        
+        $('#deepAnalysisResults').html(html);
+    }
+});
+</script>
+{% endblock %}

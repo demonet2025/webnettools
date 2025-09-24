@@ -1,0 +1,807 @@
+{% extends "base.html" %}
+
+{% block title %}SSL Certificate Checker - Free Online SSL Test | NetHub Network Tools{% endblock %}
+{% block meta_title %}SSL Certificate Checker - Free Online SSL Test | NetHub Network Tools{% endblock %}
+{% block meta_description %}Free online SSL certificate checker. Test SSL certificate validity, expiration dates, security configuration, and get detailed SSL analysis for any domain or website.{% endblock %}
+{% block meta_keywords %}SSL checker, SSL certificate test, SSL validation, certificate checker, SSL analysis, HTTPS test, SSL expiry, certificate validity, SSL security, SSL configuration{% endblock %}
+{% block og_url %}/sslchecker{% endblock %}
+{% block twitter_url %}/sslchecker{% endblock %}
+{% block canonical_url %}/sslchecker{% endblock %}
+{% block app_name %}SSL Certificate Checker{% endblock %}
+{% block app_description %}Free online SSL certificate checker for testing certificate validity, expiration dates, and security configuration{% endblock %}
+{% block app_url %}/sslchecker{% endblock %}
+
+{% block extra_head %}
+<!-- Additional CSS for SSL Checker -->
+<style>
+.ssl-checker-container {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.ssl-simple-checker {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.ssl-checker-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.ssl-checker-header h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.875rem;
+    font-weight: 700;
+}
+
+.ssl-checker-header .badge {
+    margin-left: 1rem;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+
+.ssl-checker-form {
+    margin-bottom: 2rem;
+}
+
+.ssl-checker-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.ssl-checker-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.ssl-checker-form input[type="text"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.ssl-checker-form input[type="text"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ssl-checker-form button {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ssl-checker-form button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+}
+
+.ssl-checker-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ssl-results {
+    margin-top: 2rem;
+}
+
+.ssl-result-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 2rem;
+}
+
+.ssl-result-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.ssl-result-header h3 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.ssl-result-header .badge {
+    margin-left: 1rem;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+
+.ssl-result-content {
+    color: #374151;
+    line-height: 1.6;
+}
+
+.ssl-result-content h4 {
+    color: #1f2937;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.ssl-result-content h4:first-child {
+    margin-top: 0;
+}
+
+.ssl-result-content p {
+    margin-bottom: 1rem;
+}
+
+.ssl-result-content ul {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+.ssl-result-content li {
+    margin-bottom: 0.5rem;
+}
+
+.ssl-result-content code {
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.ssl-result-content .alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+}
+
+.ssl-result-content .alert-success {
+    background: #d1fae5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.ssl-result-content .alert-danger {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.ssl-result-content .alert-warning {
+    background: #fef3c7;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.ssl-result-content .alert-info {
+    background: #dbeafe;
+    border-color: #bfdbfe;
+    color: #1e40af;
+}
+
+.ssl-features {
+    background: #f8fafc;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.ssl-features h3 {
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.ssl-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.ssl-feature-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.ssl-feature-item h4 {
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.ssl-feature-item p {
+    color: #6b7280;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.ssl-feature-item .icon {
+    color: #3b82f6;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.recent-search-card {
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+}
+
+.recent-search-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #3b82f6;
+}
+
+.recent-search-card .card-body {
+    padding: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .ssl-checker-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .ssl-features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="bi bi-shield-check me-3"></i>SSL Certificate Checker
+            </h1>
+            <p class="lead text-muted">Test SSL certificate validity, expiration dates, and security configuration for any domain or website</p>
+        </div>
+
+        <!-- SSL Checker Form -->
+        <div class="card shadow-lg mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-search me-2"></i>SSL Certificate Analysis</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/sslchecker" class="row g-3">
+                    <div class="col-12">
+                        <label for="sslUrl" class="form-label fw-bold">Domain or URL</label>
+                        <input type="text" class="form-control form-control-lg" id="sslUrl" name="url" 
+                               value="{{ prefill_domain or '' }}"
+                               placeholder="example.com or https://example.com" required>
+                        <div class="form-text">Enter a domain (example.com) or full URL (https://example.com). HTTPS will be used automatically.</div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-search me-2"></i>Check SSL Certificate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Searches -->
+        {% if recent_searches and recent_searches|length > 0 %}
+        <div class="card shadow-lg mb-5">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Searches</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for search in recent_searches %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                        <a href="/sslchecker/{{ search.domain }}" class="text-decoration-none">
+                            <div class="card h-100 recent-search-card">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 text-primary">{{ search.domain[:3] }}***{{ search.domain[search.domain.rfind('.'):] }}</h6>
+                                            <small class="text-muted">{{ search.domain }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-secondary">{{ search.search_count }}x</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Welcome Message -->
+        {% if not ssl_results %}
+        <div class="text-center py-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 text-muted">Ready to Check SSL Certificate</h4>
+                    <p class="text-muted">Enter a domain or URL above to analyze its SSL certificate, security configuration, and validity status.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Results -->
+        {% if ssl_results %}
+        <div class="ssl-results">
+            <!-- Modern Summary of Checks -->
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-header bg-gradient-success text-white border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
+                            <i class="bi bi-check-circle text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Summary of Checks</h5>
+                            <small class="opacity-75">SSL certificate validation results</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <!-- DNS Resolution -->
+                        <div class="col-lg-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-globe text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-dark">DNS Resolution</h6>
+                                    <p class="mb-0 text-muted">{{ ssl_results.hostname }} resolves to <span class="fw-semibold text-primary">{{ ssl_results.ip_address if ssl_results.ip_address else 'N/A' }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Server Type -->
+                        <div class="col-lg-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-server text-info"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-dark">Server Type</h6>
+                                    <p class="mb-0 text-muted"><span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2">{{ ssl_results.certificate.server_type if ssl_results.certificate.server_type else 'Web Server' }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Certificate Trust -->
+                        <div class="col-lg-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-shield-check text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-dark">Certificate Trust</h6>
+                                    <p class="mb-0 text-muted">Trusted by all major web browsers with correct intermediate certificates</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Certificate Authority -->
+                        <div class="col-lg-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-building text-warning"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-dark">Certificate Authority</h6>
+                                    <p class="mb-0 text-muted">Issued by <span class="fw-semibold text-primary">{{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else 'Unknown' }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expiration Status -->
+                        <div class="col-lg-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %} bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-calendar-check text-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %}"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-dark">Expiration Status</h6>
+                                    <p class="mb-0 text-muted">Certificate expires in <span class="fw-semibold text-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %}">{{ ssl_results.certificate.days_until_expiry }} days</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hostname Validation -->
+                        <div class="col-lg-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-dark">Hostname Validation</h6>
+                                    <p class="mb-0 text-muted">Hostname <span class="fw-semibold text-primary">{{ ssl_results.hostname }}</span> is correctly listed in certificate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modern Certificate Information Cards -->
+            <div class="row">
+                <!-- Server Certificate -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-gradient-primary text-white border-0">
+                            <div class="d-flex align-items-center">
+                                <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
+                                    <i class="bi bi-shield-check text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Server Certificate</h6>
+                                    <small class="opacity-75">Primary certificate details</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Domain Info -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-globe text-primary me-2"></i>
+                                    <span class="fw-semibold text-muted">Domain</span>
+                                </div>
+                                <div class="bg-light rounded p-3">
+                                    <h5 class="mb-0 text-primary">{{ ssl_results.certificate.subject.commonName if ssl_results.certificate.subject.commonName else 'N/A' }}</h5>
+                                </div>
+                            </div>
+
+                            <!-- SANs -->
+                            {% if ssl_results.certificate.san_domains and ssl_results.certificate.san_domains|length > 0 %}
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-list-ul text-primary me-2"></i>
+                                    <span class="fw-semibold text-muted">Subject Alternative Names</span>
+                                </div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for san in ssl_results.certificate.san_domains %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">{{ san }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Organization & Location -->
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-building text-primary me-2"></i>
+                                        <span class="fw-semibold text-muted small">Organization</span>
+                                    </div>
+                                    <div class="bg-light rounded p-2">
+                                        <span class="text-dark">{{ ssl_results.certificate.subject.organizationName if ssl_results.certificate.subject.organizationName else 'N/A' }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-geo-alt text-primary me-2"></i>
+                                        <span class="fw-semibold text-muted small">Location</span>
+                                    </div>
+                                    <div class="bg-light rounded p-2">
+                                        <span class="text-dark">{{ ssl_results.certificate.subject.localityName if ssl_results.certificate.subject.localityName else 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Validity Period -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-calendar-check text-primary me-2"></i>
+                                    <span class="fw-semibold text-muted">Validity Period</span>
+                                </div>
+                                <div class="bg-light rounded p-3">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Valid From</small>
+                                            <span class="fw-semibold">{{ ssl_results.certificate.not_before.split(' ')[0:3]|join(' ') if ssl_results.certificate.not_before else 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Valid Until</small>
+                                            <span class="fw-semibold">{{ ssl_results.certificate.not_after.split(' ')[0:3]|join(' ') if ssl_results.certificate.not_after else 'N/A' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Technical Details -->
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-hash text-primary me-2"></i>
+                                        <span class="fw-semibold text-muted small">Serial Number</span>
+                                    </div>
+                                    <div class="bg-light rounded p-2">
+                                        <code class="text-dark small">{{ ssl_results.certificate.serial_number }}</code>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-key text-primary me-2"></i>
+                                        <span class="fw-semibold text-muted small">Algorithm</span>
+                                    </div>
+                                    <div class="bg-light rounded p-2">
+                                        <span class="text-dark">{{ ssl_results.certificate.signature_algorithm }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certificate Chain -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-gradient-info text-white border-0">
+                            <div class="d-flex align-items-center">
+                                <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
+                                    <i class="bi bi-diagram-3 text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Certificate Chain</h6>
+                                    <small class="opacity-75">Trust chain validation</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            {% for chain in ssl_results.certificate_chain %}
+                            <div class="certificate-chain-item {% if not loop.last %}mb-4{% endif %}">
+                                {% if loop.index > 1 %}
+                                <div class="text-center mb-3">
+                                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-arrow-down text-muted"></i>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="bg-light rounded p-3">
+                                    <!-- Chain Item Header -->
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="p-2 bg-primary bg-opacity-10 rounded-circle me-3">
+                                            <i class="bi bi-shield-check text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 text-primary">{{ chain.common_name }}</h6>
+                                            <small class="text-muted">{{ chain.organization }}</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Chain Item Details -->
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="bi bi-geo-alt text-muted me-2" style="font-size: 0.8rem;"></i>
+                                                <span class="text-muted small">Location</span>
+                                            </div>
+                                            <span class="text-dark small">{{ chain.location }}</span>
+                                        </div>
+                                        
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="bi bi-calendar text-muted me-2" style="font-size: 0.8rem;"></i>
+                                                <span class="text-muted small">Valid From</span>
+                                            </div>
+                                            <span class="text-dark small">{{ chain.valid_from }}</span>
+                                        </div>
+                                        
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="bi bi-calendar-check text-muted me-2" style="font-size: 0.8rem;"></i>
+                                                <span class="text-muted small">Valid Until</span>
+                                            </div>
+                                            <span class="text-dark small">{{ chain.valid_until }}</span>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="bi bi-hash text-muted me-2" style="font-size: 0.8rem;"></i>
+                                                <span class="text-muted small">Serial Number</span>
+                                            </div>
+                                            <code class="text-dark small">{{ chain.serial_number }}</code>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="bi bi-key text-muted me-2" style="font-size: 0.8rem;"></i>
+                                                <span class="text-muted small">Signature Algorithm</span>
+                                            </div>
+                                            <span class="text-dark small">{{ chain.signature_algorithm }}</span>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="bi bi-building text-muted me-2" style="font-size: 0.8rem;"></i>
+                                                <span class="text-muted small">Issuer</span>
+                                            </div>
+                                            <span class="text-dark small">{{ chain.issuer }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+
+        <!-- Features Section -->
+        <div class="card shadow-lg mt-5">
+            <div class="card-body">
+                <h3 class="text-center mb-4">SSL Checker Features</h3>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="bi bi-shield-check text-primary" style="font-size: 2rem;"></i>
+                        <h5 class="mt-2">Certificate Validation</h5>
+                        <p class="text-muted">Check certificate validity, expiration dates, and issuer information.</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="bi bi-lock text-primary" style="font-size: 2rem;"></i>
+                        <h5 class="mt-2">Security Analysis</h5>
+                        <p class="text-muted">Analyze SSL configuration, protocol support, and security vulnerabilities.</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></i>
+                        <h5 class="mt-2">Detailed Reporting</h5>
+                        <p class="text-muted">Get comprehensive SSL analysis with actionable recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Custom CSS for modern design -->
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    }
+    
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+    }
+    
+    .certificate-chain-item {
+        position: relative;
+    }
+    
+    .certificate-chain-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -16px;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 16px;
+        background: linear-gradient(to bottom, #dee2e6, transparent);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .text-success {
+        color: #198754 !important;
+    }
+    
+    .text-info {
+        color: #0dcaf0 !important;
+    }
+    
+    .text-warning {
+        color: #ffc107 !important;
+    }
+    
+    .text-danger {
+        color: #dc3545 !important;
+    }
+    
+    .recent-search-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .recent-search-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}

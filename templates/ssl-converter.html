@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}SSL Converter - NetHub Network Tools{% endblock %}
+{% block meta_title %}SSL Converter - Convert Between Certificate Formats{% endblock %}
+{% block meta_description %}Convert between different SSL certificate formats including PEM, DER, PKCS#7, and PKCS#12 for various applications and systems.{% endblock %}
+{% block meta_keywords %}SSL converter, certificate format converter, PEM to DER, DER to PEM, PKCS#7, PKCS#12, certificate conversion{% endblock %}
+{% block og_title %}SSL Converter - Convert Between Certificate Formats{% endblock %}
+{% block og_description %}Convert between different SSL certificate formats including PEM, DER, PKCS#7, and PKCS#12 for various applications and systems.{% endblock %}
+{% block canonical_url %}/ssl-converter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="bi bi-arrow-repeat me-3"></i>SSL Converter
+            </h1>
+            <p class="card-text">Convert between different SSL certificate formats including PEM, DER, PKCS#7, and PKCS#12 for various applications and systems</p>
+        </div>
+
+        <!-- SSL Converter Form -->
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-arrow-repeat me-2"></i>SSL Certificate Converter
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="ssl-converter-form">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="input-format" class="form-label fw-bold">Input Format</label>
+                            <select id="input-format" class="form-select" required>
+                                <option value="">Select input format</option>
+                                <option value="pem">PEM (Privacy-Enhanced Mail)</option>
+                                <option value="der">DER (Distinguished Encoding Rules)</option>
+                                <option value="pkcs7">PKCS#7 (Public Key Cryptography Standards)</option>
+                                <option value="pkcs12">PKCS#12 (Personal Information Exchange)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="output-format" class="form-label fw-bold">Output Format</label>
+                            <select id="output-format" class="form-select" required>
+                                <option value="">Select output format</option>
+                                <option value="pem">PEM (Privacy-Enhanced Mail)</option>
+                                <option value="der">DER (Distinguished Encoding Rules)</option>
+                                <option value="pkcs7">PKCS#7 (Public Key Cryptography Standards)</option>
+                                <option value="pkcs12">PKCS#12 (Personal Information Exchange)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="certificate-input" class="form-label fw-bold">Certificate Data</label>
+                        <textarea 
+                            id="certificate-input" 
+                            class="form-control" 
+                            rows="10" 
+                            placeholder="Paste your certificate data here..."
+                            required
+                        ></textarea>
+                        <div class="form-text">Paste your certificate in the selected input format</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="convert-btn">
+                            <i class="bi bi-arrow-repeat me-2"></i>Convert Certificate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="d-none">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-circle me-2"></i>Conversion Successful
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="converted-output" class="form-label fw-bold">Converted Certificate</label>
+                        <textarea 
+                            id="converted-output" 
+                            class="form-control" 
+                            rows="10" 
+                            readonly
+                        ></textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-outline-primary" id="copy-btn">
+                            <i class="bi bi-clipboard me-2"></i>Copy to Clipboard
+                        </button>
+                        <button type="button" class="btn btn-outline-success" id="download-btn">
+                            <i class="bi bi-download me-2"></i>Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="d-none">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Conversion Error
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="error-message" class="alert alert-danger mb-0">
+                        <!-- Error message will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format Information -->
+        <div class="row mt-5">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-file-text me-2"></i>PEM Format
+                        </h5>
+                        <p class="card-text">Base64-encoded certificate with BEGIN/END headers. Most common format for web servers and applications.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check text-success me-2"></i>Human-readable</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Widely supported</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Text-based</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-file-binary me-2"></i>DER Format
+                        </h5>
+                        <p class="card-text">Binary-encoded certificate format. More compact and efficient for storage and transmission.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check text-success me-2"></i>Binary format</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Compact size</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Efficient storage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-file-earmark-lock me-2"></i>PKCS#7 Format
+                        </h5>
+                        <p class="card-text">Cryptographic message syntax standard. Used for certificate chains and secure messaging.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check text-success me-2"></i>Certificate chains</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Secure messaging</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Multiple certificates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-file-lock me-2"></i>PKCS#12 Format
+                        </h5>
+                        <p class="card-text">Personal Information Exchange format. Contains both certificate and private key with password protection.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check text-success me-2"></i>Password protected</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Certificate + key</li>
+                            <li><i class="bi bi-check text-success me-2"></i>Secure storage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vue.js App -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/static/ssl-converter-app.js"></script>
+{% endblock %}

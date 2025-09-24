@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  webnettools-python:
+    build: .
+    container_name: nethub-webnettools-python
+    ports:
+      - "8083:8080"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    cap_add:
+      - NET_RAW
+    networks:
+      - nethub-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  nethub-network:
+    driver: bridge
