@@ -64,9 +64,12 @@ def ssl_checker_domain(domain):
 @ssl_security_bp.route('/deep-ssl-checker', methods=['GET', 'POST'])
 def deep_ssl_checker():
     """Deep SSL Checker tool page"""
+    from datetime import datetime
+    
     recent_searches = get_recent_searches(10)
     ssl_results = None
     hostname = None
+    assessment_time = None
     
     if request.method == 'POST':
         hostname = request.form.get('hostname', '').strip()
@@ -88,15 +91,21 @@ def deep_ssl_checker():
             except:
                 # Fallback: try the original hostname
                 ssl_results = SSLAnalyzer.check_ssl_certificate(hostname)
+            
+            # Get current time for assessment
+            assessment_time = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S')
     
     return render_template('deep-ssl-checker.html', 
                          recent_searches=recent_searches,
                          ssl_results=ssl_results,
-                         hostname=hostname)
+                         hostname=hostname,
+                         assessment_time=assessment_time)
 
 @ssl_security_bp.route('/deep-ssl-checker/<domain>')
 def deep_ssl_checker_domain(domain):
     """Deep SSL Checker for specific domain"""
+    from datetime import datetime
+    
     recent_searches = get_recent_searches(10)
     
     # Automatically check the domain (pass just the domain, not the full URL)
@@ -106,10 +115,14 @@ def deep_ssl_checker_domain(domain):
     save_recent_search(domain, f'https://{domain}')
     recent_searches = get_recent_searches(10)  # Refresh recent searches
     
+    # Get current time for assessment
+    assessment_time = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S')
+    
     return render_template('deep-ssl-checker.html', 
                          recent_searches=recent_searches,
                          ssl_results=ssl_results,
-                         hostname=domain)
+                         hostname=domain,
+                         assessment_time=assessment_time)
 
 @ssl_security_bp.route('/csr-decoder')
 def csr_decoder():

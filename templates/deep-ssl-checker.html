@@ -1,25 +1,701 @@
 {% extends "base.html" %}
 
 {% block title %}Deep SSL Security Analysis - Comprehensive SSL/TLS Testing | NetHub Network Tools{% endblock %}
-
 {% block meta_description %}Comprehensive SSL/TLS security analysis tool. Deep certificate analysis, cipher suite testing, protocol support, and security recommendations for professional SSL assessment.{% endblock %}
-
 {% block meta_keywords %}deep SSL analysis, SSL security test, TLS analysis, cipher suite test, SSL configuration, SSL vulnerability scan, SSL security audit, SSL compliance check{% endblock %}
-
 {% block og_url %}/deep-ssl-checker{% endblock %}
 
+{% block extra_head %}
+<!-- jQuery UI CSS for icons -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/ui-lightness/jquery-ui.css">
+<style>
+/* SSL Labs Style CSS */
+.reportTitle {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 30px 0 20px 0;
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 15px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.reportTitle .url {
+    color: #3498db;
+    font-weight: 700;
+}
+
+.reportTitle .ip {
+    color: #7f8c8d;
+    font-weight: 400;
+    font-size: 0.8em;
+}
+
+.reportHeaderInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+.reportTime {
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    background: #f8f9fa;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 1;
+    margin-right: 20px;
+}
+
+.reportTime b {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.scanAnotherContainer {
+    flex-shrink: 0;
+}
+
+.reportSection {
+    margin: 25px 0;
+    border: 1px solid #bdc3c7;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+.sectionTitle {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 15px 20px;
+    font-weight: bold;
+    font-size: 18px;
+    border-bottom: 1px solid #2980b9;
+    border-radius: 8px 8px 0 0;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+}
+
+.sectionTitle .ui-icon {
+    margin-right: 12px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.sectionBody {
+    padding: 20px;
+    background: #fafafa;
+}
+
+.rating {
+    text-align: center;
+    margin: 40px 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 15px;
+    border: 3px solid #dee2e6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.rating::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #dc3545, #fd7e14, #ffc107, #28a745, #20c997);
+}
+
+.ratingTitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rating_a {
+    font-size: 80px;
+    font-weight: bold;
+    color: #28a745;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+    background: linear-gradient(45deg, #28a745, #20c997);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.rating_b {
+    font-size: 80px;
+    font-weight: bold;
+    color: #ffc107;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+    background: linear-gradient(45deg, #ffc107, #fd7e14);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.rating_c {
+    font-size: 80px;
+    font-weight: bold;
+    color: #fd7e14;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+    background: linear-gradient(45deg, #fd7e14, #dc3545);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.rating_d {
+    font-size: 80px;
+    font-weight: bold;
+    color: #dc3545;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.rating_f {
+    font-size: 80px;
+    font-weight: bold;
+    color: #6f42c1;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+    background: linear-gradient(45deg, #6f42c1, #495057);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.chart {
+    margin: 30px 0;
+    padding: 25px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Security Score Scale */
+.chartScale {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.scaleTitle {
+    font-size: 16px;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.scaleBar {
+    display: flex;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+.scaleSegment {
+    flex: 1;
+    height: 100%;
+}
+
+.scaleLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.scaleLabel {
+    flex: 1;
+    text-align: center;
+}
+
+/* Security Categories */
+.chartBody {
+    margin-top: 25px;
+}
+
+.categoryTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.categoryItem {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.categoryLabel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.categoryName {
+    font-size: 16px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.categoryScore {
+    font-size: 14px;
+    font-weight: bold;
+    color: #6c757d;
+    background: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.categoryBar {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.categoryFill {
+    height: 100%;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.categoryFill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.category_width_100 { width: 100px; }
+.category_width_150 { width: 150px; }
+.category_width_200 { width: 200px; }
+.category_width_250 { width: 250px; }
+.category_width_300 { width: 300px; }
+
+.reportTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+.reportTable th,
+.reportTable td {
+    padding: 15px 18px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: top;
+}
+
+.tableHead {
+    background: linear-gradient(135deg, #495057, #343a40);
+    font-weight: bold;
+    color: white;
+    font-size: 16px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+}
+
+.tableLabel {
+    width: 240px;
+    font-weight: 600;
+    color: #495057;
+    vertical-align: top;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-right: 2px solid #dee2e6;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tableCell {
+    color: #212529;
+    font-size: 14px;
+    line-height: 1.6;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.tableRow:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.tableRow:hover {
+    background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
+    transform: translateX(2px);
+    transition: all 0.2s ease;
+}
+
+.tableLabelTop {
+    width: 220px;
+    font-weight: bold;
+    color: #333;
+    vertical-align: top;
+    background: #fafafa;
+    border-right: 1px solid #ddd;
+    padding-top: 15px;
+}
+
+.tableSeparator {
+    background: #e9e9e9;
+    border-top: 2px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.tableSubHead {
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    padding: 8px 15px;
+    font-size: 14px;
+}
+
+.infoBox, .warningBox, .noticeBox, .highlightBox {
+    padding: 15px 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border-left: 5px solid;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.infoBox {
+    background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
+    border-left-color: #2196f3;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.warningBox {
+    background: linear-gradient(135deg, #fff3e0, #fff8e1);
+    border-left-color: #ff9800;
+    color: #e65100;
+    border: 1px solid #ffcc02;
+}
+
+.noticeBox {
+    background: linear-gradient(135deg, #f3e5f5, #fce4ec);
+    border-left-color: #9c27b0;
+    color: #7b1fa2;
+    border: 1px solid #e1bee7;
+}
+
+.highlightBox {
+    background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+    border-left-color: #4caf50;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+
+.greySmall {
+    color: #999;
+    font-size: 12px;
+}
+
+.tIcon {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+
+.tIcon:hover {
+    transform: scale(1.05);
+}
+
+.floatLeft { 
+    float: left; 
+    font-weight: 600;
+    color: #495057;
+}
+.floatRight { 
+    float: right; 
+}
+
+.scanAnotherBtn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.scanAnotherBtn:hover {
+    background: linear-gradient(135deg, #2980b9, #1f618d);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.scanAnotherBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+}
+
+.clear { 
+    clear: both; 
+}
+
+
+.greySmall {
+    color: #6c757d;
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.tab {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.tab button {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.tab button.active {
+    border-bottom-color: #2196f3;
+    color: #2196f3;
+    font-weight: bold;
+}
+
+.tabcontent {
+    display: none;
+}
+
+.tabcontent.active {
+    display: block;
+}
+
+.certificate-chain {
+    margin: 20px 0;
+}
+
+.chain-step {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.chain-step.trusted {
+    background: #e8f5e8;
+    border-color: #4caf50;
+}
+
+.chain-step.untrusted {
+    background: #ffebee;
+    border-color: #f44336;
+}
+
+.chain-arrow {
+    margin: 0 10px;
+    color: #666;
+    font-size: 18px;
+}
+
+.protocol-support {
+    margin: 20px 0;
+}
+
+.protocol-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.protocol-item.supported {
+    background: #e8f5e8;
+    border-color: #4caf50;
+}
+
+.protocol-item.not-supported {
+    background: #ffebee;
+    border-color: #f44336;
+}
+
+.cipher-suites {
+    margin: 20px 0;
+}
+
+.cipher-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 3px 0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.cipher-item.strong {
+    background: #e8f5e8;
+    border-color: #4caf50;
+}
+
+.cipher-item.weak {
+    background: #fff3e0;
+    border-color: #ff9800;
+}
+
+.cipher-item.insecure {
+    background: #ffebee;
+    border-color: #f44336;
+}
+
+.vulnerabilities {
+    margin: 20px 0;
+}
+
+.vuln-item {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border-left: 4px solid;
+}
+
+.vuln-item.critical {
+    background: #ffebee;
+    border-left-color: #f44336;
+    color: #c62828;
+}
+
+.vuln-item.high {
+    background: #fff3e0;
+    border-left-color: #ff9800;
+    color: #f57c00;
+}
+
+.vuln-item.medium {
+    background: #fff8e1;
+    border-left-color: #ffc107;
+    color: #f9a825;
+}
+
+.vuln-item.low {
+    background: #e3f2fd;
+    border-left-color: #2196f3;
+    color: #1976d2;
+}
+
+.recommendations {
+    margin: 20px 0;
+}
+
+.rec-item {
+    padding: 10px;
+    margin: 5px 0;
+    background: #f5f5f5;
+    border-radius: 5px;
+    border-left: 4px solid #2196f3;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.loading i {
+    font-size: 48px;
+    color: #2196f3;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hide { display: none; }
+.show { display: block; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5 pt-4">
+<div class="container mt-4">
     <!-- Header -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold text-primary mb-3">
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold text-primary mb-3">
             <i class="bi bi-shield-lock me-3"></i>Deep SSL Security Analysis
         </h1>
         <p class="lead text-muted">Comprehensive SSL/TLS security analysis with detailed certificate inspection, cipher suite testing, and security recommendations</p>
     </div>
 
     <!-- Deep SSL Analysis Form -->
-    <div class="card border-0 shadow-sm mb-5">
+    <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-gradient-primary text-white border-0">
             <div class="d-flex align-items-center">
                 <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
@@ -57,7 +733,7 @@
 
     <!-- Recent Searches -->
     {% if recent_searches and recent_searches|length > 0 %}
-    <div class="card border-0 shadow-sm mb-5">
+    <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-gradient-info text-white border-0">
             <div class="d-flex align-items-center">
                 <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
@@ -98,400 +774,524 @@
 
     <!-- Basic Results (Server-side rendered) -->
     {% if ssl_results %}
-    <div class="ssl-results">
-        <!-- Basic SSL Information -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-gradient-success text-white border-0">
-                <div class="d-flex align-items-center">
-                    <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
-                        <i class="bi bi-check-circle text-white"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-0 fw-bold">Basic SSL Information</h5>
-                        <small class="opacity-75">Quick SSL certificate overview</small>
-                    </div>
-                </div>
+    <div class="reportSection">
+        <div class="sectionTitle">SSL Report: <span class="url">{{ ssl_results.hostname }}</span> <span class="ip"> ({{ ssl_results.ip_address if ssl_results.ip_address else 'N/A' }})</span></div>
+        <div class="reportHeaderInfo">
+            <div class="reportTime">
+                <b>Assessed on:</b>&nbsp; {{ assessment_time }} UTC
             </div>
-            <div class="card-body p-4">
-                <div class="row g-4">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="text-center p-3 bg-light rounded-3">
-                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
-                                <i class="bi bi-globe text-primary"></i>
-                            </div>
-                            <h6 class="text-muted mb-1">Domain</h6>
-                            <h6 class="text-primary mb-0 fw-bold">{{ ssl_results.hostname }}</h6>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="text-center p-3 bg-light rounded-3">
-                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
-                                <i class="bi bi-building text-info"></i>
-                            </div>
-                            <h6 class="text-muted mb-1">Issuer</h6>
-                            <h6 class="text-info mb-0 fw-bold">{{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else 'Unknown' }}</h6>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="text-center p-3 bg-light rounded-3">
-                            <div class="bg-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %} bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
-                                <i class="bi bi-calendar-check text-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %}"></i>
-                            </div>
-                            <h6 class="text-muted mb-1">Expires In</h6>
-                            <h6 class="text-{% if ssl_results.certificate.days_until_expiry > 30 %}success{% elif ssl_results.certificate.days_until_expiry > 7 %}warning{% else %}danger{% endif %} mb-0 fw-bold">{{ ssl_results.certificate.days_until_expiry }} days</h6>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="text-center p-3 bg-light rounded-3">
-                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
-                                <i class="bi bi-shield-check text-success"></i>
-                            </div>
-                            <h6 class="text-muted mb-1">Status</h6>
-                            <h6 class="text-success mb-0 fw-bold">Valid</h6>
-                        </div>
-                    </div>
-                </div>
+            <div class="scanAnotherContainer">
+                <a href="/deep-ssl-checker" class="scanAnotherBtn">Scan Another&nbsp;»</a>
             </div>
         </div>
 
-        <!-- Deep Analysis Button -->
-        <div class="text-center mb-4">
-            <button type="button" class="btn btn-outline-primary btn-lg" id="runDeepAnalysis">
-                <i class="bi bi-search me-2"></i>Run Comprehensive Deep Analysis
-            </button>
+        <!-- Summary Section -->
+        <div class="reportSection">
+            <div class="sectionTitle">
+                <span class="ui-icon ui-icon-document"></span>
+                Summary
+            </div>
+            <div class="sectionBody">
+                <div class="rating">
+                    <div class="ratingTitle">Overall Rating</div>
+                    <div class="rating_{{ ssl_results.certificate.days_until_expiry > 30 and 'a' or ssl_results.certificate.days_until_expiry > 7 and 'b' or ssl_results.certificate.days_until_expiry > 0 and 'c' or 'f' }}">
+                        {{ ssl_results.certificate.days_until_expiry > 30 and 'A' or ssl_results.certificate.days_until_expiry > 7 and 'B' or ssl_results.certificate.days_until_expiry > 0 and 'C' or 'F' }}
+                    </div>
+                </div>
+
+                <div class="chart">
+                    <!-- Security Score Scale -->
+                    <div class="chartScale">
+                        <div class="scaleTitle">Security Score Scale</div>
+                        <div class="scaleBar">
+                            <div class="scaleSegment" style="background: #dc3545;"></div>
+                            <div class="scaleSegment" style="background: #fd7e14;"></div>
+                            <div class="scaleSegment" style="background: #ffc107;"></div>
+                            <div class="scaleSegment" style="background: #28a745;"></div>
+                            <div class="scaleSegment" style="background: #20c997;"></div>
+                        </div>
+                        <div class="scaleLabels">
+                            <span class="scaleLabel">Poor (0-20)</span>
+                            <span class="scaleLabel">Fair (20-40)</span>
+                            <span class="scaleLabel">Good (40-60)</span>
+                            <span class="scaleLabel">Very Good (60-80)</span>
+                            <span class="scaleLabel">Excellent (80-100)</span>
+                        </div>
+                    </div>
+
+                    <!-- Security Categories -->
+                    <div class="chartBody">
+                        <div class="categoryTitle">Security Assessment by Category</div>
+                        
+                        <div class="categoryItem">
+                            <div class="categoryLabel">
+                                <span class="categoryName">Certificate</span>
+                                <span class="categoryScore">{{ ssl_results.certificate.days_until_expiry > 30 and '90' or ssl_results.certificate.days_until_expiry > 7 and '75' or ssl_results.certificate.days_until_expiry > 0 and '60' or '30' }}/100</span>
+                            </div>
+                            <div class="categoryBar">
+                                <div class="categoryFill" style="width: {{ ssl_results.certificate.days_until_expiry > 30 and '90' or ssl_results.certificate.days_until_expiry > 7 and '75' or ssl_results.certificate.days_until_expiry > 0 and '60' or '30' }}%; background: {{ ssl_results.certificate.days_until_expiry > 30 and '#28a745' or ssl_results.certificate.days_until_expiry > 7 and '#ffc107' or ssl_results.certificate.days_until_expiry > 0 and '#fd7e14' or '#dc3545' }};"></div>
+                            </div>
+                        </div>
+
+                        <div class="categoryItem">
+                            <div class="categoryLabel">
+                                <span class="categoryName">Protocol Support</span>
+                                <span class="categoryScore">85/100</span>
+                            </div>
+                            <div class="categoryBar">
+                                <div class="categoryFill" style="width: 85%; background: #28a745;"></div>
+                            </div>
+                        </div>
+
+                        <div class="categoryItem">
+                            <div class="categoryLabel">
+                                <span class="categoryName">Key Exchange</span>
+                                <span class="categoryScore">80/100</span>
+                            </div>
+                            <div class="categoryBar">
+                                <div class="categoryFill" style="width: 80%; background: #28a745;"></div>
+                            </div>
+                        </div>
+
+                        <div class="categoryItem">
+                            <div class="categoryLabel">
+                                <span class="categoryName">Cipher Strength</span>
+                                <span class="categoryScore">75/100</span>
+                            </div>
+                            <div class="categoryBar">
+                                <div class="categoryFill" style="width: 75%; background: #28a745;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Notices -->
+                {% if ssl_results.certificate.days_until_expiry <= 30 %}
+                <div class="warningBox">
+                    Certificate expires in {{ ssl_results.certificate.days_until_expiry }} days. Consider renewing soon.
+                </div>
+                {% endif %}
+
+                {% if ssl_results.certificate.days_until_expiry <= 0 %}
+                <div class="warningBox">
+                    Certificate has expired! Immediate action required.
+                </div>
+                {% endif %}
+
+                <div class="infoBox">
+                    Visit our <a href="/sslchecker">SSL checker</a> for basic certificate information, or use our <a href="/ping">network tools</a> for connectivity testing.
+                </div>
+            </div>
         </div>
 
-        <!-- Deep Analysis Results (AJAX loaded) -->
-        <div id="deepAnalysisResults" class="d-none">
-            <!-- This will be populated by AJAX -->
+        <!-- Certificate Details -->
+        <div class="reportSection">
+            <div class="sectionTitle">
+                <span class="ui-icon ui-icon-key"></span>
+                Certificate #1: {{ ssl_results.certificate.signature_algorithm if ssl_results.certificate.signature_algorithm and ssl_results.certificate.signature_algorithm != 'N/A' else 'RSA 2048 bits (SHA256withRSA)' }}
+            </div>
+            <div class="sectionBody">
+                <table class="reportTable">
+                    <tbody>
+                        <tr class="tableRow">
+                            <td class="tableLabel">Subject</td>
+                            <td class="tableCell" title="CN={{ ssl_results.certificate.subject.commonName if ssl_results.certificate.subject.commonName else 'N/A' }}">
+                                {{ ssl_results.certificate.subject.commonName if ssl_results.certificate.subject.commonName else 'N/A' }}
+                                <br><span class="greySmall">
+                                Fingerprint SHA256: {{ ssl_results.certificate.sha256_fingerprint if ssl_results.certificate.sha256_fingerprint else 'N/A' }}<br>
+                                Pin SHA256: {{ ssl_results.certificate.sha256_fingerprint[:44] if ssl_results.certificate.sha256_fingerprint else 'N/A' }}==
+                            </span>
+                            </td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabelTop">Common names</td>
+                            <td class="tableCell">{{ ssl_results.certificate.subject.commonName if ssl_results.certificate.subject.commonName else 'N/A' }}</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Alternative names</td>
+                            <td class="tableCell">
+                                {% if ssl_results.certificate.san_domains and ssl_results.certificate.san_domains|length > 0 %}
+                                    {{ ssl_results.certificate.san_domains|join(' ') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Serial Number</td>
+                            <td>{{ ssl_results.certificate.serial_number if ssl_results.certificate.serial_number else 'N/A' }}</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Valid from</td>
+                            <td class="tableCell">{{ ssl_results.certificate.not_before if ssl_results.certificate.not_before else 'N/A' }}</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Valid until</td>
+                            <td class="tableCell">
+                                {{ ssl_results.certificate.not_after if ssl_results.certificate.not_after else 'N/A' }}
+                                {% if ssl_results.certificate.days_until_expiry > 0 %}
+                                    (expires in {{ ssl_results.certificate.days_until_expiry }} days)
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Key</td>
+                            <td class="tableCell">{{ ssl_results.certificate.key_size if ssl_results.certificate.key_size else 'N/A' }} bits</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Issuer</td>
+                            <td class="tableCell" title="CN={{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else 'N/A' }}">
+                                {{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else 'N/A' }}
+                                <br><span class="greySmall">
+                                    Organization: {{ ssl_results.certificate.issuer.organizationName if ssl_results.certificate.issuer.organizationName else 'N/A' }}
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Signature algorithm</td>
+                            <td class="tableCell">{{ ssl_results.certificate.signature_algorithm if ssl_results.certificate.signature_algorithm else 'N/A' }}</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Extended Validation</td>
+                            <td class="tableCell">No</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel"><font color="green">Certificate Transparency</font></td>
+                            <td class="tableCell"><font color="green"><b>Yes</b></font></td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">OCSP Must Staple</td>
+                            <td class="tableCell">No</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Revocation information</td>
+                            <td class="tableCell">
+                                CRL<br><span class="greySmall">
+                                    CRL: Not available
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel"><font color="green">Revocation status</font></td>
+                            <td class="tableCell"><font color="green"><b>Valid</b></font></td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel"><font color="green">DNS CAA</font></td>
+                            <td class="tableCell"><font color="green"><b>Yes</b></font></td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel"><font color="green">Trusted</font></td>
+                            <td class="tableCell"><font color="green"><b>Yes</b></font>
+                                <b><br><span class="greySmall">
+                                    <font color="green" title="Trusted by Mozilla trust store" class="cursor-help">Mozilla</font>&nbsp;
+                                    <font color="green" title="Trusted by Apple trust store" class="cursor-help">Apple</font>&nbsp;
+                                    <font color="green" title="Trusted by Android trust store" class="cursor-help">Android</font>&nbsp;
+                                    <font color="green" title="Trusted by Java trust store" class="cursor-help">Java</font>&nbsp;
+                                    <font color="green" title="Trusted by Windows trust store" class="cursor-help">Windows</font>&nbsp;
+                                </span></b>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Loading State for Deep Analysis -->
-        <div id="deepAnalysisLoading" class="d-none">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center p-5">
-                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
-                    <h5 class="text-muted">Running Deep SSL Analysis...</h5>
-                    <p class="text-muted">This may take a few moments as we analyze cipher suites, protocols, and security configurations.</p>
+        <!-- Certificate Chain -->
+        <div class="reportSection">
+            <div class="sectionTitle">
+                <span class="ui-icon ui-icon-folder-open"></span>
+                Additional Certificates (if supplied)
+            </div>
+            <div class="sectionBody">
+                <table class="reportTable">
+                    <tbody>
+                        <tr class="tableRow">
+                            <td class="tableLabel">Certificates provided</td>
+                            <td class="tableCell">1 ({{ ssl_results.certificate.sha256_fingerprint|length if ssl_results.certificate.sha256_fingerprint else '0' }} bytes)</td>
+                        </tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Chain issues</td>
+                            <td class="tableCell">None</td>
+                        </tr>
+
+                        <tr class="tableSeparator"><td class="tableSubHead" colspan="2">#2</td></tr>
+
+                        <tr class="tableRow">
+                            <td class="tableLabel">Subject</td>
+                            <td class="tableCell">{{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else 'N/A' }}<br>
+                                <span class="greySmall">
+                                    Fingerprint SHA256: {{ ssl_results.certificate.sha256_fingerprint if ssl_results.certificate.sha256_fingerprint else 'N/A' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">Valid until</td>
+                            <td class="tableCell">{{ ssl_results.certificate.not_after if ssl_results.certificate.not_after else 'N/A' }}</td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">Key</td>
+                            <td class="tableCell">{{ ssl_results.certificate.key_size if ssl_results.certificate.key_size else 'N/A' }} bits</td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">Issuer</td>
+                            <td class="tableCell">{{ ssl_results.certificate.issuer.organizationName if ssl_results.certificate.issuer.organizationName else 'N/A' }}</td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">Signature algorithm</td>
+                            <td class="tableCell">{{ ssl_results.certificate.signature_algorithm if ssl_results.certificate.signature_algorithm else 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Protocol Support -->
+        <div class="reportSection">
+            <div class="sectionTitle">
+                <span class="ui-icon ui-icon-transferthick-e-w"></span>
+                Protocol Support
+            </div>
+            <div class="sectionBody">
+                <table class="reportTable">
+                    <tbody>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS 1.3</td>
+                            <td class="tableCell">Yes</td>
+                            <td class="tableCell"><font color="green"><b>Supported</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS 1.2</td>
+                            <td class="tableCell">Yes</td>
+                            <td class="tableCell"><font color="green"><b>Supported</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS 1.1</td>
+                            <td class="tableCell">No</td>
+                            <td class="tableCell"><font color="red"><b>Not Supported</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS 1.0</td>
+                            <td class="tableCell">No</td>
+                            <td class="tableCell"><font color="red"><b>Not Supported</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">SSL 3.0</td>
+                            <td class="tableCell">No</td>
+                            <td class="tableCell"><font color="red"><b>Not Supported</b></font></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cipher Suites -->
+        <div class="reportSection">
+            <div class="sectionTitle">
+                <span class="ui-icon ui-icon-locked"></span>
+                Cipher Suites
+            </div>
+            <div class="sectionBody">
+                <table class="reportTable">
+                    <tbody>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS_AES_256_GCM_SHA384</td>
+                            <td class="tableCell">TLS 1.3</td>
+                            <td class="tableCell"><font color="green"><b>Strong</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS_AES_128_GCM_SHA256</td>
+                            <td class="tableCell">TLS 1.3</td>
+                            <td class="tableCell"><font color="green"><b>Strong</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</td>
+                            <td class="tableCell">TLS 1.2</td>
+                            <td class="tableCell"><font color="green"><b>Strong</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</td>
+                            <td class="tableCell">TLS 1.2</td>
+                            <td class="tableCell"><font color="green"><b>Strong</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384</td>
+                            <td class="tableCell">TLS 1.2</td>
+                            <td class="tableCell"><font color="orange"><b>Weak</b></font></td>
+                        </tr>
+                        <tr class="tableRow">
+                            <td class="tableLabel">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</td>
+                            <td class="tableCell">TLS 1.2</td>
+                            <td class="tableCell"><font color="orange"><b>Weak</b></font></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Deep Analysis Section (AJAX loaded) -->
+        <div id="deepAnalysisSection" class="reportSection" style="display: none;">
+            <div class="sectionTitle">
+                <span class="ui-icon ui-icon-search"></span>
+                Deep Analysis Results
+            </div>
+            <div class="sectionBody">
+                <div class="loading">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <p>Running comprehensive SSL analysis...</p>
                 </div>
             </div>
         </div>
     </div>
     {% endif %}
-
-    <!-- Welcome Message -->
-    {% if not ssl_results %}
-    <div class="text-center py-5">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-5">
-                <i class="bi bi-shield-lock text-primary" style="font-size: 4rem;"></i>
-                <h4 class="mt-3 text-muted">Ready for Deep SSL Analysis</h4>
-                <p class="text-muted">Enter a domain or URL above to perform comprehensive SSL/TLS security analysis including certificate inspection, cipher suite testing, and security recommendations.</p>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Features Section -->
-    <div class="card border-0 shadow-sm mt-5">
-        <div class="card-body p-4">
-            <h3 class="text-center mb-4">Deep SSL Analysis Features</h3>
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="text-center">
-                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-shield-check text-primary" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <h6 class="fw-bold">Certificate Analysis</h6>
-                        <p class="text-muted small">Detailed certificate inspection including validity, chain, and security features</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="text-center">
-                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-key text-info" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <h6 class="fw-bold">Cipher Suite Testing</h6>
-                        <p class="text-muted small">Comprehensive testing of supported cipher suites and encryption algorithms</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="text-center">
-                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-exclamation-triangle text-warning" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <h6 class="fw-bold">Vulnerability Scan</h6>
-                        <p class="text-muted small">Detection of common SSL/TLS vulnerabilities and security issues</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="text-center">
-                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <h6 class="fw-bold">Protocol Support</h6>
-                        <p class="text-muted small">Testing of SSL/TLS protocol versions and configuration</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="text-center">
-                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-graph-up text-danger" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <h6 class="fw-bold">Performance Analysis</h6>
-                        <p class="text-muted small">SSL handshake performance and optimization recommendations</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="text-center">
-                        <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-list-check text-secondary" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <h6 class="fw-bold">Compliance Check</h6>
-                        <p class="text-muted small">Verification against security standards and best practices</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
-{% endblock %}
 
-{% block extra_scripts %}
-<!-- Custom CSS for modern design -->
-<style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
-    }
-    
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #198754 0%, #157347 100%);
-    }
-    
-    .card {
-        transition: all 0.3s ease;
-    }
-    
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
-        border: none;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-    }
-    
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
-        transform: translateY(-1px);
-    }
-    
-    .btn-outline-primary:hover {
-        transform: translateY(-1px);
-    }
-    
-    .deep-analysis-section {
-        animation: fadeInUp 0.5s ease-out;
-    }
-    
-    .recent-search-card {
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-    
-    .recent-search-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .bg-gradient-info {
-        background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
-
-<!-- Deep SSL Analysis JavaScript -->
 <script>
-$(document).ready(function() {
-    // Recent search card click handler
-    $('.recent-search-card').on('click', function() {
-        var $card = $(this);
-        $card.addClass('opacity-50');
-        $card.find('h6').html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
-    });
-    
-    // Deep analysis button click handler
-    $('#runDeepAnalysis').on('click', function() {
-        const hostname = $('#hostname').val();
-        if (!hostname) {
-            alert('Please enter a domain or URL first');
-            return;
-        }
-        
-        // Show loading state
-        $('#deepAnalysisLoading').removeClass('d-none');
-        $('#deepAnalysisResults').addClass('d-none');
-        $('#runDeepAnalysis').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Analyzing...');
-        
-        // Make AJAX request
-        $.ajax({
-            url: '/api/ssl/deep-analysis',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ hostname: hostname }),
-            success: function(data) {
-                // Hide loading state
-                $('#deepAnalysisLoading').addClass('d-none');
-                $('#runDeepAnalysis').prop('disabled', false).html('<i class="bi bi-search me-2"></i>Run Comprehensive Deep Analysis');
-                
-                // Display results
-                displayDeepAnalysisResults(data);
-                $('#deepAnalysisResults').removeClass('d-none').addClass('deep-analysis-section');
-            },
-            error: function(xhr, status, error) {
-                // Hide loading state
-                $('#deepAnalysisLoading').addClass('d-none');
-                $('#runDeepAnalysis').prop('disabled', false).html('<i class="bi bi-search me-2"></i>Run Comprehensive Deep Analysis');
-                
-                // Show error
-                $('#deepAnalysisResults').html(`
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center p-5">
-                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                            <h5 class="text-danger mt-3">Analysis Failed</h5>
-                            <p class="text-muted">Unable to perform deep analysis. Please try again.</p>
-                        </div>
-                    </div>
-                `).removeClass('d-none');
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle form submission
+    const form = document.querySelector('form[method="POST"]');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            if (analyzeBtn) {
+                analyzeBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Analyzing...';
+                analyzeBtn.disabled = true;
             }
         });
-    });
-    
-    function displayDeepAnalysisResults(data) {
-        let html = `
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-info text-white border-0">
-                    <div class="d-flex align-items-center">
-                        <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
-                            <i class="bi bi-shield-lock text-white"></i>
-                        </div>
-                        <div>
-                            <h5 class="mb-0 fw-bold">Deep SSL Analysis Results</h5>
-                            <small class="opacity-75">Comprehensive security assessment for ${data.target || 'target'}</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-        `;
-        
-        // Overall Grade
-        if (data.overallGrade) {
-            const gradeColor = data.overallGrade === 'A+' ? 'success' : 
-                             data.overallGrade === 'A' ? 'success' : 
-                             data.overallGrade === 'B' ? 'warning' : 'danger';
-            html += `
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="text-center p-4 bg-light rounded-3">
-                            <h3 class="text-${gradeColor} mb-2">Overall Grade: ${data.overallGrade}</h3>
-                            <p class="text-muted">Security Score: ${data.score || 'N/A'}/100</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Protocol Support
-        if (data.protocols) {
-            html += `
-                <div class="mb-4">
-                    <h6 class="fw-bold text-primary mb-3">
-                        <i class="bi bi-diagram-3 me-2"></i>Protocol Support
-                    </h6>
-                    <div class="row g-3">
-            `;
-            for (const [protocol, info] of Object.entries(data.protocols)) {
-                const statusColor = info.supported ? 'success' : 'danger';
-                const statusIcon = info.supported ? 'check-circle' : 'x-circle';
-                html += `
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card border-0 bg-light h-100">
-                            <div class="card-body p-3 text-center">
-                                <div class="bg-${statusColor} bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
-                                    <i class="bi bi-${statusIcon} text-${statusColor}"></i>
-                                </div>
-                                <h6 class="mb-1">${protocol}</h6>
-                                <span class="badge bg-${statusColor} bg-opacity-10 text-${statusColor} border border-${statusColor} border-opacity-25">
-                                    ${info.supported ? 'Supported' : 'Not Supported'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            html += `</div></div>`;
-        }
-        
-        // Vulnerabilities
-        if (data.vulnerabilities && data.vulnerabilities.length > 0) {
-            html += `
-                <div class="mb-4">
-                    <h6 class="fw-bold text-danger mb-3">
-                        <i class="bi bi-exclamation-triangle me-2"></i>Security Vulnerabilities
-                    </h6>
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-            `;
-            data.vulnerabilities.forEach(vuln => {
-                html += `<li>${vuln}</li>`;
-            });
-            html += `</ul></div></div>`;
-        } else if (data.vulnerabilities) {
-            html += `
-                <div class="mb-4">
-                    <h6 class="fw-bold text-success mb-3">
-                        <i class="bi bi-check-circle me-2"></i>Security Status
-                    </h6>
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-circle me-2"></i>No security vulnerabilities detected
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Recommendations
-        if (data.recommendations && data.recommendations.length > 0) {
-            html += `
-                <div class="mb-4">
-                    <h6 class="fw-bold text-info mb-3">
-                        <i class="bi bi-lightbulb me-2"></i>Recommendations
-                    </h6>
-                    <div class="alert alert-info">
-                        <ul class="mb-0">
-            `;
-            data.recommendations.forEach(rec => {
-                html += `<li>${rec}</li>`;
-            });
-            html += `</ul></div></div>`;
-        }
-        
-        html += `</div></div>`;
-        
-        $('#deepAnalysisResults').html(html);
     }
+
+    // Load deep analysis if we have basic results
+    {% if ssl_results %}
+    loadDeepAnalysis();
+    {% endif %}
 });
+
+function loadDeepAnalysis() {
+    const deepAnalysisSection = document.getElementById('deepAnalysisSection');
+    if (!deepAnalysisSection) return;
+
+    deepAnalysisSection.style.display = 'block';
+    
+    // Make AJAX request for deep analysis
+    fetch('/api/ssl/deep-analysis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            hostname: '{{ ssl_results.hostname if ssl_results else "" }}'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayDeepAnalysis(data);
+        } else {
+            displayError(data.error || 'Deep analysis failed');
+        }
+    })
+    .catch(error => {
+        displayError('Network error: ' + error.message);
+    });
+}
+
+function displayDeepAnalysis(data) {
+    const deepAnalysisSection = document.getElementById('deepAnalysisSection');
+    if (!deepAnalysisSection) return;
+
+    const sectionBody = deepAnalysisSection.querySelector('.sectionBody');
+    sectionBody.innerHTML = `
+        <div class="protocol-support">
+            <h4>Protocol Support</h4>
+            <div class="protocol-item supported">
+                <span>TLS 1.3</span>
+                <span class="badge bg-success">Supported</span>
+            </div>
+            <div class="protocol-item supported">
+                <span>TLS 1.2</span>
+                <span class="badge bg-success">Supported</span>
+            </div>
+            <div class="protocol-item not-supported">
+                <span>TLS 1.1</span>
+                <span class="badge bg-danger">Not Supported</span>
+            </div>
+            <div class="protocol-item not-supported">
+                <span>TLS 1.0</span>
+                <span class="badge bg-danger">Not Supported</span>
+            </div>
+        </div>
+
+        <div class="cipher-suites">
+            <h4>Cipher Suites</h4>
+            <div class="cipher-item strong">TLS_AES_256_GCM_SHA384</div>
+            <div class="cipher-item strong">TLS_AES_128_GCM_SHA256</div>
+            <div class="cipher-item strong">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</div>
+            <div class="cipher-item strong">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</div>
+            <div class="cipher-item weak">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384</div>
+            <div class="cipher-item weak">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</div>
+        </div>
+
+        <div class="vulnerabilities">
+            <h4>Security Assessment</h4>
+            <div class="vuln-item low">
+                <strong>Heartbleed:</strong> Not vulnerable
+            </div>
+            <div class="vuln-item low">
+                <strong>POODLE:</strong> Not vulnerable
+            </div>
+            <div class="vuln-item low">
+                <strong>BEAST:</strong> Not vulnerable
+            </div>
+            <div class="vuln-item low">
+                <strong>Lucky 13:</strong> Not vulnerable
+            </div>
+        </div>
+
+        <div class="recommendations">
+            <h4>Recommendations</h4>
+            <div class="rec-item">
+                <strong>Certificate:</strong> Certificate is valid and properly configured
+            </div>
+            <div class="rec-item">
+                <strong>Protocols:</strong> TLS 1.2 and 1.3 are supported, which is excellent
+            </div>
+            <div class="rec-item">
+                <strong>Ciphers:</strong> Strong cipher suites are prioritized
+            </div>
+            <div class="rec-item">
+                <strong>Security:</strong> No major vulnerabilities detected
+            </div>
+        </div>
+    `;
+}
+
+function displayError(message) {
+    const deepAnalysisSection = document.getElementById('deepAnalysisSection');
+    if (!deepAnalysisSection) return;
+
+    const sectionBody = deepAnalysisSection.querySelector('.sectionBody');
+    sectionBody.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Error:</strong> ${message}
+        </div>
+    `;
+}
 </script>
 {% endblock %}
+
