@@ -13,7 +13,7 @@ from .utils import get_recent_searches, save_recent_search
 # Create blueprint
 ssl_security_bp = Blueprint('ssl_security', __name__)
 
-@ssl_security_bp.route('/sslchecker', methods=['GET', 'POST'])
+@ssl_security_bp.route('/ssl-checker', methods=['GET', 'POST'])
 def ssl_checker():
     """SSL Checker tool page"""
     recent_searches = get_recent_searches(10)
@@ -45,13 +45,13 @@ def ssl_checker():
     # Fetch domain description
     domain_info = SSLAnalyzer.fetch_domain_description(prefill_domain) if prefill_domain else None
     
-    return render_template('sslchecker.html', 
+    return render_template('ssl-checker.html', 
                          recent_searches=recent_searches, 
                          ssl_results=ssl_results,
                          prefill_domain=prefill_domain,
                          domain_info=domain_info)
 
-@ssl_security_bp.route('/sslchecker/<domain>')
+@ssl_security_bp.route('/ssl-checker/<domain>')
 def ssl_checker_domain(domain):
     """SSL Certificate Checker for specific domain"""
     recent_searches = get_recent_searches(10)
@@ -66,13 +66,13 @@ def ssl_checker_domain(domain):
     # Fetch domain description
     domain_info = SSLAnalyzer.fetch_domain_description(domain)
     
-    return render_template('sslchecker.html', 
+    return render_template('ssl-checker.html', 
                          recent_searches=recent_searches, 
                          ssl_results=ssl_results,
                          prefill_domain=domain,
                          domain_info=domain_info)
 
-@ssl_security_bp.route('/deep-ssl-checker', methods=['GET', 'POST'])
+@ssl_security_bp.route('/ssl-deep-checker', methods=['GET', 'POST'])
 def deep_ssl_checker():
     """Deep SSL Checker tool page"""
     from datetime import datetime
@@ -109,14 +109,14 @@ def deep_ssl_checker():
     # Fetch domain description
     domain_info = SSLAnalyzer.fetch_domain_description(hostname) if hostname else None
     
-    return render_template('deep-ssl-checker.html', 
+    return render_template('ssl-deep-checker.html', 
                          recent_searches=recent_searches,
                          ssl_results=ssl_results,
                          hostname=hostname,
                          assessment_time=assessment_time,
                          domain_info=domain_info)
 
-@ssl_security_bp.route('/deep-ssl-checker/<domain>')
+@ssl_security_bp.route('/ssl-deep-checker/<domain>')
 def deep_ssl_checker_domain(domain):
     """Deep SSL Checker for specific domain"""
     from datetime import datetime
@@ -136,62 +136,62 @@ def deep_ssl_checker_domain(domain):
     # Fetch domain description
     domain_info = SSLAnalyzer.fetch_domain_description(domain)
     
-    return render_template('deep-ssl-checker.html', 
+    return render_template('ssl-deep-checker.html', 
                          recent_searches=recent_searches,
                          ssl_results=ssl_results,
                          hostname=domain,
                          assessment_time=assessment_time,
                          domain_info=domain_info)
 
-@ssl_security_bp.route('/csr-decoder', methods=['GET', 'POST'])
+@ssl_security_bp.route('/ssl-csr-decoder', methods=['GET', 'POST'])
 def csr_decoder():
     """CSR Decoder tool page"""
     if request.method == 'POST':
         csr = request.form.get('csr', '').strip()
         
         if not csr:
-            return render_template('csr-decoder.html', 
+            return render_template('ssl-csr-decoder.html', 
                                  csr=csr,
                                  csr_result={'success': False, 'error': 'CSR is required'})
         
         try:
             # Decode the CSR
             result = CSRDecoder.decode_csr(csr)
-            return render_template('csr-decoder.html', 
+            return render_template('ssl-csr-decoder.html', 
                                  csr=csr,
                                  csr_result=result)
         except Exception as e:
-            return render_template('csr-decoder.html', 
+            return render_template('ssl-csr-decoder.html', 
                                  csr=csr,
                                  csr_result={'success': False, 'error': str(e)})
     
-    return render_template('csr-decoder.html')
+    return render_template('ssl-csr-decoder.html')
 
-@ssl_security_bp.route('/certificate-decoder', methods=['GET', 'POST'])
+@ssl_security_bp.route('/ssl-certificate-decoder', methods=['GET', 'POST'])
 def certificate_decoder():
     """Certificate Decoder tool page"""
     if request.method == 'POST':
         certificate = request.form.get('certificate', '').strip()
         
         if not certificate:
-            return render_template('certificate-decoder.html', 
+            return render_template('ssl-certificate-decoder.html', 
                                  certificate=certificate,
                                  certificate_result={'success': False, 'error': 'Certificate is required'})
         
         try:
             # Decode the certificate
             result = CertificateDecoder.decode_certificate(certificate)
-            return render_template('certificate-decoder.html', 
+            return render_template('ssl-certificate-decoder.html', 
                                  certificate=certificate,
                                  certificate_result=result)
         except Exception as e:
-            return render_template('certificate-decoder.html', 
+            return render_template('ssl-certificate-decoder.html', 
                                  certificate=certificate,
                                  certificate_result={'success': False, 'error': str(e)})
     
-    return render_template('certificate-decoder.html')
+    return render_template('ssl-certificate-decoder.html')
 
-@ssl_security_bp.route('/certificate-key-matcher', methods=['GET', 'POST'])
+@ssl_security_bp.route('/ssl-certificate-key-matcher', methods=['GET', 'POST'])
 def certificate_key_matcher():
     """Certificate Key Matcher tool page"""
     if request.method == 'POST':
@@ -199,7 +199,7 @@ def certificate_key_matcher():
         private_key = request.form.get('private_key', '').strip()
         
         if not certificate or not private_key:
-            return render_template('certificate-key-matcher.html', 
+            return render_template('ssl-certificate-key-matcher.html', 
                                  certificate=certificate,
                                  private_key=private_key,
                                  match_result={'success': False, 'error': 'Both certificate and private key are required'})
@@ -207,17 +207,17 @@ def certificate_key_matcher():
         try:
             # Match the certificate and key
             result = CertificateKeyMatcher.match_certificate_key(certificate, private_key)
-            return render_template('certificate-key-matcher.html', 
+            return render_template('ssl-certificate-key-matcher.html', 
                                  certificate=certificate,
                                  private_key=private_key,
                                  match_result=result)
         except Exception as e:
-            return render_template('certificate-key-matcher.html', 
+            return render_template('ssl-certificate-key-matcher.html', 
                                  certificate=certificate,
                                  private_key=private_key,
                                  match_result={'success': False, 'error': str(e)})
     
-    return render_template('certificate-key-matcher.html')
+    return render_template('ssl-certificate-key-matcher.html')
 
 @ssl_security_bp.route('/api/ssl/certificate-key-match', methods=['POST'])
 def certificate_key_match_api():
@@ -474,7 +474,7 @@ def api_ssl_bulk_checker():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@ssl_security_bp.route('/ocsp-checker', methods=['GET', 'POST'])
+@ssl_security_bp.route('/ssl-ocsp-checker', methods=['GET', 'POST'])
 def ocsp_checker():
     """OCSP Status Checker tool page"""
     ocsp_results = None
@@ -499,7 +499,7 @@ def ocsp_checker():
                 ocsp_checker = OCSPChecker()
                 ocsp_results = ocsp_checker.check_ocsp_status(certificate_input)
     
-    return render_template('ocsp-checker.html', 
+    return render_template('ssl-ocsp-checker.html', 
                          ocsp_results=ocsp_results,
                          certificate_input=certificate_input)
 

@@ -1,55 +1,333 @@
 {% extends "base.html" %}
 
+{% block title %}Network Diagnostic Tools - Professional Network Testing & Analysis | NetHub Tools{% endblock %}
+{% block meta_description %}Professional network diagnostic tools for developers, system administrators, and network engineers. SSL checker, ping test, traceroute, port scanner, DNS lookup, and more. Free online network testing tools.{% endblock %}
+{% block meta_keywords %}network diagnostic tools, SSL checker, ping test, traceroute, port scanner, DNS lookup, network testing, network analysis, system administration, network engineering, online tools{% endblock %}
+{% block og_title %}Network Diagnostic Tools - Professional Network Testing & Analysis{% endblock %}
+{% block og_description %}Professional network diagnostic tools for developers, system administrators, and network engineers. SSL checker, ping test, traceroute, port scanner, DNS lookup, and more.{% endblock %}
+{% block canonical_url %}/{% endblock %}
+
+{% block extra_head %}
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 3rem;
+    border-radius: 0 0 2rem 2rem;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+}
+
+.tool-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.tool-card .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 2rem;
+}
+
+.tool-icon-large {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: white;
+    font-size: 2rem;
+}
+
+.tool-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.tool-card .card-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.tool-features {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.tool-feature-badge {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.tool-action-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.tool-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.feature-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stats-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    border-radius: 1rem;
+    margin: 3rem 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #ffffff;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.cta-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 3rem 0;
+    border-radius: 1rem;
+    margin: 3rem 0;
+    text-align: center;
+}
+
+.btn-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    text-align: center;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-10">
-        <!-- Page Header -->
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-primary mb-3">
-                <i class="bi bi-tools me-3"></i>Network Diagnostic Tools
-            </h1>
-            <p class="lead text-muted">Professional network testing and analysis tools for developers, system administrators, and network engineers</p>
-        </div>
-
-        <!-- Tool Categories -->
-        <div class="row mb-5">
-            <div class="col-md-4 mb-3">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
-                        <h4 class="card-title mt-3">SSL & Security Tools</h4>
-                        <p class="card-text">Comprehensive SSL certificate analysis, CSR decoding, certificate management, and security testing tools.</p>
-                        <a href="#ssl-tools" class="btn btn-outline-primary">View SSL Tools</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-diagram-3 text-primary" style="font-size: 3rem;"></i>
-                        <h4 class="card-title mt-3">Network Tools</h4>
-                        <p class="card-text">Ping testing, traceroute analysis, port scanning, DNS lookup, and network connectivity diagnostic tools.</p>
-                        <a href="#network-tools" class="btn btn-outline-primary">View Network Tools</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-gear text-primary" style="font-size: 3rem;"></i>
-                        <h4 class="card-title mt-3">Utility Tools</h4>
-                        <p class="card-text">Subnet calculators, text encoding/decoding, and other utility tools for network professionals.</p>
-                        <a href="#utility-tools" class="btn btn-outline-primary">View Utilities</a>
-                    </div>
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="hero-title">
+                    <i class="bi bi-tools me-3"></i>Network Diagnostic Tools
+                </h1>
+                <p class="hero-subtitle">
+                    Professional network testing and analysis tools for developers, system administrators, and network engineers. 
+                    Get instant insights into your network infrastructure with our comprehensive suite of diagnostic tools.
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="#ssl-tools" class="btn btn-light btn-lg px-4">
+                        <i class="bi bi-shield-check me-2"></i>SSL Tools
+                    </a>
+                    <a href="#network-tools" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-diagram-3 me-2"></i>Network Tools
+                    </a>
+                    <a href="#utility-tools" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-gear me-2"></i>Utilities
+                    </a>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- SSL & Security Tools Section -->
-        <div id="ssl-tools" class="mb-5">
-            <h2 class="h3 text-primary mb-4">
-                <i class="bi bi-shield-check me-2"></i>SSL & Security Tools
-            </h2>
+<div class="container">
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">18+</span>
+                    <span class="stat-label">Professional Tools</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Free to Use</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Available</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Registration Required</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool Categories -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="feature-card h-100">
+                <div class="tool-icon-large mb-3">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h4 class="card-title mt-3">SSL & Security Tools</h4>
+                <p class="card-text">Comprehensive SSL certificate analysis, CSR decoding, certificate management, and security testing tools for enterprise-grade security assessment.</p>
+                <a href="#ssl-tools" class="btn btn-modern">View SSL Tools</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-card h-100">
+                <div class="tool-icon-large mb-3">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+                <h4 class="card-title mt-3">Network Tools</h4>
+                <p class="card-text">Ping testing, traceroute analysis, port scanning, DNS lookup, and network connectivity diagnostic tools for comprehensive network analysis.</p>
+                <a href="#network-tools" class="btn btn-modern">View Network Tools</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-card h-100">
+                <div class="tool-icon-large mb-3">
+                    <i class="bi bi-gear"></i>
+                </div>
+                <h4 class="card-title mt-3">Utility Tools</h4>
+                <p class="card-text">Subnet calculators, text encoding/decoding, and other utility tools for network professionals and system administrators.</p>
+                <a href="#utility-tools" class="btn btn-modern">View Utilities</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SSL & Security Tools Section -->
+    <div id="ssl-tools" class="mb-5">
+        <h2 class="section-title">
+            <i class="bi bi-shield-check me-2"></i>SSL & Security Tools
+        </h2>
+        <p class="text-center text-muted mb-5">Comprehensive SSL certificate analysis and security testing tools for enterprise-grade security assessment</p>
             <div class="row g-4">
                 <!-- SSL Checker Tool -->
             <div class="col-lg-4 col-md-6 mb-4">
@@ -61,11 +339,11 @@
                         <h5 class="card-title">SSL Checker</h5>
                         <p class="card-text">Check SSL certificate validity, expiration dates, and security configuration for any domain or website.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">SSL Analysis</span>
-                            <span class="badge bg-primary me-1">Certificate Check</span>
-                            <span class="badge bg-primary me-1">Security Scan</span>
+                            <span class="tool-feature-badge">SSL Analysis</span>
+                            <span class="tool-feature-badge">Certificate Check</span>
+                            <span class="tool-feature-badge">Security Scan</span>
                         </div>
-                        <a href="/sslchecker" class="btn btn-primary mt-3">Use SSL Checker</a>
+                        <a href="/ssl-checker" class="tool-action-btn">Use SSL Checker</a>
                     </div>
                 </div>
             </div>
@@ -80,12 +358,12 @@
                         <h5 class="card-title">Deep SSL Analysis</h5>
                         <p class="card-text">Comprehensive SSL/TLS security analysis with detailed certificate chain, cipher suite evaluation, protocol testing, and vulnerability assessment.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">Deep Analysis</span>
-                            <span class="badge bg-primary me-1">Certificate Chain</span>
-                            <span class="badge bg-primary me-1">Cipher Suites</span>
-                            <span class="badge bg-primary me-1">Vulnerability Scan</span>
+                            <span class="tool-feature-badge">Deep Analysis</span>
+                            <span class="tool-feature-badge">Certificate Chain</span>
+                            <span class="tool-feature-badge">Cipher Suites</span>
+                            <span class="tool-feature-badge">Vulnerability Scan</span>
                         </div>
-                        <a href="/deep-ssl-checker" class="btn btn-primary mt-3">Use Deep Analysis</a>
+                        <a href="/ssl-deep-checker" class="tool-action-btn">Use Deep Analysis</a>
                     </div>
                 </div>
             </div>
@@ -100,11 +378,11 @@
                         <h5 class="card-title">CSR Decoder</h5>
                         <p class="card-text">Decode Certificate Signing Requests to extract detailed information including subject details, public key information, and signature algorithm.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">CSR Analysis</span>
-                            <span class="badge bg-primary me-1">Subject Details</span>
-                            <span class="badge bg-primary me-1">Public Key Info</span>
+                            <span class="tool-feature-badge">CSR Analysis</span>
+                            <span class="tool-feature-badge">Subject Details</span>
+                            <span class="tool-feature-badge">Public Key Info</span>
                         </div>
-                        <a href="/csr-decoder" class="btn btn-primary mt-3">Use CSR Decoder</a>
+                        <a href="/ssl-csr-decoder" class="tool-action-btn">Use CSR Decoder</a>
                     </div>
                 </div>
             </div>
@@ -119,11 +397,11 @@
                         <h5 class="card-title">Certificate Decoder</h5>
                         <p class="card-text">Decode SSL certificates to extract detailed information including subject, issuer, validity dates, and public key details.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">Certificate Decode</span>
-                            <span class="badge bg-primary me-1">Subject Analysis</span>
-                            <span class="badge bg-primary me-1">Validity Check</span>
+                            <span class="tool-feature-badge">Certificate Decode</span>
+                            <span class="tool-feature-badge">Subject Analysis</span>
+                            <span class="tool-feature-badge">Validity Check</span>
                         </div>
-                        <a href="/certificate-decoder" class="btn btn-primary mt-3">Use Certificate Decoder</a>
+                        <a href="/ssl-certificate-decoder" class="tool-action-btn">Use Certificate Decoder</a>
                     </div>
                 </div>
             </div>
@@ -138,11 +416,11 @@
                         <h5 class="card-title">Certificate Key Matcher</h5>
                         <p class="card-text">Match SSL certificates with their corresponding private keys to verify certificate-key pairs and ensure proper configuration.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">Key Matching</span>
-                            <span class="badge bg-primary me-1">Pair Verification</span>
-                            <span class="badge bg-primary me-1">Security Check</span>
+                            <span class="tool-feature-badge">Key Matching</span>
+                            <span class="tool-feature-badge">Pair Verification</span>
+                            <span class="tool-feature-badge">Security Check</span>
                         </div>
-                        <a href="/certificate-key-matcher" class="btn btn-primary mt-3">Use Key Matcher</a>
+                        <a href="/ssl-certificate-key-matcher" class="tool-action-btn">Use Key Matcher</a>
                     </div>
                 </div>
             </div>
@@ -157,11 +435,49 @@
                         <h5 class="card-title">SSL Converter</h5>
                         <p class="card-text">Convert between different SSL certificate formats including PEM, DER, PKCS#7, and PKCS#12 for various applications and systems.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">Format Conversion</span>
-                            <span class="badge bg-primary me-1">Multi-Format</span>
-                            <span class="badge bg-primary me-1">Easy Export</span>
+                            <span class="tool-feature-badge">Format Conversion</span>
+                            <span class="tool-feature-badge">Multi-Format</span>
+                            <span class="tool-feature-badge">Easy Export</span>
                         </div>
-                        <a href="/ssl-converter" class="btn btn-primary mt-3">Use SSL Converter</a>
+                        <a href="/ssl-converter" class="tool-action-btn">Use SSL Converter</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SSL Bulk Checker Tool -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 tool-card">
+                    <div class="card-body text-center">
+                        <div class="tool-icon-large mb-3">
+                            <i class="bi bi-list-check"></i>
+                        </div>
+                        <h5 class="card-title">SSL Bulk Checker</h5>
+                        <p class="card-text">Check multiple SSL certificates at once. Upload a list of domains or hostnames to perform bulk SSL certificate validation and analysis.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature-badge">Bulk Analysis</span>
+                            <span class="tool-feature-badge">Multiple Domains</span>
+                            <span class="tool-feature-badge">Batch Processing</span>
+                        </div>
+                        <a href="/ssl-bulk-checker" class="tool-action-btn">Use Bulk Checker</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OCSP Checker Tool -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 tool-card">
+                    <div class="card-body text-center">
+                        <div class="tool-icon-large mb-3">
+                            <i class="bi bi-shield-exclamation"></i>
+                        </div>
+                        <h5 class="card-title">OCSP Checker</h5>
+                        <p class="card-text">Check the revocation status of SSL certificates using the Online Certificate Status Protocol (OCSP) for real-time certificate validation.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature-badge">Revocation Check</span>
+                            <span class="tool-feature-badge">Real-time Status</span>
+                            <span class="tool-feature-badge">OCSP Protocol</span>
+                        </div>
+                        <a href="/ssl-ocsp-checker" class="tool-action-btn">Use OCSP Checker</a>
                     </div>
                 </div>
             </div>
@@ -176,12 +492,12 @@
                         <h5 class="card-title">Decode/Encode Tool</h5>
                         <p class="card-text">Convert text between different encoding formats including Base64, URL, HTML, Hex, Binary, and JSON encoding/decoding.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">Base64</span>
-                            <span class="badge bg-primary me-1">URL Encode</span>
-                            <span class="badge bg-primary me-1">HTML Entities</span>
-                            <span class="badge bg-primary me-1">Hex/Binary</span>
+                            <span class="tool-feature-badge">Base64</span>
+                            <span class="tool-feature-badge">URL Encode</span>
+                            <span class="tool-feature-badge">HTML Entities</span>
+                            <span class="tool-feature-badge">Hex/Binary</span>
                         </div>
-                        <a href="/decode-encode" class="btn btn-primary mt-3">Use Decode/Encode</a>
+                        <a href="/utils-decode-encode" class="tool-action-btn">Use Decode/Encode</a>
                     </div>
                 </div>
             </div>
@@ -189,11 +505,12 @@
             </div>
         </div>
 
-        <!-- Utility Tools Section -->
-        <div id="utility-tools" class="mb-5">
-            <h2 class="h3 text-primary mb-4">
-                <i class="bi bi-gear me-2"></i>Utility Tools
-            </h2>
+    <!-- Utility Tools Section -->
+    <div id="utility-tools" class="mb-5">
+        <h2 class="section-title">
+            <i class="bi bi-gear me-2"></i>Utility Tools
+        </h2>
+        <p class="text-center text-muted mb-5">Essential utility tools for network professionals and system administrators</p>
             <div class="row g-4">
                 <!-- IP Subnet Calculator Tool -->
                 <div class="col-lg-4 col-md-6 mb-4">
@@ -205,12 +522,12 @@
                         <h5 class="card-title">IP Subnet Calculator</h5>
                         <p class="card-text">Calculate IPv4 and IPv6 subnet information including network addresses, usable host ranges, subnet masks, and IP classes.</p>
                         <div class="tool-features">
-                            <span class="badge bg-primary me-1">IPv4 Calculator</span>
-                            <span class="badge bg-primary me-1">IPv6 Calculator</span>
-                            <span class="badge bg-primary me-1">Subnet Masks</span>
-                            <span class="badge bg-primary me-1">Host Ranges</span>
+                            <span class="tool-feature-badge">IPv4 Calculator</span>
+                            <span class="tool-feature-badge">IPv6 Calculator</span>
+                            <span class="tool-feature-badge">Subnet Masks</span>
+                            <span class="tool-feature-badge">Host Ranges</span>
                         </div>
-                        <a href="/subnet-calculator" class="btn btn-primary mt-3">Use Subnet Calculator</a>
+                        <a href="/utils-subnet-calculator" class="tool-action-btn">Use Subnet Calculator</a>
                     </div>
                 </div>
             </div>
@@ -218,153 +535,269 @@
             </div>
         </div>
 
-        <!-- Network Tools Section -->
-        <div id="network-tools" class="mb-5">
-            <h2 class="h3 text-primary mb-4">
-                <i class="bi bi-diagram-3 me-2"></i>Network Tools
-            </h2>
+    <!-- Network Tools Section -->
+    <div id="network-tools" class="mb-5">
+        <h2 class="section-title">
+            <i class="bi bi-diagram-3 me-2"></i>Network Tools
+        </h2>
+        <p class="text-center text-muted mb-5">Comprehensive network diagnostic tools for connectivity testing and network analysis</p>
             <div class="row g-4">
                 <!-- Ping Tool -->
                 <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 tool-card">
-                    <div class="card-body text-center">
-                        <div class="tool-icon-large mb-3">
-                            <i class="bi bi-broadcast"></i>
+                    <div class="card h-100 tool-card">
+                        <div class="card-body text-center">
+                            <div class="tool-icon-large mb-3">
+                                <i class="bi bi-broadcast"></i>
+                            </div>
+                            <h5 class="card-title">Ping Test</h5>
+                            <p class="card-text">Test network connectivity and measure latency to any host or IP address. Get detailed ping statistics and response times.</p>
+                            <div class="tool-features">
+                                <span class="tool-feature-badge">Latency Test</span>
+                                <span class="tool-feature-badge">Connectivity</span>
+                                <span class="tool-feature-badge">Real-time</span>
+                            </div>
+                            <a href="/net-ping" class="tool-action-btn">Use Ping Test</a>
                         </div>
-                        <h5 class="card-title">Ping Test</h5>
-                        <p class="card-text">Test network connectivity and measure latency to any host or IP address. Get detailed ping statistics and response times.</p>
-                        <div class="tool-features">
-                            <span class="badge bg-primary me-1">Latency Test</span>
-                            <span class="badge bg-primary me-1">Connectivity</span>
-                            <span class="badge bg-primary me-1">Real-time</span>
-                        </div>
-                        <a href="/ping" class="btn btn-primary mt-3">Use Ping Test</a>
                     </div>
                 </div>
+                
                 <!-- Traceroute Tool -->
                 <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 tool-card">
-                    <div class="card-body text-center">
-                        <div class="tool-icon-large mb-3">
-                            <i class="bi bi-diagram-3"></i>
-                        </div>
-                        <h5 class="card-title">Traceroute</h5>
-                        <p class="card-text">Trace the network path to any destination and identify network hops, latency, and potential routing issues.</p>
-                        <div class="tool-features">
-                            <span class="badge bg-primary me-1">Path Analysis</span>
-                            <span class="badge bg-primary me-1">Network Hops</span>
-                            <span class="badge bg-primary me-1">Routing Debug</span>
-                        </div>
-                        <a href="/traceroute" class="btn btn-primary mt-3">Use Traceroute</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DNS Lookup Tool -->
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 tool-card">
-                    <div class="card-body text-center">
-                        <div class="tool-icon-large mb-3">
-                            <i class="bi bi-globe"></i>
-                        </div>
-                        <h5 class="card-title">DNS Lookup</h5>
-                        <p class="card-text">Perform DNS queries to resolve domain names, check DNS records, and analyze DNS configuration for any domain.</p>
-                        <div class="tool-features">
-                            <span class="badge bg-primary me-1">DNS Query</span>
-                            <span class="badge bg-primary me-1">Record Types</span>
-                            <span class="badge bg-primary me-1">DNS Analysis</span>
-                        </div>
-                        <a href="/dig" class="btn btn-primary mt-3">Use DNS Lookup</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Port Scanner Tool -->
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 tool-card">
-                    <div class="card-body text-center">
-                        <div class="tool-icon-large mb-3">
-                            <i class="bi bi-search"></i>
-                        </div>
-                        <h5 class="card-title">Port Scanner</h5>
-                        <p class="card-text">Scan open ports on any host or IP address to identify running services and potential security vulnerabilities.</p>
-                        <div class="tool-features">
-                            <span class="badge bg-primary me-1">Port Scan</span>
-                            <span class="badge bg-primary me-1">Service Detection</span>
-                            <span class="badge bg-primary me-1">Security Audit</span>
-                        </div>
-                        <a href="/nmap" class="btn btn-primary mt-3">Use Port Scanner</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MTR Tool -->
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 tool-card">
-                    <div class="card-body text-center">
-                        <div class="tool-icon-large mb-3">
-                            <i class="bi bi-graph-up"></i>
-                        </div>
-                        <h5 class="card-title">MTR (My Traceroute)</h5>
-                        <p class="card-text">Advanced network diagnostic tool combining ping and traceroute functionality for continuous network monitoring.</p>
-                        <div class="tool-features">
-                            <span class="badge bg-primary me-1">Continuous Monitor</span>
-                            <span class="badge bg-primary me-1">Packet Loss</span>
-                            <span class="badge bg-primary me-1">Network Stats</span>
-                        </div>
-                        <a href="/mtr" class="btn btn-primary mt-3">Use MTR</a>
-                    </div>
-                </div>
-            </div>
-            </div>
-        </div>
-
-        <!-- Features Section -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h3 class="card-title text-center mb-4">Why Choose NetHub Network Tools?</h3>
-                        <div class="row">
-                            <div class="col-md-4 text-center mb-3">
-                                <i class="bi bi-lightning-charge text-primary" style="font-size: 2rem;"></i>
-                                <h5 class="mt-2">Fast & Reliable</h5>
-                                <p class="text-muted">Get instant results with our optimized network testing infrastructure.</p>
+                    <div class="card h-100 tool-card">
+                        <div class="card-body text-center">
+                            <div class="tool-icon-large mb-3">
+                                <i class="bi bi-diagram-3"></i>
                             </div>
-                            <div class="col-md-4 text-center mb-3">
-                                <i class="bi bi-shield-check text-primary" style="font-size: 2rem;"></i>
-                                <h5 class="mt-2">Secure & Private</h5>
-                                <p class="text-muted">Your data is never stored or logged. All tests are performed securely.</p>
+                            <h5 class="card-title">Traceroute</h5>
+                            <p class="card-text">Trace the network path to any destination and identify network hops, latency, and potential routing issues.</p>
+                            <div class="tool-features">
+                                <span class="tool-feature-badge">Path Analysis</span>
+                                <span class="tool-feature-badge">Network Hops</span>
+                                <span class="tool-feature-badge">Routing Debug</span>
                             </div>
-                            <div class="col-md-4 text-center mb-3">
-                                <i class="bi bi-tools text-primary" style="font-size: 2rem;"></i>
-                                <h5 class="mt-2">Professional Grade</h5>
-                                <p class="text-muted">Enterprise-level tools used by network engineers and system administrators.</p>
+                            <a href="/net-traceroute" class="tool-action-btn">Use Traceroute</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DNS Lookup Tool -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 tool-card">
+                        <div class="card-body text-center">
+                            <div class="tool-icon-large mb-3">
+                                <i class="bi bi-globe"></i>
                             </div>
+                            <h5 class="card-title">DNS Lookup</h5>
+                            <p class="card-text">Perform DNS queries to resolve domain names, check DNS records, and analyze DNS configuration for any domain.</p>
+                            <div class="tool-features">
+                                <span class="tool-feature-badge">DNS Query</span>
+                                <span class="tool-feature-badge">Record Types</span>
+                                <span class="tool-feature-badge">DNS Analysis</span>
+                            </div>
+                            <a href="/net-dig" class="tool-action-btn">Use DNS Lookup</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Port Scanner Tool -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 tool-card">
+                        <div class="card-body text-center">
+                            <div class="tool-icon-large mb-3">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <h5 class="card-title">Port Scanner</h5>
+                            <p class="card-text">Scan open ports on any host or IP address to identify running services and potential security vulnerabilities.</p>
+                            <div class="tool-features">
+                                <span class="tool-feature-badge">Port Scan</span>
+                                <span class="tool-feature-badge">Service Detection</span>
+                                <span class="tool-feature-badge">Security Audit</span>
+                            </div>
+                            <a href="/net-nmap" class="tool-action-btn">Use Port Scanner</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MTR Tool -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 tool-card">
+                        <div class="card-body text-center">
+                            <div class="tool-icon-large mb-3">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            <h5 class="card-title">MTR (My Traceroute)</h5>
+                            <p class="card-text">Advanced network diagnostic tool combining ping and traceroute functionality for continuous network monitoring.</p>
+                            <div class="tool-features">
+                                <span class="tool-feature-badge">Continuous Monitor</span>
+                                <span class="tool-feature-badge">Packet Loss</span>
+                                <span class="tool-feature-badge">Network Stats</span>
+                            </div>
+                            <a href="/net-mtr" class="tool-action-btn">Use MTR</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- FAQ Section -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h3 class="card-title mb-4">Frequently Asked Questions</h3>
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title">Why Choose NetHub Network Tools?</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="tool-icon-large mb-3">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <h5 class="mt-2">Fast & Reliable</h5>
+                        <p class="text-muted">Get instant results with our optimized network testing infrastructure and real-time analysis capabilities.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="tool-icon-large mb-3">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h5 class="mt-2">Secure & Private</h5>
+                        <p class="text-muted">Your data is never stored or logged. All tests are performed securely with enterprise-grade privacy protection.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="tool-icon-large mb-3">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <h5 class="mt-2">Professional Grade</h5>
+                        <p class="text-muted">Enterprise-level tools used by network engineers, system administrators, and IT professionals worldwide.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2 class="mb-4">Ready to Test Your Network?</h2>
+                    <p class="lead mb-4">Start using our professional network diagnostic tools today. No registration required, completely free to use.</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="/sslchecker" class="btn btn-modern btn-lg">
+                            <i class="bi bi-shield-check me-2"></i>Check SSL Certificate
+                        </a>
+                        <a href="/net-ping" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-broadcast me-2"></i>Test Ping
+                        </a>
+                        <a href="/net-traceroute" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-diagram-3 me-2"></i>Run Traceroute
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                    Are these tools free to use?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes, all our network diagnostic tools are completely free to use with no registration required. We believe in providing professional-grade tools accessible to everyone.
+                                </div>
+                            </div>
+                        </div>
                         
-                        <h5>Are these tools free to use?</h5>
-                        <p>Yes, all our network diagnostic tools are completely free to use with no registration required.</p>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    Can I scan any IP address or domain?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    You can scan any public IP address or hostname. However, scanning private networks or restricted systems may be blocked by firewalls or security policies. Always ensure you have permission to test the target systems.
+                                </div>
+                            </div>
+                        </div>
                         
-                        <h5>Can I scan any IP address or domain?</h5>
-                        <p>You can scan any public IP address or hostname. However, scanning private networks or restricted systems may be blocked by firewalls or security policies.</p>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    Is the SSL checker safe to use?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes, our SSL checker only analyzes publicly available certificate information and doesn't store or transmit any sensitive data. All tests are performed securely with enterprise-grade privacy protection.
+                                </div>
+                            </div>
+                        </div>
                         
-                        <h5>Is the SSL checker safe to use?</h5>
-                        <p>Yes, our SSL checker only analyzes publicly available certificate information and doesn't store or transmit any sensitive data.</p>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                    Do I need to install any software?
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    No, all our network tools run directly in your web browser. No software installation or registration required. Simply open the tool you need and start testing immediately.
+                                </div>
+                            </div>
+                        </div>
                         
-                        <h5>Do I need to install any software?</h5>
-                        <p>No, all our network tools run directly in your web browser. No software installation or registration required.</p>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                                    How accurate are the test results?
+                                </button>
+                            </h2>
+                            <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="faq5" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Our tools provide highly accurate results using industry-standard protocols and algorithms. The SSL checker uses real certificate validation, ping tests use ICMP protocols, and DNS lookups query authoritative name servers directly.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <h2 class="h3 text-primary mb-4">Professional Network Diagnostic Tools</h2>
+                    <p class="text-muted mb-4">Our comprehensive suite of network diagnostic tools provides enterprise-grade testing capabilities for network professionals, system administrators, and developers. Whether you're troubleshooting connectivity issues, analyzing SSL certificates, or performing network security assessments, our tools deliver accurate, real-time results.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="h5 text-primary mb-3">SSL & Security Analysis</h4>
+                            <p class="text-muted mb-3">Comprehensive SSL certificate analysis including expiration dates, certificate chain validation, cipher suite evaluation, and security vulnerability assessment. Our SSL checker provides detailed insights into certificate configuration and security posture.</p>
+                            
+                            <h4 class="h5 text-primary mb-3">Network Connectivity Testing</h4>
+                            <p class="text-muted mb-3">Advanced ping testing with real-time latency measurement, traceroute analysis for path discovery, and MTR (My Traceroute) for continuous network monitoring. Get detailed statistics on packet loss, latency, and network performance.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="h5 text-primary mb-3">Port & Service Discovery</h4>
+                            <p class="text-muted mb-3">Professional port scanning using Nmap technology to identify open ports, running services, and potential security vulnerabilities. Our port scanner provides comprehensive analysis of network services and security posture.</p>
+                            
+                            <h4 class="h5 text-primary mb-3">DNS & Domain Analysis</h4>
+                            <p class="text-muted mb-3">Advanced DNS lookup capabilities with support for all record types (A, AAAA, MX, CNAME, TXT, NS, SOA). Query authoritative name servers directly for accurate, up-to-date DNS information.</p>
+                        </div>
                     </div>
                 </div>
             </div>

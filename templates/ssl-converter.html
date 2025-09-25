@@ -1,394 +1,449 @@
 {% extends "base.html" %}
 
-{% block title %}SSL Converter - NetHub Network Tools{% endblock %}
-{% block meta_title %}SSL Converter - Convert Between Certificate Formats{% endblock %}
-{% block meta_description %}Convert between different SSL certificate formats including PEM, DER, PKCS#7, and PKCS#12 for various applications and systems.{% endblock %}
-{% block meta_keywords %}SSL converter, certificate format converter, PEM to DER, DER to PEM, PKCS#7, PKCS#12, certificate conversion{% endblock %}
-{% block og_title %}SSL Converter - Convert Between Certificate Formats{% endblock %}
-{% block og_description %}Convert between different SSL certificate formats including PEM, DER, PKCS#7, and PKCS#12 for various applications and systems.{% endblock %}
+{% block title %}SSL Converter - Convert SSL Certificate Formats | NetHub Network Tools{% endblock %}
+{% block meta_title %}SSL Converter - Convert SSL Certificate Formats | NetHub Network Tools{% endblock %}
+{% block meta_description %}Convert SSL certificates between different formats including PEM, DER, PKCS#7, and PKCS#12. Free online SSL certificate format converter tool for developers and system administrators.{% endblock %}
+{% block meta_keywords %}ssl converter, certificate converter, pem to der, der to pem, pkcs7 converter, pkcs12 converter, ssl format converter, certificate format conversion{% endblock %}
+
+{% block og_title %}SSL Converter - Convert SSL Certificate Formats | NetHub Network Tools{% endblock %}
+{% block og_description %}Convert SSL certificates between different formats including PEM, DER, PKCS#7, and PKCS#12. Free online SSL certificate format converter tool.{% endblock %}
+{% block og_url %}/ssl-converter{% endblock %}
+
+{% block twitter_title %}SSL Converter - Convert SSL Certificate Formats | NetHub Network Tools{% endblock %}
+{% block twitter_description %}Convert SSL certificates between different formats including PEM, DER, PKCS#7, and PKCS#12. Free online SSL certificate format converter tool.{% endblock %}
+{% block twitter_url %}/ssl-converter{% endblock %}
+
 {% block canonical_url %}/ssl-converter{% endblock %}
 
+{% block app_name %}SSL Converter{% endblock %}
+{% block app_description %}Convert SSL certificates between different formats including PEM, DER, PKCS#7, and PKCS#12{% endblock %}
+{% block app_url %}/ssl-converter{% endblock %}
+
+{% block extra_head %}
+<!-- Additional CSS for SSL Converter -->
+<style>
+.converter-form {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.format-selector {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.format-selector.active {
+    border-color: #007bff;
+    background: #f0f8ff;
+}
+.result-area {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+.conversion-steps {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.step-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.step-number {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-10">
-        <!-- Page Header -->
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-primary mb-3">
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-center mb-3">
                 <i class="bi bi-arrow-repeat me-3"></i>SSL Converter
             </h1>
-            <p class="card-text">Convert between different SSL certificate formats including PEM, DER, PKCS#7, and PKCS#12 for various applications and systems</p>
+            <p class="lead text-center text-muted">
+                Convert SSL certificates and private keys between different formats including PEM, DER, PKCS#7, and PKCS#12.
+            </p>
         </div>
+    </div>
 
-        <!-- SSL Converter Form -->
-        <div class="card shadow-lg border-0 mb-5">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-arrow-repeat me-2"></i>SSL Certificate Converter
-                </h5>
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Conversion Steps -->
+            <div class="conversion-steps">
+                <h4 class="mb-3"><i class="bi bi-list-ol me-2"></i>How to Convert SSL Certificates</h4>
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div>Select the input format (PEM, DER, PKCS#7, or PKCS#12)</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div>Choose the desired output format</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div>Paste your certificate or private key data</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div>Click "Convert" to get the converted format</div>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="POST" action="/ssl-converter">
-                    <div class="row mb-4">
+
+            <!-- Converter Form -->
+            <div class="converter-form">
+                <form method="POST" id="converterForm">
+                    <div class="row">
                         <div class="col-md-6">
-                            <label for="input-format" class="form-label fw-bold">Input Format</label>
-                            <select id="input-format" name="input_format" class="form-select" required>
-                                <option value="">Select input format</option>
-                                <option value="pem" {% if input_format == 'pem' %}selected{% endif %}>PEM (Privacy-Enhanced Mail)</option>
-                                <option value="der" {% if input_format == 'der' %}selected{% endif %}>DER (Distinguished Encoding Rules)</option>
-                                <option value="pkcs7" {% if input_format == 'pkcs7' %}selected{% endif %}>PKCS#7 (Public Key Cryptography Standards)</option>
-                                <option value="pkcs12" {% if input_format == 'pkcs12' %}selected{% endif %}>PKCS#12 (Personal Information Exchange)</option>
-                            </select>
+                            <div class="format-selector">
+                                <h6 class="mb-3"><i class="bi bi-download me-2"></i>Input Format</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="input_format" id="input_pem" value="pem" checked>
+                                    <label class="form-check-label" for="input_pem">
+                                        <strong>PEM</strong> - Privacy Enhanced Mail format
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="input_format" id="input_der" value="der">
+                                    <label class="form-check-label" for="input_der">
+                                        <strong>DER</strong> - Distinguished Encoding Rules
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="input_format" id="input_pkcs7" value="pkcs7">
+                                    <label class="form-check-label" for="input_pkcs7">
+                                        <strong>PKCS#7</strong> - Public Key Cryptography Standards
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="input_format" id="input_pkcs12" value="pkcs12">
+                                    <label class="form-check-label" for="input_pkcs12">
+                                        <strong>PKCS#12</strong> - Personal Information Exchange
+                                    </label>
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="col-md-6">
-                            <label for="output-format" class="form-label fw-bold">Output Format</label>
-                            <select id="output-format" name="output_format" class="form-select" required>
-                                <option value="">Select output format</option>
-                                <option value="pem" {% if output_format == 'pem' %}selected{% endif %}>PEM (Privacy-Enhanced Mail)</option>
-                                <option value="der" {% if output_format == 'der' %}selected{% endif %}>DER (Distinguished Encoding Rules)</option>
-                                <option value="pkcs7" {% if output_format == 'pkcs7' %}selected{% endif %}>PKCS#7 (Public Key Cryptography Standards)</option>
-                                <option value="pkcs12" {% if output_format == 'pkcs12' %}selected{% endif %}>PKCS#12 (Personal Information Exchange)</option>
-                            </select>
+                            <div class="format-selector">
+                                <h6 class="mb-3"><i class="bi bi-upload me-2"></i>Output Format</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="output_format" id="output_pem" value="pem" checked>
+                                    <label class="form-check-label" for="output_pem">
+                                        <strong>PEM</strong> - Privacy Enhanced Mail format
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="output_format" id="output_der" value="der">
+                                    <label class="form-check-label" for="output_der">
+                                        <strong>DER</strong> - Distinguished Encoding Rules
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="output_format" id="output_pkcs7" value="pkcs7">
+                                    <label class="form-check-label" for="output_pkcs7">
+                                        <strong>PKCS#7</strong> - Public Key Cryptography Standards
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="output_format" id="output_pkcs12" value="pkcs12">
+                                    <label class="form-check-label" for="output_pkcs12">
+                                        <strong>PKCS#12</strong> - Personal Information Exchange
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <label for="conversion-type" class="form-label fw-bold">Conversion Type</label>
-                            <select id="conversion-type" name="conversion_type" class="form-select" required>
-                                <option value="certificate" {% if conversion_type == 'certificate' %}selected{% endif %}>Certificate Only</option>
-                                <option value="private_key" {% if conversion_type == 'private_key' %}selected{% endif %}>Private Key Only</option>
-                                <option value="both" {% if conversion_type == 'both' %}selected{% endif %}>Certificate + Private Key (for PKCS#12)</option>
-                            </select>
+                    <div class="mb-3">
+                        <label for="conversion_type" class="form-label">
+                            <strong>Conversion Type</strong>
+                        </label>
+                        <select class="form-select" id="conversion_type" name="conversion_type">
+                            <option value="certificate">Certificate Only</option>
+                            <option value="private_key">Private Key Only</option>
+                            <option value="both">Certificate + Private Key</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="input_data" class="form-label">
+                            <strong>Certificate/Private Key Data</strong>
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="input_data" 
+                            name="input_data" 
+                            rows="8" 
+                            placeholder="Paste your certificate or private key data here..."
+                            required>{{ input_data if input_data else '' }}</textarea>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Paste your certificate or private key in the selected input format. For PKCS#12 files, provide the password below.
                         </div>
                     </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <label for="input-data" class="form-label fw-bold">Input Data</label>
-                            <textarea 
-                                id="input-data" 
-                                name="input_data"
-                                class="form-control" 
-                                rows="8" 
-                                placeholder="Paste your certificate or private key data here..."
-                                required
-                            >{{ input_data or '' }}</textarea>
-                        </div>
+                    <div class="mb-3" id="key_data_section" style="display: none;">
+                        <label for="key_data" class="form-label">
+                            <strong>Private Key Data</strong>
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="key_data" 
+                            name="key_data" 
+                            rows="4" 
+                            placeholder="Paste your private key data here...">{{ key_data if key_data else '' }}</textarea>
                     </div>
 
-                    <!-- Private Key Data (for combined conversion) -->
-                    <div id="key-data-section" class="row mb-4" style="display: {% if conversion_type == 'both' %}block{% else %}none{% endif %};">
-                        <div class="col-md-12">
-                            <label for="key-data" class="form-label fw-bold">Private Key Data</label>
-                            <textarea 
-                                id="key-data" 
-                                name="key_data"
-                                class="form-control" 
-                                rows="6" 
-                                placeholder="Paste your private key data here (required for PKCS#12 conversion)..."
-                            >{{ key_data or '' }}</textarea>
-                        </div>
+                    <div class="mb-3" id="password_section">
+                        <label for="password" class="form-label">
+                            <strong>Password (for PKCS#12 files)</strong>
+                        </label>
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Enter password for PKCS#12 file..."
+                            value="{{ password if password else '' }}">
                     </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <label for="password" class="form-label fw-bold">Password (Optional)</label>
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password"
-                                class="form-control" 
-                                placeholder="Enter password if the input data is encrypted..."
-                                value="{{ password or '' }}"
-                            >
-                        </div>
-                    </div>
-                    
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-arrow-repeat me-2"></i>Convert Certificate
+                            <i class="bi bi-arrow-repeat me-2"></i>Convert SSL Certificate
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
 
-        <!-- Results Section -->
-        {% if conversion_result %}
-            {% if conversion_result.success %}
-                <!-- Success Results -->
-                <div class="card shadow-lg border-0 mb-5">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-check-circle me-2"></i>Conversion Successful
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Conversion Info -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card border-info">
-                                    <div class="card-body">
-                                        <h6 class="card-title text-info">
-                                            <i class="bi bi-arrow-right me-2"></i>Conversion Details
-                                        </h6>
-                                        <p class="mb-1"><strong>From:</strong> {{ conversion_result.input_format|upper }}</p>
-                                        <p class="mb-1"><strong>To:</strong> {{ conversion_result.output_format|upper }}</p>
-                                        <p class="mb-0"><strong>Type:</strong> {{ conversion_type|title }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card border-success">
-                                    <div class="card-body">
-                                        <h6 class="card-title text-success">
-                                            <i class="bi bi-download me-2"></i>Download Options
-                                        </h6>
-                                        <button class="btn btn-outline-success btn-sm me-2" onclick="copyToClipboard('output-data')">
-                                            <i class="bi bi-clipboard me-1"></i>Copy
-                                        </button>
-                                        <button class="btn btn-outline-success btn-sm" onclick="downloadData()">
-                                            <i class="bi bi-download me-1"></i>Download
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Output Data -->
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <h6 class="mb-0">
-                                    <i class="bi bi-file-text me-2"></i>Converted Data ({{ conversion_result.output_format|upper }})
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <textarea 
-                                    id="output-data" 
-                                    class="form-control" 
-                                    rows="12" 
-                                    readonly
-                                >{{ conversion_result.output_data }}</textarea>
-                            </div>
-                        </div>
-
-                        <!-- Certificate/Key Information -->
-                        {% if conversion_result.certificate_info %}
-                        <div class="card mt-4">
-                            <div class="card-header bg-info text-white">
-                                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Certificate Information</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <table class="table table-striped">
-                                            <tbody>
-                                                <tr>
-                                                    <td><strong>Subject</strong></td>
-                                                    <td>{{ conversion_result.certificate_info.subject.commonName or 'N/A' }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Issuer</strong></td>
-                                                    <td>{{ conversion_result.certificate_info.issuer.commonName or 'N/A' }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Serial Number</strong></td>
-                                                    <td>{{ conversion_result.certificate_info.serial_number or 'N/A' }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <table class="table table-striped">
-                                            <tbody>
-                                                <tr>
-                                                    <td><strong>Version</strong></td>
-                                                    <td>{{ conversion_result.certificate_info.version or 'N/A' }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Signature Algorithm</strong></td>
-                                                    <td>{{ conversion_result.certificate_info.signature_algorithm or 'N/A' }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Valid Until</strong></td>
-                                                    <td>{{ conversion_result.certificate_info.not_after or 'N/A' }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Results Section -->
+            {% if conversion_result %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-check-circle me-2"></i>Conversion Result
+                        {% if conversion_result.success %}
+                            <span class="badge bg-success">Success</span>
+                        {% else %}
+                            <span class="badge bg-danger">Error</span>
                         {% endif %}
-
-                        {% if conversion_result.key_info %}
-                        <div class="card mt-4">
-                            <div class="card-header bg-warning text-white">
-                                <h6 class="mb-0"><i class="bi bi-key me-2"></i>Private Key Information</h6>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-striped">
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>Key Type</strong></td>
-                                            <td>{{ conversion_result.key_info.key_type or 'N/A' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Key Size</strong></td>
-                                            <td>{{ conversion_result.key_info.key_size or 'N/A' }} bits</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% else %}
-                <!-- Error Results -->
-                <div class="card shadow-lg border-0 mb-5">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-exclamation-triangle me-2"></i>Conversion Failed
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-danger" role="alert">
-                            <h6 class="alert-heading">Error Details:</h6>
-                            <p class="mb-0">{{ conversion_result.error }}</p>
-                        </div>
-                        <div class="mt-3">
-                            <h6>Common Issues:</h6>
-                            <ul>
-                                <li>Ensure the input data is in the correct format</li>
-                                <li>Check that the data is complete and not truncated</li>
-                                <li>Verify the password if the data is encrypted</li>
-                                <li>Make sure there are no extra characters or formatting issues</li>
-                                <li>For PKCS#12 output, ensure both certificate and private key are provided</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        {% else %}
-            <!-- Welcome Message -->
-            <div class="card shadow-lg border-0 mb-5">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-info-circle me-2"></i>Supported Conversions
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <h6><i class="bi bi-arrow-right text-primary me-2"></i>Certificate Conversions</h6>
+                    {% if conversion_result.success %}
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Converted Data:</strong></label>
+                            <div class="position-relative">
+                                <div class="result-area">{{ conversion_result.output_data }}</div>
+                                <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('converted_data')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {% if conversion_result.input_info %}
+                        <div class="mb-3">
+                            <h6>Input Information:</h6>
                             <ul class="list-unstyled">
-                                <li>• PEM ↔ DER</li>
-                                <li>• PEM ↔ PKCS#7</li>
-                                <li>• DER ↔ PKCS#7</li>
-                                <li>• PKCS#12 → PEM/DER</li>
+                                <li><strong>Format:</strong> {{ conversion_result.input_info.format }}</li>
+                                <li><strong>Type:</strong> {{ conversion_result.input_info.type }}</li>
+                                {% if conversion_result.input_info.subject %}
+                                <li><strong>Subject:</strong> {{ conversion_result.input_info.subject }}</li>
+                                {% endif %}
+                                {% if conversion_result.input_info.issuer %}
+                                <li><strong>Issuer:</strong> {{ conversion_result.input_info.issuer }}</li>
+                                {% endif %}
                             </ul>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <h6><i class="bi bi-key text-warning me-2"></i>Private Key Conversions</h6>
-                            <ul class="list-unstyled">
-                                <li>• PEM ↔ DER</li>
-                                <li>• PKCS#12 → PEM/DER</li>
-                                <li>• Password-protected keys supported</li>
-                            </ul>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Conversion Error:</strong> {{ conversion_result.error }}
                         </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Format Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Format Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>PEM Format</h6>
+                        <small class="text-muted">
+                            Base64 encoded data with headers. Most common format for certificates and private keys.
+                        </small>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h6><i class="bi bi-archive text-success me-2"></i>Combined Conversions</h6>
-                            <ul class="list-unstyled">
-                                <li>• PEM Certificate + Private Key → PKCS#12</li>
-                                <li>• Perfect for creating .p12/.pfx files</li>
-                            </ul>
-                        </div>
+                    <div class="mb-3">
+                        <h6>DER Format</h6>
+                        <small class="text-muted">
+                            Binary encoded data. Used in Windows and some other systems.
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <h6>PKCS#7 Format</h6>
+                        <small class="text-muted">
+                            Container format that can hold multiple certificates and CRLs.
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <h6>PKCS#12 Format</h6>
+                        <small class="text-muted">
+                            Password-protected container that can hold certificates and private keys.
+                        </small>
                     </div>
                 </div>
             </div>
-        {% endif %}
+
+            <!-- Features -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-star me-2"></i>Converter Features</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>PEM ↔ DER conversion</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>PKCS#7 support</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>PKCS#12 support</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Certificate validation</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Private key conversion</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Password protection</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>One-click copy</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Related Tools -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-tools me-2"></i>Related Tools</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/ssl-checker" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-shield-check me-2"></i>SSL Checker
+                        </a>
+                        <a href="/ssl-certificate-decoder" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-file-earmark-text me-2"></i>Certificate Decoder
+                        </a>
+                        <a href="/ssl-csr-decoder" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-file-text me-2"></i>CSR Decoder
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_head %}
-<style>
-    .card {
-        transition: transform 0.2s ease-in-out;
-    }
-    .card:hover {
-        transform: translateY(-2px);
-    }
-    .form-control:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-    }
-    .btn-primary {
-        background: linear-gradient(45deg, #0d6efd, #6610f2);
-        border: none;
-    }
-    .btn-primary:hover {
-        background: linear-gradient(45deg, #0b5ed7, #5a0fc8);
-        transform: translateY(-1px);
-    }
-</style>
+<!-- JavaScript for enhanced functionality -->
 <script>
-    // Show/hide private key section based on conversion type
-    document.getElementById('conversion-type').addEventListener('change', function() {
-        const keyDataSection = document.getElementById('key-data-section');
-        const keyDataInput = document.getElementById('key-data');
-        
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('converterForm');
+    const conversionType = document.getElementById('conversion_type');
+    const keyDataSection = document.getElementById('key_data_section');
+    const passwordSection = document.getElementById('password_section');
+    const inputFormat = document.querySelectorAll('input[name="input_format"]');
+    const outputFormat = document.querySelectorAll('input[name="output_format"]');
+    
+    // Show/hide key data section based on conversion type
+    conversionType.addEventListener('change', function() {
         if (this.value === 'both') {
             keyDataSection.style.display = 'block';
-            keyDataInput.required = true;
+            document.getElementById('key_data').required = true;
         } else {
             keyDataSection.style.display = 'none';
-            keyDataInput.required = false;
+            document.getElementById('key_data').required = false;
         }
     });
-
+    
+    // Show/hide password section based on input format
+    function togglePasswordSection() {
+        const selectedInput = document.querySelector('input[name="input_format"]:checked').value;
+        if (selectedInput === 'pkcs12') {
+            passwordSection.style.display = 'block';
+            document.getElementById('password').required = true;
+        } else {
+            passwordSection.style.display = 'none';
+            document.getElementById('password').required = false;
+        }
+    }
+    
+    inputFormat.forEach(radio => {
+        radio.addEventListener('change', togglePasswordSection);
+    });
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function() {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Converting...';
+        submitBtn.disabled = true;
+    });
+    
     // Copy to clipboard function
-    function copyToClipboard(elementId) {
+    window.copyToClipboard = function(elementId) {
         const element = document.getElementById(elementId);
-        element.select();
-        element.setSelectionRange(0, 99999); // For mobile devices
-        document.execCommand('copy');
-        
-        // Show feedback
-        const button = event.target.closest('button');
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
-        button.classList.remove('btn-outline-success');
-        button.classList.add('btn-success');
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.classList.remove('btn-success');
-            button.classList.add('btn-outline-success');
-        }, 2000);
-    }
-
-    // Download data function
-    function downloadData() {
-        const outputData = document.getElementById('output-data').value;
-        const inputFormat = '{{ conversion_result.input_format or "unknown" }}';
-        const outputFormat = '{{ conversion_result.output_format or "unknown" }}';
-        const conversionType = '{{ conversion_type or "certificate" }}';
-        
-        const filename = `${conversionType}_${inputFormat}_to_${outputFormat}.${outputFormat === 'pem' ? 'pem' : outputFormat === 'der' ? 'der' : outputFormat === 'pkcs7' ? 'p7b' : 'p12'}`;
-        
-        const blob = new Blob([outputData], { type: 'text/plain' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    }
+        if (element) {
+            element.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check"></i>';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-secondary');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        }
+    };
+    
+    // Initialize
+    togglePasswordSection();
+});
 </script>
+
+<!-- Hidden textarea for copying -->
+<textarea id="converted_data" style="position: absolute; left: -9999px;">{{ conversion_result.output_data if conversion_result and conversion_result.success else '' }}</textarea>
 {% endblock %}

@@ -15,6 +15,12 @@ def homepage():
     recent_searches = get_recent_searches(10)
     return render_template('homepage.html', recent_searches=recent_searches)
 
+@core_bp.route('/tools')
+def tools_homepage():
+    """Tools homepage alias - redirects to main homepage"""
+    recent_searches = get_recent_searches(10)
+    return render_template('homepage.html', recent_searches=recent_searches)
+
 @core_bp.route('/robots.txt')
 def robots_txt():
     """Robots.txt for SEO"""

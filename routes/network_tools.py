@@ -13,7 +13,7 @@ import time
 # Create blueprint
 network_tools_bp = Blueprint('network_tools', __name__)
 
-@network_tools_bp.route('/ping', methods=['GET', 'POST'])
+@network_tools_bp.route('/net-ping', methods=['GET', 'POST'])
 def ping_tool():
     """Ping test tool page"""
     ping_results = None
@@ -28,12 +28,12 @@ def ping_tool():
             # Perform ping test
             ping_results = NetworkTools.ping(hostname, count)
     
-    return render_template('ping.html', 
+    return render_template('net-ping.html', 
                          ping_results=ping_results,
                          hostname=hostname,
                          count=count)
 
-@network_tools_bp.route('/traceroute', methods=['GET', 'POST'])
+@network_tools_bp.route('/net-traceroute', methods=['GET', 'POST'])
 def traceroute_tool():
     """Traceroute tool page"""
     traceroute_results = None
@@ -48,7 +48,7 @@ def traceroute_tool():
             # Perform traceroute
             traceroute_results = NetworkTools.traceroute(hostname, max_hops)
     
-    return render_template('traceroute.html', 
+    return render_template('net-traceroute.html', 
                          traceroute_results=traceroute_results,
                          hostname=hostname,
                          max_hops=max_hops)
@@ -134,7 +134,7 @@ def traceroute_stream():
     
     return Response(generate(), mimetype='text/event-stream')
 
-@network_tools_bp.route('/nmap', methods=['GET', 'POST'])
+@network_tools_bp.route('/net-nmap', methods=['GET', 'POST'])
 def nmap_tool():
     """Nmap tool page"""
     nmap_results = None
@@ -149,12 +149,12 @@ def nmap_tool():
             # Perform Nmap scan
             nmap_results = NetworkTools.nmap_scan(hostname, scan_type)
     
-    return render_template('nmap.html', 
+    return render_template('net-nmap.html', 
                          nmap_results=nmap_results,
                          hostname=hostname,
                          scan_type=scan_type)
 
-@network_tools_bp.route('/dig', methods=['GET', 'POST'])
+@network_tools_bp.route('/net-dig', methods=['GET', 'POST'])
 def dig_tool():
     """DNS lookup tool page"""
     dig_results = None
@@ -169,12 +169,12 @@ def dig_tool():
             # Perform DNS lookup
             dig_results = NetworkTools.dig_query(domain, record_type)
     
-    return render_template('dig.html', 
+    return render_template('net-dig.html', 
                          dig_results=dig_results,
                          domain=domain,
                          record_type=record_type)
 
-@network_tools_bp.route('/mtr', methods=['GET', 'POST'])
+@network_tools_bp.route('/net-mtr', methods=['GET', 'POST'])
 def mtr_tool():
     """MTR tool page"""
     mtr_results = None
@@ -191,7 +191,7 @@ def mtr_tool():
             # Perform MTR trace
             mtr_results = NetworkTools.mtr_trace(hostname, max_hops, count)
     
-    return render_template('mtr.html', 
+    return render_template('net-mtr.html', 
                          mtr_results=mtr_results,
                          hostname=hostname,
                          count=count,

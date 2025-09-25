@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
 COPY app.py .
-COPY app_new.py .
+# COPY app_new.py .
 COPY routes/ routes/
 COPY modules/ modules/
 COPY templates/ templates/

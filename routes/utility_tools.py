@@ -10,7 +10,7 @@ from modules.subnet_calculator import SubnetCalculator
 # Create blueprint
 utility_tools_bp = Blueprint('utility_tools', __name__)
 
-@utility_tools_bp.route('/decode-encode', methods=['GET', 'POST'])
+@utility_tools_bp.route('/utils-decode-encode', methods=['GET', 'POST'])
 def decode_encode():
     """Decode/Encode tool page"""
     results = {}
@@ -63,14 +63,14 @@ def decode_encode():
                 elif operation == 'decode':
                     results = DecodeEncoder.json_decode(input_text)
     
-    return render_template('decode-encode.html',
+    return render_template('utils-decode-encode.html',
                          results=results,
                          input_text=input_text,
                          operation=operation,
                          format_type=format_type,
                          detection=detection)
 
-@utility_tools_bp.route('/subnet-calculator', methods=['GET', 'POST'])
+@utility_tools_bp.route('/utils-subnet-calculator', methods=['GET', 'POST'])
 def subnet_calculator():
     """IP Subnet Calculator tool page"""
     ipv4_results = None
@@ -150,7 +150,7 @@ def subnet_calculator():
                 except ValueError:
                     pass
     
-    return render_template('subnet-calculator.html',
+    return render_template('utils-subnet-calculator.html',
                          ipv4_results=ipv4_results,
                          ipv6_results=ipv6_results,
                          ipv4_address=ipv4_address,

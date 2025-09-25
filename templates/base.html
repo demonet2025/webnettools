@@ -96,14 +96,14 @@
                         SSL & Security
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="sslDropdown">
-                        <li><a class="dropdown-item {% if request.endpoint == 'ssl_checker' %}active{% endif %}" href="/sslchecker">SSL Checker</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'deep_ssl_checker' %}active{% endif %}" href="/deep-ssl-checker">Deep SSL Analysis</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'ssl_checker' %}active{% endif %}" href="/ssl-checker">SSL Checker</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'deep_ssl_checker' %}active{% endif %}" href="/ssl-deep-checker">Deep SSL Analysis</a></li>
                         <li><a class="dropdown-item {% if request.endpoint == 'ssl_bulk_checker' %}active{% endif %}" href="/ssl-bulk-checker">SSL Bulk Checker</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'ocsp_checker' %}active{% endif %}" href="/ocsp-checker">OCSP Checker</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'ocsp_checker' %}active{% endif %}" href="/ssl-ocsp-checker">OCSP Checker</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'certificate_decoder' %}active{% endif %}" href="/certificate-decoder">Certificate Decoder</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'csr_decoder' %}active{% endif %}" href="/csr-decoder">CSR Decoder</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'certificate_key_matcher' %}active{% endif %}" href="/certificate-key-matcher">Key Matcher</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'certificate_decoder' %}active{% endif %}" href="/ssl-certificate-decoder">Certificate Decoder</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'csr_decoder' %}active{% endif %}" href="/ssl-csr-decoder">CSR Decoder</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'certificate_key_matcher' %}active{% endif %}" href="/ssl-certificate-key-matcher">Key Matcher</a></li>
                         <li><a class="dropdown-item {% if request.endpoint == 'ssl_converter' %}active{% endif %}" href="/ssl-converter">SSL Converter</a></li>
                     </ul>
                 </div>
@@ -114,12 +114,12 @@
                         Network Tools
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="networkDropdown">
-                        <li><a class="dropdown-item {% if request.endpoint == 'ping_tool' %}active{% endif %}" href="/ping">Ping Test</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'traceroute_tool' %}active{% endif %}" href="/traceroute">Traceroute</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'mtr_tool' %}active{% endif %}" href="/mtr">MTR Trace</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'ping_tool' %}active{% endif %}" href="/net-ping">Ping Test</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'traceroute_tool' %}active{% endif %}" href="/net-traceroute">Traceroute</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'mtr_tool' %}active{% endif %}" href="/net-mtr">MTR Trace</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'nmap_tool' %}active{% endif %}" href="/nmap">Port Scanner</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'dig_tool' %}active{% endif %}" href="/dig">DNS Lookup</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'nmap_tool' %}active{% endif %}" href="/net-nmap">Port Scanner</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'dig_tool' %}active{% endif %}" href="/net-dig">DNS Lookup</a></li>
                     </ul>
                 </div>
                 
@@ -129,8 +129,8 @@
                         Utilities
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="utilityDropdown">
-                        <li><a class="dropdown-item {% if request.endpoint == 'subnet_calculator' %}active{% endif %}" href="/subnet-calculator">Subnet Calculator</a></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'decode_encode' %}active{% endif %}" href="/decode-encode">Decode/Encode</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'subnet_calculator' %}active{% endif %}" href="/utils-subnet-calculator">Subnet Calculator</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'decode_encode' %}active{% endif %}" href="/utils-decode-encode">Decode/Encode</a></li>
                     </ul>
                 </div>
                 </div>
