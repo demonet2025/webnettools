@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Deep SSL Security Analysis - Comprehensive SSL/TLS Testing | NetHub Network Tools{% endblock %}
-{% block meta_description %}Comprehensive SSL/TLS security analysis tool. Deep certificate analysis, cipher suite testing, protocol support, and security recommendations for professional SSL assessment.{% endblock %}
-{% block meta_keywords %}deep SSL analysis, SSL security test, TLS analysis, cipher suite test, SSL configuration, SSL vulnerability scan, SSL security audit, SSL compliance check{% endblock %}
+{% block title %}{% if ssl_results and ssl_results.hostname %}SSL Certificate Analysis for {{ ssl_results.hostname }} - Free SSL Checker | NetHub Network Tools{% else %}SSL Certificate Checker - Free Online SSL Certificate Analysis Tool | NetHub Network Tools{% endif %}{% endblock %}
+{% block meta_description %}{% if ssl_results and ssl_results.hostname %}SSL certificate analysis for {{ ssl_results.hostname }}. Check SSL certificate status, issuer, expiration date, and security details. Free SSL certificate checker and analysis tool.{% else %}Check the status of any website's SSL certificate with our free SSL checker. Get detailed SSL certificate information including issuer, expiration date, chain validation, and security analysis. Professional SSL certificate examination tool.{% endif %}{% endblock %}
+{% block meta_keywords %}SSL checker, SSL certificate checker, SSL certificate analysis, SSL certificate examination, SSL certificate lookup, SSL certificate validation, SSL certificate status, SSL certificate details, SSL certificate information, SSL certificate test, SSL certificate check, SSL certificate verification, SSL certificate inspection, SSL certificate audit, SSL certificate monitoring, SSL certificate management, SSL certificate security, SSL certificate compliance, SSL certificate troubleshooting, SSL certificate diagnostics{% endblock %}
 {% block og_url %}/deep-ssl-checker{% endblock %}
 
 {% block extra_head %}
@@ -685,14 +685,135 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="text-center mb-4">
-        <h1 class="display-5 fw-bold text-primary mb-3">
-            <i class="bi bi-shield-lock me-3"></i>Deep SSL Security Analysis
+<div class="container-fluid">
+    <!-- Full Width Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-shield-lock me-3"></i>SSL Certificate Checker
         </h1>
-        <p class="lead text-muted">Comprehensive SSL/TLS security analysis with detailed certificate inspection, cipher suite testing, and security recommendations</p>
+        <p class="lead text-muted">Check the status of any website's SSL certificate with our free SSL checker. Get detailed SSL certificate information including issuer, expiration date, chain validation, and security analysis.</p>
     </div>
+
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">
+                        {% if ssl_results and ssl_results.hostname %}
+                            SSL Certificate Analysis for {{ ssl_results.hostname }}
+                        {% else %}
+                            Free Online SSL Certificate Analysis Tool
+                        {% endif %}
+                    </h2>
+                    {% if ssl_results and ssl_results.hostname %}
+                        <p class="text-muted mb-3">We have analyzed the SSL certificate for <strong>{{ ssl_results.hostname }}</strong> and found that it has a valid SSL certificate. SSL certificates are essential for website security and ensure that data transmitted between the user and the website is encrypted and secure.</p>
+                        
+                        <p class="text-muted mb-3">The SSL certificate for {{ ssl_results.hostname }} was issued by <strong>{{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else ssl_results.certificate.issuer.organizationName if ssl_results.certificate.issuer.organizationName else 'Unknown Authority' }}</strong> and is valid until <strong>{{ ssl_results.certificate.not_after if ssl_results.certificate.not_after else 'Unknown' }}</strong>. This certificate provides secure HTTPS communication for the website.</p>
+                        
+                        <p class="text-muted mb-0"><strong>Our SSL certificate analysis tool provides comprehensive security assessment for {{ ssl_results.hostname }}, making it valuable for cybersecurity experts, website developers, and network administrators.</strong></p>
+                    {% else %}
+                        <p class="text-muted mb-3">We have developed this online SSL certificate lookup to help our users quickly check the status of SSL certificates for any website. SSL certificates need to be installed on all websites so that they can use the HTTPS communication protocol. These certificates are essential for website security.</p>
+                        
+                        <p class="text-muted mb-3">Our SSL lookup allows you to enter the URL of any domain and quickly find whether it has an SSL certificate or not, when it (if present) was issued, who the issuer was, and so on. Our tool not only confirms the presence or absence of an SSL certificate but also provides a range of other useful information related to it.</p>
+                        
+                        <p class="text-muted mb-0"><strong>A reliable SSL certificate checker like ours can be very useful for cybersecurity experts, website developers, and network administrators.</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Right Sidebar (20%) - Appears first in HTML -->
+        <div class="col-lg-3 order-lg-2">
+            <div class="sticky-top" style="top: 20px;">
+                <!-- Recent Searches -->
+                {% if recent_searches and recent_searches|length > 0 %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-clock me-2"></i>Recent Searches</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for search in recent_searches %}
+                            <a href="/deep-ssl-checker/{{ search.domain }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">{{ search.domain[:3] }}***.{{ search.domain.split('.')[-1] }}</div>
+                                    <small class="text-muted">{{ search.domain }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ search.search_count }}x</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Website Information (if available) -->
+                {% if domain_info and domain_info.success %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-globe me-2"></i>Website Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary mb-2">{{ domain_info.title }}</h6>
+                        <p class="text-muted mb-3 small">{{ domain_info.description }}</p>
+                        <a href="{{ domain_info.url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Visit Website
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Deep SSL Analysis Features -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Analysis Features</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3 small">Our deep SSL analysis provides comprehensive security assessment including:</p>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Certificate chain validation</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Cipher suite analysis</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Protocol support testing</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Security vulnerability scanning</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Performance optimization tips</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Security Recommendations -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>Security Tips</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <i class="bi bi-lock text-primary" style="font-size: 1.5rem;"></i>
+                                <h6 class="mt-2 small">Strong Ciphers</h6>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <i class="bi bi-calendar-check text-primary" style="font-size: 1.5rem;"></i>
+                                <h6 class="mt-2 small">Valid Certificates</h6>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <i class="bi bi-shield-lock text-primary" style="font-size: 1.5rem;"></i>
+                                <h6 class="mt-2 small">TLS 1.3 Support</h6>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <i class="bi bi-graph-up text-primary" style="font-size: 1.5rem;"></i>
+                                <h6 class="mt-2 small">Performance</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content (80%) -->
+        <div class="col-lg-9 order-lg-1">
 
     <!-- Deep SSL Analysis Form -->
     <div class="card border-0 shadow-sm mb-4">
@@ -731,51 +852,100 @@
         </div>
     </div>
 
-    <!-- Recent Searches -->
-    {% if recent_searches and recent_searches|length > 0 %}
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-gradient-info text-white border-0">
-            <div class="d-flex align-items-center">
-                <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
-                    <i class="bi bi-clock-history text-white"></i>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">What is the Benefit of Using Our Tool to Check SSL Certificates?</h2>
+                    <p class="text-muted mb-3">According to online sources, one of the simplest ways to check if a website has an SSL certificate or not is to see its URL. Websites that have an SSL certificate start with "https" and not "http."</p>
+                    
+                    <p class="text-muted mb-3">However, this is not a valid method, considering that sometimes domains with "https" can fail to renew their certificates. When that happens, they may become inaccessible or unsafe to visit.</p>
+                    
+                    <p class="text-muted mb-0"><strong>Using our tool to check SSL certificates is a much better way than simply inspecting the URL.</strong> You can get updated information about them, such as when they were issued, the date till which they will remain valid, etc. You also don't have to visit the website yourself to see if a notice pops up.</p>
                 </div>
-                <div>
-                    <h5 class="mb-0 fw-bold">Recent Searches</h5>
-                    <small class="opacity-75">Quick access to previously analyzed domains</small>
-                </div>
-            </div>
-        </div>
-        <div class="card-body p-4">
-            <div class="row g-3">
-                {% for search in recent_searches %}
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="/deep-ssl-checker/{{ search.domain }}" class="text-decoration-none">
-                        <div class="card border-0 bg-light h-100 recent-search-card">
-                            <div class="card-body p-3 text-center">
-                                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
-                                    <i class="bi bi-shield-lock text-primary"></i>
-                                </div>
-                                <h6 class="mb-1 text-primary">{{ search.domain[:3] }}***{{ search.domain[search.domain.rfind('.'):] }}</h6>
-                                <small class="text-muted">{{ search.domain }}</small>
-                                <div class="mt-2">
-                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
-                                        {{ search.search_count }}x
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                {% endfor %}
             </div>
         </div>
     </div>
-    {% endif %}
+
+    <!-- Details Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">What Details Can You Acquire Using Our SSL Checker Online?</h2>
+                    <p class="text-muted mb-3">Once you enter the domain name and start the process, you will see a lot of different details, which are listed below. Here is a brief guide to understanding all of those details.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>Host:</strong> This field contains the domain that you have entered</li>
+                                <li class="mb-2"><strong>URL:</strong> This field contains the exact URL</li>
+                                <li class="mb-2"><strong>Issued For:</strong> This field indicates which site the SSL certificate is issued for</li>
+                                <li class="mb-2"><strong>Issued By:</strong> This field indicates which authority has issued the SSL certificate</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>SSL Compression:</strong> This field indicates whether the SSL certificate is compressed or not</li>
+                                <li class="mb-2"><strong>SSL Chain Validation:</strong> This field indicates whether the SSL certificate chain is valid or not</li>
+                                <li class="mb-2"><strong>Hash:</strong> A unique identifier of the certificate</li>
+                                <li class="mb-2"><strong>Public Key:</strong> Used in the process of certificate encryption</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted mt-3 mb-0"><strong>PEM</strong> is a file format that is used to carry certificate info and encryption keys. All of these details give you more and more information about your SSL certificate.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SSL Certificate and Chain Explanation -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Understand More About SSL Certificate and SSL Chain</h2>
+                    <p class="text-muted mb-3">To get a better grasp of the importance and utility of our test SSL certificate tool, we recommend learning more about SSL certificates and SSL chain validation.</p>
+                    
+                    <p class="text-muted mb-3"><strong>SSL certificates</strong> are digital certificates issued by CAs (Certification Authorities) that verify the authenticity of a website. In other words, the certificates tell the Internet and its users that the website is who it purports to be and is not fake or malicious. The CAs of a domain are specified in its CAA records.</p>
+                    
+                    <p class="text-muted mb-0">An <strong>SSL chain</strong>, on the other hand, is basically a chain of all the different CAs that are responsible for relaying the certificate from the root authority to the website. In this chain, there can sometimes be intermediary authorities that simply carry the certificate onto the website and don't create it themselves. <strong>This is yet another reason why our tool is so helpful</strong> - you can see the various intermediaries involved in the certification process all in one place.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Basic Results (Server-side rendered) -->
     {% if ssl_results %}
     <div class="reportSection">
         <div class="sectionTitle">SSL Report: <span class="url">{{ ssl_results.hostname }}</span> <span class="ip"> ({{ ssl_results.ip_address if ssl_results.ip_address else 'N/A' }})</span></div>
+        
+        <!-- Domain Information -->
+        {% if domain_info and domain_info.success %}
+        <div class="sectionBody" style="margin-bottom: 20px;">
+            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                <h4 style="color: #495057; margin-bottom: 15px; font-size: 18px;">
+                    <span class="ui-icon ui-icon-info" style="display: inline-block; width: 16px; height: 16px; margin-right: 8px;"></span>
+                    Website Information
+                </h4>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="flex: 1; margin-right: 20px;">
+                        <h5 style="color: #007bff; margin-bottom: 10px; font-size: 16px;">{{ domain_info.title }}</h5>
+                        <p style="color: #6c757d; margin: 0; line-height: 1.5;">{{ domain_info.description }}</p>
+                    </div>
+                    <div>
+                        <a href="{{ domain_info.url }}" target="_blank" style="background: #007bff; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px; display: inline-block;">
+                            <span class="ui-icon ui-icon-extlink" style="display: inline-block; width: 12px; height: 12px; margin-right: 4px;"></span>
+                            Visit Website
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="reportHeaderInfo">
             <div class="reportTime">
                 <b>Assessed on:</b>&nbsp; {{ assessment_time }} UTC
@@ -1293,5 +1463,77 @@ function displayError(message) {
     `;
 }
 </script>
+
+        </div> <!-- End main content col-lg-9 -->
+    </div> <!-- End row -->
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="sslFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                    What should I do if the SSL tester says my SSL certificate is not valid?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#sslFAQ">
+                                <div class="accordion-body">
+                                    If your SSL certificate is shown as invalid, you should renew it. Before doing that, of course, you should confirm it beforehand. Load your website to see if it works properly or not. You should also visit your SSL certificate provider and make sure that the expiration date has really passed.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    How do I renew my SSL certificate?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#sslFAQ">
+                                <div class="accordion-body">
+                                    You can renew your SSL certificate by following these three steps:
+                                    <ol>
+                                        <li>Acquire a CSR file. (CSR stands for <em>certificate signing request.</em>)</li>
+                                        <li>Submit the CSR file to a Certificate Authority (CA).</li>
+                                        <li>Acquire the new SSL certificate and install it on your site via your hosting provider.</li>
+                                    </ol>
+                                    The exact steps needed for the SSL installation vary depending on the hosting platform that you're using. For example, in cPanel, you can simply navigate to the SSL/TSL menu and then click on "Manage SSL Sites." After that, you can enter the CRT file and the private key to install the certificate.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    What information does the SSL checker provide?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#sslFAQ">
+                                <div class="accordion-body">
+                                    Our SSL checker provides comprehensive information including:
+                                    <ul>
+                                        <li>Certificate validity status and expiration date</li>
+                                        <li>Issuer information and certificate authority details</li>
+                                        <li>Certificate chain validation and trust status</li>
+                                        <li>Security analysis including cipher suites and protocols</li>
+                                        <li>Certificate fingerprints (SHA1 and SHA256)</li>
+                                        <li>Public key information and signature algorithm</li>
+                                        <li>Subject Alternative Names (SANs) if present</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- End container-fluid -->
 {% endblock %}
 

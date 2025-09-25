@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Decode/Encode Tool - Base64, URL, HTML, Hex, Binary Converter | NetHub Network Tools{% endblock %}
-{% block meta_title %}Decode/Encode Tool - Base64, URL, HTML, Hex, Binary Converter | NetHub Network Tools{% endblock %}
-{% block meta_description %}Free online decode/encode tool for Base64, URL encoding, HTML entities, hexadecimal, binary, and JSON. Convert between different text formats instantly.{% endblock %}
-{% block meta_keywords %}decode encode, base64 encode decode, URL encode decode, HTML encode decode, hex encode decode, binary encode decode, text converter, encoding tool, decoding tool{% endblock %}
+{% block title %}URL Decoder/Encoder - Base64, URL, HTML, Hex, Binary Converter | NetHub Network Tools{% endblock %}
+{% block meta_title %}URL Decoder/Encoder - Base64, URL, HTML, Hex, Binary Converter | NetHub Network Tools{% endblock %}
+{% block meta_description %}Input a string of text and encode or decode it as you like. Handy for turning encoded JavaScript URLs from complete gibberish into readable gibberish. Free online tool for Base64, URL, HTML, Hex, and Binary conversion.{% endblock %}
+{% block meta_keywords %}URL decoder encoder, base64 encode decode, URL encode decode, HTML encode decode, hex encode decode, binary encode decode, text converter, encoding tool, decoding tool, JavaScript URL decoder, gibberish decoder{% endblock %}
 {% block og_url %}/decode-encode{% endblock %}
 {% block twitter_url %}/decode-encode{% endblock %}
 {% block canonical_url %}/decode-encode{% endblock %}
@@ -49,27 +49,8 @@
     padding: 0.5rem 1rem;
 }
 
-.format-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
-
-.encode-section, .decode-section {
-    background: #f8fafc;
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-}
-
-.encode-section h4, .decode-section h4 {
-    color: #1f2937;
-    margin-bottom: 1rem;
-    font-size: 1.125rem;
-    font-weight: 600;
-}
-
 .input-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .input-group label {
@@ -84,11 +65,10 @@
     padding: 0.75rem;
     border: 2px solid #d1d5db;
     border-radius: 0.5rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 0.875rem;
-    font-family: 'Courier New', monospace;
     resize: vertical;
-    min-height: 100px;
-    transition: border-color 0.2s;
+    min-height: 120px;
 }
 
 .input-group textarea:focus {
@@ -97,387 +77,883 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.input-group button {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-encode {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     border: none;
+    color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    width: 100%;
-}
-
-.input-group button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
-}
-
-.input-group button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.result-display {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    margin-top: 1rem;
-    font-family: 'Courier New', monospace;
-    font-size: 0.875rem;
-    white-space: pre-wrap;
-    word-break: break-all;
-    min-height: 100px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.result-success {
-    border-color: #10b981;
-    background: #f0fdf4;
-}
-
-.result-error {
-    border-color: #ef4444;
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.process-all-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 1rem;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.process-all-section h3 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.process-all-section p {
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.process-all-section button {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 1rem 2rem;
-    border-radius: 0.75rem;
-    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.process-all-section button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
+.btn-encode:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
-.all-results {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
-
-.result-card {
-    background: white;
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
-}
-
-.result-card h5 {
-    color: #1f2937;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.result-card .result-content {
-    font-family: 'Courier New', monospace;
-    font-size: 0.75rem;
-    background: #f9fafb;
-    padding: 0.75rem;
+.btn-decode {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 150px;
-    overflow-y: auto;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.result-card .result-error {
+.btn-decode:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.result-section {
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.result-title {
+    font-weight: 600;
+    color: #059669;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.result-content {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    word-break: break-all;
+    white-space: pre-wrap;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.error-message {
     color: #dc2626;
     background: #fef2f2;
-    border-color: #fecaca;
+    border: 1px solid #fecaca;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-top: 1rem;
 }
 
-@media (max-width: 768px) {
-    .format-content {
-        grid-template-columns: 1fr;
-    }
-    
-    .all-results {
-        grid-template-columns: 1fr;
-    }
+.success-message {
+    color: #059669;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.copy-btn {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.copy-btn:hover {
+    background: #4b5563;
+}
+
+.all-formats-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.all-formats-section h3 {
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.all-formats-section .input-group textarea {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.all-formats-section .input-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.all-formats-section .input-group textarea:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.all-formats-section .btn-encode {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.all-formats-section .btn-encode:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-10">
-        <!-- Page Header -->
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-primary mb-3">
-                <i class="bi bi-code-square me-3"></i>Decode/Encode Tool
-            </h1>
-            <p class="lead text-muted">Convert text between different encoding formats including Base64, URL, HTML, Hexadecimal, Binary, and JSON</p>
-        </div>
+<div class="decode-encode-container">
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-code-square me-3"></i>URL Decoder/Encoder
+        </h1>
+        <p class="lead text-muted">Input a string of text and encode or decode it as you like. Handy for turning encoded JavaScript URLs from complete gibberish into readable gibberish.</p>
+    </div>
 
-        <!-- Process All Formats Section -->
-        <div class="process-all-section">
-            <h3><i class="bi bi-magic me-2"></i>Process All Formats</h3>
-            <p>Enter text below to encode/decode it in all supported formats at once</p>
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <textarea v-model="allFormatsText" placeholder="Enter text to process in all formats..." rows="3"></textarea>
-                    </div>
-                    <button @click="processAllFormats" :disabled="isProcessingAll" class="btn btn-lg">
-                        <span v-if="isProcessingAll" class="spinner-border spinner-border-sm me-2"></span>
-                        <i v-else class="bi bi-magic me-2"></i>
-                        <span v-if="isProcessingAll">Processing...</span>
-                        <span v-else>Process All Formats</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Individual Format Sections -->
-        <div class="decode-encode-container">
-            <!-- Base64 Section -->
-            <div class="format-section">
-                <div class="format-header">
-                    <h3><i class="bi bi-file-binary me-2"></i>Base64</h3>
-                    <span class="badge bg-primary">Text Encoding</span>
-                </div>
-                <div class="format-content">
-                    <div class="encode-section">
-                        <h4>Encode to Base64</h4>
-                        <div class="input-group">
-                            <label>Input Text</label>
-                            <textarea v-model="base64Input" placeholder="Enter text to encode to Base64..."></textarea>
-                        </div>
-                        <button @click="encodeBase64" :disabled="isLoadingBase64">Encode</button>
-                        <div v-if="base64EncodeResult" class="result-display" :class="base64EncodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="base64EncodeResult.success ? base64EncodeResult.encoded : base64EncodeResult.error"></span>
-                        </div>
-                    </div>
-                    <div class="decode-section">
-                        <h4>Decode from Base64</h4>
-                        <div class="input-group">
-                            <label>Base64 Text</label>
-                            <textarea v-model="base64Input" placeholder="Enter Base64 text to decode..."></textarea>
-                        </div>
-                        <button @click="decodeBase64" :disabled="isLoadingBase64">Decode</button>
-                        <div v-if="base64DecodeResult" class="result-display" :class="base64DecodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="base64DecodeResult.success ? base64DecodeResult.decoded : base64DecodeResult.error"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- URL Section -->
-            <div class="format-section">
-                <div class="format-header">
-                    <h3><i class="bi bi-link-45deg me-2"></i>URL Encoding</h3>
-                    <span class="badge bg-success">Web Safe</span>
-                </div>
-                <div class="format-content">
-                    <div class="encode-section">
-                        <h4>Encode for URL</h4>
-                        <div class="input-group">
-                            <label>Input Text</label>
-                            <textarea v-model="urlInput" placeholder="Enter text to encode for URL..."></textarea>
-                        </div>
-                        <button @click="encodeUrl" :disabled="isLoadingUrl">Encode</button>
-                        <div v-if="urlEncodeResult" class="result-display" :class="urlEncodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="urlEncodeResult.success ? urlEncodeResult.encoded : urlEncodeResult.error"></span>
-                        </div>
-                    </div>
-                    <div class="decode-section">
-                        <h4>Decode from URL</h4>
-                        <div class="input-group">
-                            <label>URL Encoded Text</label>
-                            <textarea v-model="urlInput" placeholder="Enter URL encoded text to decode..."></textarea>
-                        </div>
-                        <button @click="decodeUrl" :disabled="isLoadingUrl">Decode</button>
-                        <div v-if="urlDecodeResult" class="result-display" :class="urlDecodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="urlDecodeResult.success ? urlDecodeResult.decoded : urlDecodeResult.error"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HTML Section -->
-            <div class="format-section">
-                <div class="format-header">
-                    <h3><i class="bi bi-file-code me-2"></i>HTML Entities</h3>
-                    <span class="badge bg-warning">Web Safe</span>
-                </div>
-                <div class="format-content">
-                    <div class="encode-section">
-                        <h4>Encode HTML Entities</h4>
-                        <div class="input-group">
-                            <label>Input Text</label>
-                            <textarea v-model="htmlInput" placeholder="Enter text to encode as HTML entities..."></textarea>
-                        </div>
-                        <button @click="encodeHtml" :disabled="isLoadingHtml">Encode</button>
-                        <div v-if="htmlEncodeResult" class="result-display" :class="htmlEncodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="htmlEncodeResult.success ? htmlEncodeResult.encoded : htmlEncodeResult.error"></span>
-                        </div>
-                    </div>
-                    <div class="decode-section">
-                        <h4>Decode HTML Entities</h4>
-                        <div class="input-group">
-                            <label>HTML Encoded Text</label>
-                            <textarea v-model="htmlInput" placeholder="Enter HTML encoded text to decode..."></textarea>
-                        </div>
-                        <button @click="decodeHtml" :disabled="isLoadingHtml">Decode</button>
-                        <div v-if="htmlDecodeResult" class="result-display" :class="htmlDecodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="htmlDecodeResult.success ? htmlDecodeResult.decoded : htmlDecodeResult.error"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hexadecimal Section -->
-            <div class="format-section">
-                <div class="format-header">
-                    <h3><i class="bi bi-hash me-2"></i>Hexadecimal</h3>
-                    <span class="badge bg-info">Low Level</span>
-                </div>
-                <div class="format-content">
-                    <div class="encode-section">
-                        <h4>Encode to Hex</h4>
-                        <div class="input-group">
-                            <label>Input Text</label>
-                            <textarea v-model="hexInput" placeholder="Enter text to encode to hexadecimal..."></textarea>
-                        </div>
-                        <button @click="encodeHex" :disabled="isLoadingHex">Encode</button>
-                        <div v-if="hexEncodeResult" class="result-display" :class="hexEncodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="hexEncodeResult.success ? hexEncodeResult.encoded : hexEncodeResult.error"></span>
-                        </div>
-                    </div>
-                    <div class="decode-section">
-                        <h4>Decode from Hex</h4>
-                        <div class="input-group">
-                            <label>Hexadecimal Text</label>
-                            <textarea v-model="hexInput" placeholder="Enter hexadecimal text to decode..."></textarea>
-                        </div>
-                        <button @click="decodeHex" :disabled="isLoadingHex">Decode</button>
-                        <div v-if="hexDecodeResult" class="result-display" :class="hexDecodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="hexDecodeResult.success ? hexDecodeResult.decoded : hexDecodeResult.error"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Binary Section -->
-            <div class="format-section">
-                <div class="format-header">
-                    <h3><i class="bi bi-0-circle me-2"></i>Binary</h3>
-                    <span class="badge bg-dark">Machine Code</span>
-                </div>
-                <div class="format-content">
-                    <div class="encode-section">
-                        <h4>Encode to Binary</h4>
-                        <div class="input-group">
-                            <label>Input Text</label>
-                            <textarea v-model="binaryInput" placeholder="Enter text to encode to binary..."></textarea>
-                        </div>
-                        <button @click="encodeBinary" :disabled="isLoadingBinary">Encode</button>
-                        <div v-if="binaryEncodeResult" class="result-display" :class="binaryEncodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="binaryEncodeResult.success ? binaryEncodeResult.encoded : binaryEncodeResult.error"></span>
-                        </div>
-                    </div>
-                    <div class="decode-section">
-                        <h4>Decode from Binary</h4>
-                        <div class="input-group">
-                            <label>Binary Text</label>
-                            <textarea v-model="binaryInput" placeholder="Enter binary text to decode (8-bit groups)..."></textarea>
-                        </div>
-                        <button @click="decodeBinary" :disabled="isLoadingBinary">Decode</button>
-                        <div v-if="binaryDecodeResult" class="result-display" :class="binaryDecodeResult.success ? 'result-success' : 'result-error'">
-                            <span v-text="binaryDecodeResult.success ? binaryDecodeResult.decoded : binaryDecodeResult.error"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- All Results Section -->
-            <div v-if="allResults" class="format-section">
-                <div class="format-header">
-                    <h3><i class="bi bi-collection me-2"></i>All Format Results</h3>
-                    <span class="badge bg-secondary">Complete Analysis</span>
-                </div>
-                <div class="all-results">
-                    <div v-for="(result, key) in allResults" :key="key" class="result-card">
-                        <h5 v-text="key.replace('_', ' ').toUpperCase()"></h5>
-                        <div class="result-content" :class="result.success ? '' : 'result-error'">
-                            <span v-text="result.success ? (result.encoded || result.decoded) : result.error"></span>
-                        </div>
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">About URL Decoder/Encoder</h2>
+                    <p class="text-muted mb-3">This powerful tool allows you to input a string of text and encode or decode it as you like. It's particularly handy for turning encoded JavaScript URLs from complete gibberish into readable gibberish, making it an essential tool for developers, webmasters, and anyone working with encoded text.</p>
+                    
+                    <p class="text-muted mb-3">Our comprehensive decoder/encoder supports multiple formats including Base64, URL encoding, HTML entities, hexadecimal, binary, and JSON. Whether you're debugging encoded URLs, working with API responses, or need to convert text between different formats, this tool provides instant and accurate results.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Creative Commons License</h5>
+                        <p class="mb-0">This tool is provided without warranty, guarantee, or much in the way of explanation. Note that use of this tool may or may not crash your browser, lock up your machine, erase your hard drive, or e-mail those naughty pictures you hid in the Utilities folder to your mother. Don't blame us if anything bad happens to you, because it's actually the aliens' fault.</p>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Features Section -->
-        <div class="card shadow-lg mt-5">
-            <div class="card-body">
-                <h3 class="text-center mb-4">Decode/Encode Tool Features</h3>
-                <div class="row">
-                    <div class="col-md-4 text-center mb-3">
-                        <i class="bi bi-code-square text-primary" style="font-size: 2rem;"></i>
-                        <h5 class="mt-2">Multiple Formats</h5>
-                        <p class="text-muted">Support for Base64, URL, HTML, Hex, Binary, and JSON encoding/decoding.</p>
+    <!-- All Formats Section -->
+    <div class="all-formats-section">
+        <div class="format-header">
+            <h3><i class="bi bi-globe me-2"></i>All Formats Converter</h3>
+            <span class="badge bg-light text-dark">Universal</span>
+        </div>
+        <form method="POST" action="/decode-encode">
+            <div class="input-group">
+                <label for="allFormatsText">Enter text to convert</label>
+                <textarea id="allFormatsText" name="input_text" placeholder="Enter text to convert in any format..." required>{{ input_text or '' }}</textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-white">Format Type</label>
+                    <select name="format_type" class="form-select mb-3" required>
+                        <option value="">Select format</option>
+                        <option value="base64" {% if format_type == 'base64' %}selected{% endif %}>Base64</option>
+                        <option value="url" {% if format_type == 'url' %}selected{% endif %}>URL Encoding</option>
+                        <option value="html" {% if format_type == 'html' %}selected{% endif %}>HTML Entities</option>
+                        <option value="hex" {% if format_type == 'hex' %}selected{% endif %}>Hexadecimal</option>
+                        <option value="binary" {% if format_type == 'binary' %}selected{% endif %}>Binary</option>
+                        <option value="json" {% if format_type == 'json' %}selected{% endif %}>JSON</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-white">Operation</label>
+                    <select name="operation" class="form-select mb-3" required>
+                        <option value="">Select operation</option>
+                        <option value="encode" {% if operation == 'encode' %}selected{% endif %}>Encode</option>
+                        <option value="decode" {% if operation == 'decode' %}selected{% endif %}>Decode</option>
+                    </select>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-encode">
+                    <i class="bi bi-arrow-left-right me-2"></i>Convert Text
+                </button>
+            </div>
+        </form>
+
+        <!-- All Formats Results -->
+        {% if results and format_type %}
+        <div class="result-section mt-4">
+            {% if results.success %}
+            <div class="result-title">
+                <i class="bi bi-check-circle me-2"></i>{{ format_type|title }} {{ operation|title }} Result
+            </div>
+            <div class="result-content">{{ results.encoded or results.decoded }}</div>
+            <button class="copy-btn" onclick="copyToClipboard('{{ (results.encoded or results.decoded)|replace("'", "\\'") }}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Result
+            </button>
+            {% else %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ results.error }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Base64 Section -->
+    <div class="format-section">
+        <div class="format-header">
+            <h3><i class="bi bi-file-earmark-code me-2"></i>Base64</h3>
+            <span class="badge bg-info">Binary-to-Text</span>
+        </div>
+        <form method="POST" action="/decode-encode">
+            <input type="hidden" name="format_type" value="base64">
+            <input type="hidden" name="operation" value="">
+            <div class="input-group">
+                <label for="base64Input">Enter text for Base64 conversion</label>
+                <textarea id="base64Input" name="input_text" placeholder="Enter text to encode/decode with Base64...">{{ input_text if format_type == 'base64' else '' }}</textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-encode convert-btn" data-operation="encode">
+                    <i class="bi bi-arrow-up me-2"></i>Encode to Base64
+                </button>
+                <button type="button" class="btn-decode convert-btn" data-operation="decode">
+                    <i class="bi bi-arrow-down me-2"></i>Decode from Base64
+                </button>
+            </div>
+        </form>
+        
+        <!-- Base64 Results -->
+        {% if results and format_type == 'base64' %}
+        <div class="result-section">
+            {% if results.success %}
+            <div class="result-title">
+                <i class="bi bi-check-circle me-2"></i>Base64 {{ operation|title }} Result
+            </div>
+            <div class="result-content">{{ results.encoded or results.decoded }}</div>
+            <button class="copy-btn" onclick="copyToClipboard('{{ (results.encoded or results.decoded)|replace("'", "\\'") }}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Result
+            </button>
+            {% else %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ results.error }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- URL Encoding Section -->
+    <div class="format-section">
+        <div class="format-header">
+            <h3><i class="bi bi-link-45deg me-2"></i>URL Encoding</h3>
+            <span class="badge bg-warning">Percent-Encoding</span>
+        </div>
+        <form method="POST" action="/decode-encode">
+            <input type="hidden" name="format_type" value="url">
+            <input type="hidden" name="operation" value="">
+            <div class="input-group">
+                <label for="urlInput">Enter text for URL encoding</label>
+                <textarea id="urlInput" name="input_text" placeholder="Enter text to encode/decode for URLs...">{{ input_text if format_type == 'url' else '' }}</textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-encode convert-btn" data-operation="encode">
+                    <i class="bi bi-arrow-up me-2"></i>Encode URL
+                </button>
+                <button type="button" class="btn-decode convert-btn" data-operation="decode">
+                    <i class="bi bi-arrow-down me-2"></i>Decode URL
+                </button>
+            </div>
+        </form>
+        
+        <!-- URL Results -->
+        {% if results and format_type == 'url' %}
+        <div class="result-section">
+            {% if results.success %}
+            <div class="result-title">
+                <i class="bi bi-check-circle me-2"></i>URL {{ operation|title }} Result
+            </div>
+            <div class="result-content">{{ results.encoded or results.decoded }}</div>
+            <button class="copy-btn" onclick="copyToClipboard('{{ (results.encoded or results.decoded)|replace("'", "\\'") }}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Result
+            </button>
+            {% else %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ results.error }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- HTML Entities Section -->
+    <div class="format-section">
+        <div class="format-header">
+            <h3><i class="bi bi-code-square me-2"></i>HTML Entities</h3>
+            <span class="badge bg-success">Character References</span>
+        </div>
+        <form method="POST" action="/decode-encode">
+            <input type="hidden" name="format_type" value="html">
+            <input type="hidden" name="operation" value="">
+            <div class="input-group">
+                <label for="htmlInput">Enter text for HTML entity conversion</label>
+                <textarea id="htmlInput" name="input_text" placeholder="Enter text to encode/decode HTML entities...">{{ input_text if format_type == 'html' else '' }}</textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-encode convert-btn" data-operation="encode">
+                    <i class="bi bi-arrow-up me-2"></i>Encode HTML
+                </button>
+                <button type="button" class="btn-decode convert-btn" data-operation="decode">
+                    <i class="bi bi-arrow-down me-2"></i>Decode HTML
+                </button>
+            </div>
+        </form>
+        
+        <!-- HTML Results -->
+        {% if results and format_type == 'html' %}
+        <div class="result-section">
+            {% if results.success %}
+            <div class="result-title">
+                <i class="bi bi-check-circle me-2"></i>HTML {{ operation|title }} Result
+            </div>
+            <div class="result-content">{{ results.encoded or results.decoded }}</div>
+            <button class="copy-btn" onclick="copyToClipboard('{{ (results.encoded or results.decoded)|replace("'", "\\'") }}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Result
+            </button>
+            {% else %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ results.error }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Hexadecimal Section -->
+    <div class="format-section">
+        <div class="format-header">
+            <h3><i class="bi bi-hash me-2"></i>Hexadecimal</h3>
+            <span class="badge bg-secondary">Base-16</span>
+        </div>
+        <form method="POST" action="/decode-encode">
+            <input type="hidden" name="format_type" value="hex">
+            <input type="hidden" name="operation" value="">
+            <div class="input-group">
+                <label for="hexInput">Enter text for hexadecimal conversion</label>
+                <textarea id="hexInput" name="input_text" placeholder="Enter text to convert to/from hexadecimal...">{{ input_text if format_type == 'hex' else '' }}</textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-encode convert-btn" data-operation="encode">
+                    <i class="bi bi-arrow-up me-2"></i>Encode to Hex
+                </button>
+                <button type="button" class="btn-decode convert-btn" data-operation="decode">
+                    <i class="bi bi-arrow-down me-2"></i>Decode from Hex
+                </button>
+            </div>
+        </form>
+        
+        <!-- Hex Results -->
+        {% if results and format_type == 'hex' %}
+        <div class="result-section">
+            {% if results.success %}
+            <div class="result-title">
+                <i class="bi bi-check-circle me-2"></i>Hexadecimal {{ operation|title }} Result
+            </div>
+            <div class="result-content">{{ results.encoded or results.decoded }}</div>
+            <button class="copy-btn" onclick="copyToClipboard('{{ (results.encoded or results.decoded)|replace("'", "\\'") }}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Result
+            </button>
+            {% else %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ results.error }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Binary Section -->
+    <div class="format-section">
+        <div class="format-header">
+            <h3><i class="bi bi-0-circle me-2"></i>Binary</h3>
+            <span class="badge bg-dark">Base-2</span>
+        </div>
+        <form method="POST" action="/decode-encode">
+            <input type="hidden" name="format_type" value="binary">
+            <input type="hidden" name="operation" value="">
+            <div class="input-group">
+                <label for="binaryInput">Enter text for binary conversion</label>
+                <textarea id="binaryInput" name="input_text" placeholder="Enter text to convert to/from binary...">{{ input_text if format_type == 'binary' else '' }}</textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-encode convert-btn" data-operation="encode">
+                    <i class="bi bi-arrow-up me-2"></i>Encode to Binary
+                </button>
+                <button type="button" class="btn-decode convert-btn" data-operation="decode">
+                    <i class="bi bi-arrow-down me-2"></i>Decode from Binary
+                </button>
+            </div>
+        </form>
+        
+        <!-- Binary Results -->
+        {% if results and format_type == 'binary' %}
+        <div class="result-section">
+            {% if results.success %}
+            <div class="result-title">
+                <i class="bi bi-check-circle me-2"></i>Binary {{ operation|title }} Result
+            </div>
+            <div class="result-content">{{ results.encoded or results.decoded }}</div>
+            <button class="copy-btn" onclick="copyToClipboard('{{ (results.encoded or results.decoded)|replace("'", "\\'") }}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Result
+            </button>
+            {% else %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ results.error }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- JSON Section -->
+    <div class="format-section">
+        <div class="format-header">
+            <h3><i class="bi bi-filetype-json me-2"></i>JSON</h3>
+            <span class="badge bg-danger">Data Format</span>
+        </div>
+        <form method="POST" action="/decode-encode">
+            <input type="hidden" name="format_type" value="json">
+            <input type="hidden" name="operation" value="">
+            <div class="input-group">
+                <label for="jsonInput">Enter JSON data for formatting</label>
+                <textarea id="jsonInput" name="input_text" placeholder="Enter JSON data to format/minify...">{{ input_text if format_type == 'json' else '' }}</textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-encode convert-btn" data-operation="encode">
+                    <i class="bi bi-arrow-up me-2"></i>Format JSON
+                </button>
+                <button type="button" class="btn-decode convert-btn" data-operation="decode">
+                    <i class="bi bi-arrow-down me-2"></i>Minify JSON
+                </button>
+            </div>
+        </form>
+        
+        <!-- JSON Results -->
+        {% if results and format_type == 'json' %}
+        <div class="result-section">
+            {% if results.success %}
+            <div class="result-title">
+                <i class="bi bi-check-circle me-2"></i>JSON {{ operation|title }} Result
+            </div>
+            <div class="result-content">{{ results.encoded or results.decoded }}</div>
+            <button class="copy-btn" onclick="copyToClipboard('{{ (results.encoded or results.decoded)|replace("'", "\\'") }}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Result
+            </button>
+            {% else %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ results.error }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Features Section -->
+    <div class="card shadow-lg mt-5">
+        <div class="card-body">
+            <h3 class="text-center mb-4">Decode/Encode Tool Features</h3>
+            <div class="row">
+                <div class="col-md-4 text-center mb-3">
+                    <i class="bi bi-code-square text-primary" style="font-size: 2rem;"></i>
+                    <h5 class="mt-2">Multiple Formats</h5>
+                    <p class="text-muted">Support for Base64, URL, HTML, Hex, Binary, and JSON encoding/decoding.</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <i class="bi bi-arrow-left-right text-primary" style="font-size: 2rem;"></i>
+                    <h5 class="mt-2">Bidirectional</h5>
+                    <p class="text-muted">Encode and decode in both directions for all supported formats.</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <i class="bi bi-lightning text-primary" style="font-size: 2rem;"></i>
+                    <h5 class="mt-2">Instant Results</h5>
+                    <p class="text-muted">Get immediate results with real-time encoding and decoding.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show success message
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+        button.classList.remove('copy-btn');
+        button.classList.add('btn-success');
+        
+        setTimeout(function() {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-success');
+            button.classList.add('copy-btn');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+        alert('Failed to copy text to clipboard');
+    });
+}
+
+// Auto-detection function
+function detectFormat(text) {
+    if (!text || text.trim() === '') {
+        return { format: '', operation: '', confidence: 0 };
+    }
+    
+    text = text.trim();
+    let confidence = 0;
+    let detectedFormat = '';
+    let detectedOperation = '';
+    
+    // Base64 detection
+    if (/^[A-Za-z0-9+/]*={0,2}$/.test(text) && text.length % 4 === 0) {
+        try {
+            atob(text);
+            detectedFormat = 'base64';
+            detectedOperation = 'decode';
+            confidence = 90;
+        } catch(e) {
+            // Not valid Base64
+        }
+    }
+    
+    // URL encoding detection
+    if (text.includes('%') && /%[0-9A-Fa-f]{2}/.test(text)) {
+        detectedFormat = 'url';
+        detectedOperation = 'decode';
+        confidence = 85;
+    }
+    
+    // HTML entities detection
+    if (text.includes('&') && (text.includes(';') || /&[a-zA-Z]+;/.test(text) || /&#\d+;/.test(text))) {
+        detectedFormat = 'html';
+        detectedOperation = 'decode';
+        confidence = 80;
+    }
+    
+    // Hexadecimal detection
+    if (/^[0-9A-Fa-f\s]+$/.test(text.replace(/\s/g, '')) && text.replace(/\s/g, '').length % 2 === 0) {
+        detectedFormat = 'hex';
+        detectedOperation = 'decode';
+        confidence = 75;
+    }
+    
+    // Binary detection
+    if (/^[01\s]+$/.test(text) && text.replace(/\s/g, '').length % 8 === 0) {
+        detectedFormat = 'binary';
+        detectedOperation = 'decode';
+        confidence = 70;
+    }
+    
+    // JSON detection
+    if ((text.startsWith('{') && text.endsWith('}')) || (text.startsWith('[') && text.endsWith(']'))) {
+        try {
+            JSON.parse(text);
+            detectedFormat = 'json';
+            detectedOperation = 'encode';
+            confidence = 95;
+        } catch(e) {
+            // Not valid JSON
+        }
+    }
+    
+    // If no specific format detected, check if it looks like plain text
+    if (!detectedFormat && /^[a-zA-Z0-9\s.,!?@#$%^&*()_+\-=\[\]{}|;:"'<>?/~`]+$/.test(text)) {
+        detectedFormat = 'base64';
+        detectedOperation = 'encode';
+        confidence = 60;
+    }
+    
+    return {
+        format: detectedFormat,
+        operation: detectedOperation,
+        confidence: confidence
+    };
+}
+
+// Auto-detect on input change
+document.addEventListener('DOMContentLoaded', function() {
+    const inputField = document.getElementById('allFormatsText');
+    const formatSelect = document.querySelector('select[name="format_type"]');
+    const operationSelect = document.querySelector('select[name="operation"]');
+    
+    if (inputField && formatSelect && operationSelect) {
+        inputField.addEventListener('input', function() {
+            const text = this.value;
+            const detection = detectFormat(text);
+            
+            if (detection.confidence > 50) {
+                // Update the dropdowns with detected values
+                formatSelect.value = detection.format;
+                operationSelect.value = detection.operation;
+                
+                // Show detection hint
+                showDetectionHint(detection);
+            } else {
+                hideDetectionHint();
+            }
+        });
+    }
+    
+    // Auto-submit individual section forms when convert buttons are clicked
+    const convertButtons = document.querySelectorAll('.convert-btn');
+    convertButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const form = this.closest('form');
+            if (form) {
+                // Set the operation based on button clicked
+                const operation = this.getAttribute('data-operation');
+                const operationInput = form.querySelector('input[name="operation"]');
+                if (operationInput) {
+                    operationInput.value = operation;
+                }
+                
+                // Submit the form
+                form.submit();
+            }
+        });
+    });
+});
+
+function showDetectionHint(detection) {
+    let hint = document.getElementById('detection-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'detection-hint';
+        hint.className = 'alert alert-info mt-2';
+        hint.innerHTML = '<i class="bi bi-lightbulb me-2"></i><span id="hint-text"></span>';
+        
+        const inputGroup = document.querySelector('.input-group');
+        inputGroup.appendChild(hint);
+    }
+    
+    const hintText = document.getElementById('hint-text');
+    hintText.textContent = `Auto-detected: ${detection.format.toUpperCase()} ${detection.operation} (${detection.confidence}% confidence)`;
+    hint.style.display = 'block';
+}
+
+function hideDetectionHint() {
+    const hint = document.getElementById('detection-hint');
+    if (hint) {
+        hint.style.display = 'none';
+    }
+}
+</script>
+
+    <!-- Supported Formats Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Supported Encoding Formats</h2>
+                    <p class="text-muted mb-3">Our URL Decoder/Encoder supports a wide range of encoding formats commonly used in web development, data processing, and system administration:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Text Encoding</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Base64 Encode/Decode</strong> - Binary data encoding</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Base64URL Encode/Decode</strong> - URL-safe Base64 encoding</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>URL Encode/Decode</strong> - Percent-encoding for URLs</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>HTML Encode/Decode</strong> - HTML entity encoding</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Data Formats</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Hexadecimal Encode/Decode</strong> - Hex representation</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Binary Encode/Decode</strong> - Binary representation</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>JSON Encode/Decode</strong> - JSON formatting</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>UTF-16 Decode</strong> - Unicode text decoding</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center mb-3">
-                        <i class="bi bi-arrow-left-right text-primary" style="font-size: 2rem;"></i>
-                        <h5 class="mt-2">Bidirectional</h5>
-                        <p class="text-muted">Encode and decode in both directions for all supported formats.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use Cases Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Common Use Cases</h2>
+                    <p class="text-muted mb-3">URL Decoder/Encoder tools are essential for various development and data processing tasks:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Web Development</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug encoded JavaScript URLs</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Process API responses and data</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Handle form data encoding</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Work with encoded query parameters</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Data Processing</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Convert between text formats</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Process encoded configuration files</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Handle binary data encoding</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug data transmission issues</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center mb-3">
-                        <i class="bi bi-lightning text-primary" style="font-size: 2rem;"></i>
-                        <h5 class="mt-2">Instant Results</h5>
-                        <p class="text-muted">Get immediate results with real-time encoding and decoding.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Encoding Standards Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Encoding Standards and Specifications</h2>
+                    <p class="text-muted mb-3">Our tool implements industry-standard encoding and decoding algorithms:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">RFC Standards</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-file-text text-primary me-2"></i><strong>RFC 4648</strong> - Base64 and Base64URL encoding</li>
+                                <li class="mb-2"><i class="bi bi-file-text text-primary me-2"></i><strong>RFC 3986</strong> - URL encoding (percent-encoding)</li>
+                                <li class="mb-2"><i class="bi bi-file-text text-primary me-2"></i><strong>RFC 2047</strong> - MIME header encoding</li>
+                                <li class="mb-2"><i class="bi bi-file-text text-primary me-2"></i><strong>RFC 7159</strong> - JSON data format</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Web Standards</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-globe text-primary me-2"></i><strong>HTML5</strong> - HTML entity encoding</li>
+                                <li class="mb-2"><i class="bi bi-globe text-primary me-2"></i><strong>Unicode</strong> - UTF-8, UTF-16 text encoding</li>
+                                <li class="mb-2"><i class="bi bi-globe text-primary me-2"></i><strong>W3C</strong> - Web content guidelines</li>
+                                <li class="mb-2"><i class="bi bi-globe text-primary me-2"></i><strong>ECMAScript</strong> - JavaScript string handling</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Why Use Our URL Decoder/Encoder?</h2>
+                    <p class="text-muted mb-3">Our comprehensive encoding/decoding tool provides several advantages:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For Developers</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Instant format detection and conversion</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Support for all major encoding formats</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Bidirectional conversion capabilities</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Real-time auto-detection hints</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For Data Analysts</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Process encoded data files</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Convert between different data formats</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug data transmission issues</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Handle API response processing</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="decodeEncodeFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                    What is the difference between Base64 and Base64URL?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#decodeEncodeFAQ">
+                                <div class="accordion-body">
+                                    Base64 uses characters A-Z, a-z, 0-9, +, and / for encoding, while Base64URL uses A-Z, a-z, 0-9, -, and _ instead of + and /. Base64URL is URL-safe and can be used directly in URLs without additional encoding, making it ideal for web applications and API endpoints.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    When should I use URL encoding?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#decodeEncodeFAQ">
+                                <div class="accordion-body">
+                                    URL encoding (percent-encoding) should be used when including special characters in URLs, form data, or query parameters. It ensures that characters like spaces, ampersands, and other special characters are properly transmitted and interpreted by web servers and browsers.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    How does auto-detection work?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#decodeEncodeFAQ">
+                                <div class="accordion-body">
+                                    Our auto-detection feature analyzes the input text to identify patterns characteristic of different encoding formats. It checks for Base64 patterns, URL encoding patterns, HTML entities, hexadecimal characters, and other format-specific indicators to suggest the most likely format and operation.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
-<!-- Vue 3 -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
-<!-- Decode/Encode App -->
-<script src="/static/decode-encode-app.js"></script>
 {% endblock %}

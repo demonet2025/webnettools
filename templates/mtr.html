@@ -1,0 +1,898 @@
+{% extends "base.html" %}
+
+{% block title %}MTR - My Traceroute Network Diagnostics Tool | NetHub Network Tools{% endblock %}
+
+{% block meta_description %}Free online MTR (My Traceroute) tool that combines ping and traceroute functionality for comprehensive network diagnostics. Monitor network paths, detect packet loss, and analyze routing performance in real-time.{% endblock %}
+
+{% block meta_keywords %}MTR tool, my traceroute, network diagnostics, MTR online, network monitoring, ping traceroute, packet loss detection, network analysis, routing performance, real-time monitoring, network troubleshooting{% endblock %}
+
+{% block og_url %}/mtr{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-diagram-3-fill me-3"></i>MTR - My Traceroute Network Diagnostics
+        </h1>
+        <p class="lead text-muted">Advanced network diagnostics tool that combines ping and traceroute functionality for comprehensive network path analysis and real-time monitoring</p>
+    </div>
+
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">What is MTR (My Traceroute)?</h2>
+                    <p class="text-muted mb-3">MTR (My Traceroute) is a powerful network diagnostic tool that combines the functionality of both <code>ping</code> and <code>traceroute</code> in a single program. It provides continuous monitoring of network paths, allowing you to detect packet loss, measure latency, and identify network bottlenecks in real-time.</p>
+                    
+                    <p class="text-muted mb-3">Unlike traditional traceroute tools that send a limited number of packets, MTR continuously sends packets to each hop along the network path, providing statistical data about packet loss, latency, and jitter. This makes it an invaluable tool for network administrators and IT professionals who need to monitor network performance and troubleshoot connectivity issues.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Key Features of MTR</h5>
+                        <p class="mb-0">MTR provides real-time statistics including packet loss percentage, average response time, best and worst response times, and standard deviation for each hop in the network path. This comprehensive data helps identify problematic network segments and routing issues.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MTR Form -->
+    <div class="card shadow-lg mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-diagram-3-fill me-2"></i>MTR Analysis</h5>
+        </div>
+        <div class="card-body">
+            <form id="mtrForm" class="row g-3">
+                <div class="col-md-6">
+                    <label for="hostname" class="form-label fw-bold">Hostname or IP Address</label>
+                    <input 
+                        type="text" 
+                        id="hostname" 
+                        name="hostname"
+                        value="{{ hostname or '' }}"
+                        class="form-control form-control-lg" 
+                        placeholder="example.com or 8.8.8.8" 
+                        required
+                    >
+                </div>
+                <div class="col-md-3">
+                    <label for="count" class="form-label fw-bold">Probes per Hop</label>
+                    <select id="count" name="count" class="form-select form-select-lg">
+                        <option value="5" {% if count == 5 %}selected{% endif %}>5 probes</option>
+                        <option value="10" {% if count == 10 %}selected{% endif %}>10 probes</option>
+                        <option value="20" {% if count == 20 %}selected{% endif %}>20 probes</option>
+                        <option value="50" {% if count == 50 %}selected{% endif %}>50 probes</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="maxHops" class="form-label fw-bold">Max Hops</label>
+                    <select id="maxHops" name="max_hops" class="form-select form-select-lg">
+                        <option value="15" {% if max_hops == 15 %}selected{% endif %}>15 hops</option>
+                        <option value="30" {% if max_hops == 30 %}selected{% endif %}>30 hops</option>
+                        <option value="50" {% if max_hops == 50 %}selected{% endif %}>50 hops</option>
+                        <option value="64" {% if max_hops == 64 %}selected{% endif %}>64 hops</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="streamingMode" checked>
+                            <label class="form-check-label" for="streamingMode">
+                                <i class="bi bi-lightning me-1"></i>Real-time streaming
+                            </label>
+                        </div>
+                        <div>
+                            <button type="submit" id="startBtn" class="btn btn-primary btn-lg">
+                                <i class="bi bi-diagram-3-fill me-2"></i>Start MTR Analysis
+                            </button>
+                            <button type="button" id="stopBtn" class="btn btn-danger btn-lg ms-2" style="display: none;">
+                                <i class="bi bi-stop-circle me-2"></i>Stop MTR
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div id="resultsContainer" style="display: none;">
+        <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);">
+            <div class="card-header border-0" style="background: transparent;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="p-2 rounded-circle me-3" style="background: rgba(13, 110, 253, 0.1);">
+                            <i class="bi bi-diagram-3-fill" style="color: #6c757d; font-size: 1.2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold" style="color: #6c757d;">MTR Analysis Results</h5>
+                            <small style="color: #adb5bd;">Comprehensive network path analysis</small>
+                        </div>
+                    </div>
+                    <div id="statusIndicator" class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span id="statusText">Starting...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <!-- Progress Bar -->
+                <div class="mb-3">
+                    <div class="progress" style="height: 8px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted" id="progressText">Preparing MTR analysis...</small>
+                </div>
+                
+                <!-- Live Statistics Cards -->
+                <div class="row g-4 mb-4" id="statsCards">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(13, 110, 253, 0.1);">
+                                <i class="bi bi-diagram-3" style="color: #0d6efd; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Total Hops</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #0d6efd;" id="totalHops">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(25, 135, 84, 0.1);">
+                                <i class="bi bi-check-circle" style="color: #198754; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Reachable Hops</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #198754;" id="reachableHops">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(255, 193, 7, 0.1);">
+                                <i class="bi bi-exclamation-triangle" style="color: #ffc107; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Avg Loss</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #ffc107;" id="avgLoss">0%</h3>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(13, 202, 240, 0.1);">
+                                <i class="bi bi-speedometer2" style="color: #0dcaf0; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Avg RTT</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #0dcaf0;" id="avgRtt">0 ms</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Real-time Output -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-terminal me-2"></i>Live MTR Output
+                    </h6>
+                    <div id="liveOutput" class="bg-dark text-light p-3 rounded" style="height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px;">
+                        <div class="text-success">Waiting for MTR analysis to start...</div>
+                    </div>
+                </div>
+                
+                <!-- Network Path Table -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-diagram-3 me-2"></i>Network Path Analysis
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Hop</th>
+                                    <th>Host</th>
+                                    <th>Loss %</th>
+                                    <th>Sent</th>
+                                    <th>Last</th>
+                                    <th>Avg</th>
+                                    <th>Best</th>
+                                    <th>Worst</th>
+                                    <th>StDev</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hopsTableBody">
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">No data yet...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Traditional Results (for non-streaming mode) -->
+    {% if mtr_results %}
+    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);">
+        <div class="card-header border-0" style="background: transparent;">
+            <div class="d-flex align-items-center">
+                <div class="p-2 rounded-circle me-3" style="background: rgba(13, 110, 253, 0.1);">
+                    <i class="bi bi-diagram-3-fill" style="color: #6c757d; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold" style="color: #6c757d;">MTR Analysis Results</h5>
+                    <small style="color: #adb5bd;">Comprehensive network path analysis</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            {% if mtr_results.success and mtr_results.hops %}
+            <!-- Statistics Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(13, 110, 253, 0.1);">
+                            <i class="bi bi-diagram-3" style="color: #0d6efd; font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="mb-1" style="color: #6c757d;">Total Hops</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #0d6efd;">{{ mtr_results.hops|length }}</h3>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(25, 135, 84, 0.1);">
+                            <i class="bi bi-check-circle" style="color: #198754; font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="mb-1" style="color: #6c757d;">Reachable Hops</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #198754;">{{ mtr_results.hops|selectattr('loss_percentage', 'lt', 100)|list|length }}</h3>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(255, 193, 7, 0.1);">
+                            <i class="bi bi-exclamation-triangle" style="color: #ffc107; font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="mb-1" style="color: #6c757d;">Avg Loss</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #ffc107;">{{ "%.1f"|format(mtr_results.hops|map(attribute='loss_percentage')|sum / mtr_results.hops|length) }}%</h3>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(13, 202, 240, 0.1);">
+                            <i class="bi bi-speedometer2" style="color: #0dcaf0; font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="mb-1" style="color: #6c757d;">Avg RTT</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #0dcaf0;">{{ "%.1f"|format(mtr_results.hops|selectattr('avg_rtt', 'gt', 0)|map(attribute='avg_rtt')|sum / mtr_results.hops|selectattr('avg_rtt', 'gt', 0)|list|length) }} ms</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Network Path Table -->
+            <div class="mb-4">
+                <h6 class="fw-bold text-primary mb-3">
+                    <i class="bi bi-diagram-3 me-2"></i>Network Path Analysis
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Hop</th>
+                                <th>Host</th>
+                                <th>Loss %</th>
+                                <th>Sent</th>
+                                <th>Last</th>
+                                <th>Avg</th>
+                                <th>Best</th>
+                                <th>Worst</th>
+                                <th>StDev</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hop in mtr_results.hops %}
+                            <tr>
+                                <td class="fw-bold">{{ hop.hop_number }}</td>
+                                <td>
+                                    {% if hop.hostname %}
+                                        <div class="fw-bold">{{ hop.hostname }}</div>
+                                        <small class="text-muted">{{ hop.ip_address }}</small>
+                                    {% else %}
+                                        <span class="text-muted">{{ hop.ip_address or 'N/A' }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {% if hop.loss_percentage == 0 %}bg-success{% elif hop.loss_percentage < 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ "%.1f"|format(hop.loss_percentage) }}%
+                                    </span>
+                                </td>
+                                <td>{{ hop.sent }}</td>
+                                <td>
+                                    {% if hop.last_rtt > 0 %}
+                                        <span class="text-success">{{ "%.1f"|format(hop.last_rtt) }} ms</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if hop.avg_rtt > 0 %}
+                                        <span class="text-primary">{{ "%.1f"|format(hop.avg_rtt) }} ms</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if hop.best_rtt > 0 %}
+                                        <span class="text-success">{{ "%.1f"|format(hop.best_rtt) }} ms</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if hop.worst_rtt > 0 %}
+                                        <span class="text-warning">{{ "%.1f"|format(hop.worst_rtt) }} ms</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if hop.stdev_rtt > 0 %}
+                                        <span class="text-info">{{ "%.1f"|format(hop.stdev_rtt) }} ms</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if mtr_results.raw_output %}
+            <div class="mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                    <i class="bi bi-terminal me-2"></i>Raw MTR Output
+                </h6>
+                <pre class="bg-dark text-light p-3 rounded"><code>{{ mtr_results.raw_output }}</code></pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Error Message -->
+    {% if mtr_results and mtr_results.error %}
+    <div class="alert alert-danger mt-4" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Error:</strong> {{ mtr_results.error }}
+    </div>
+    {% endif %}
+
+    <!-- Error Message for Streaming -->
+    <div id="errorMessage" class="alert alert-danger mt-4" role="alert" style="display: none;">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Error:</strong> <span id="errorText"></span>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('mtrForm');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const liveOutput = document.getElementById('liveOutput');
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const hopsTableBody = document.getElementById('hopsTableBody');
+    
+    // Statistics elements
+    const totalHopsEl = document.getElementById('totalHops');
+    const reachableHopsEl = document.getElementById('reachableHops');
+    const avgLossEl = document.getElementById('avgLoss');
+    const avgRttEl = document.getElementById('avgRtt');
+    
+    let eventSource = null;
+    let hopCount = 0;
+    let reachableCount = 0;
+    let totalLoss = 0;
+    let totalRtt = 0;
+    let rttCount = 0;
+    let hopsData = [];
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        startMtr();
+    });
+    
+    stopBtn.addEventListener('click', function() {
+        stopMtr();
+    });
+    
+    function startMtr() {
+        const hostname = document.getElementById('hostname').value.trim();
+        const maxHops = document.getElementById('maxHops').value;
+        const count = document.getElementById('count').value;
+        const streamingMode = document.getElementById('streamingMode').checked;
+        
+        if (!hostname) {
+            showError('Please enter a hostname or IP address');
+            return;
+        }
+        
+        if (streamingMode) {
+            startStreamingMtr(hostname, maxHops, count);
+        } else {
+            startTraditionalMtr(hostname, maxHops, count);
+        }
+    }
+    
+    function startStreamingMtr(hostname, maxHops, count) {
+        // Reset state
+        hopCount = 0;
+        reachableCount = 0;
+        totalLoss = 0;
+        totalRtt = 0;
+        rttCount = 0;
+        hopsData = [];
+        
+        // Update UI
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-block';
+        resultsContainer.style.display = 'block';
+        errorMessage.style.display = 'none';
+        
+        // Clear previous output
+        liveOutput.innerHTML = '<div class="text-success">Starting MTR analysis to ' + hostname + '...</div>';
+        hopsTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No data yet...</td></tr>';
+        
+        // Update status
+        statusText.textContent = 'Running...';
+        document.querySelector('.spinner-border').style.display = 'inline-block';
+        
+        // Start streaming
+        const url = `/api/mtr/stream?hostname=${encodeURIComponent(hostname)}&max_hops=${maxHops}&count=${count}`;
+        eventSource = new EventSource(url);
+        
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            switch(data.type) {
+                case 'start':
+                    progressText.textContent = `Analyzing route to ${data.hostname} (${data.count} probes, max ${data.max_hops} hops)...`;
+                    break;
+                    
+                case 'hop':
+                    addHopToOutput(data.hop_data, data.hop_number);
+                    updateProgress(data.hop_number, maxHops);
+                    break;
+                    
+                case 'complete':
+                    completeMtr(data.summary);
+                    break;
+                    
+                case 'error':
+                    showError(data.message);
+                    stopMtr();
+                    break;
+            }
+        };
+        
+        eventSource.onerror = function(event) {
+            showError('Connection lost or MTR failed');
+            stopMtr();
+        };
+    }
+    
+    function startTraditionalMtr(hostname, maxHops, count) {
+        // Traditional mode - submit form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/mtr';
+        
+        const hostnameInput = document.createElement('input');
+        hostnameInput.type = 'hidden';
+        hostnameInput.name = 'hostname';
+        hostnameInput.value = hostname;
+        
+        const maxHopsInput = document.createElement('input');
+        maxHopsInput.type = 'hidden';
+        maxHopsInput.name = 'max_hops';
+        maxHopsInput.value = maxHops;
+        
+        const countInput = document.createElement('input');
+        countInput.type = 'hidden';
+        countInput.name = 'count';
+        countInput.value = count;
+        
+        form.appendChild(hostnameInput);
+        form.appendChild(maxHopsInput);
+        form.appendChild(countInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    function addHopToOutput(hopData, hopNumber) {
+        if (hopData.type === 'header') {
+            // Add header line to live output
+            liveOutput.innerHTML += `<div class="text-info mb-1">${hopData.line}</div>`;
+            return;
+        }
+        
+        if (hopData.type === 'raw') {
+            // Add raw line to live output
+            liveOutput.innerHTML += `<div class="text-light mb-1">${hopData.line}</div>`;
+            return;
+        }
+        
+        // Process hop data
+        hopCount++;
+        hopsData.push(hopData);
+        
+        // Update statistics
+        if (hopData.loss_percentage < 100) {
+            reachableCount++;
+        }
+        totalLoss += hopData.loss_percentage;
+        
+        if (hopData.avg_rtt > 0) {
+            totalRtt += hopData.avg_rtt;
+            rttCount++;
+        }
+        
+        // Add to live output
+        const colorClass = hopData.loss_percentage === 0 ? 'text-success' : 
+                          hopData.loss_percentage < 50 ? 'text-warning' : 'text-danger';
+        liveOutput.innerHTML += `<div class="${colorClass} mb-1">${hopData.raw_line}</div>`;
+        
+        // Update table
+        updateHopsTable(hopData);
+        
+        // Update statistics display
+        updateStatistics();
+        
+        // Auto-scroll to bottom (throttled for performance)
+        if (hopNumber % 3 === 0 || hopNumber < 10) {
+            liveOutput.scrollTop = liveOutput.scrollHeight;
+        }
+    }
+    
+    function updateHopsTable(hopData) {
+        // Remove "No data yet" row if it exists
+        const noDataRow = hopsTableBody.querySelector('tr td[colspan]');
+        if (noDataRow) {
+            noDataRow.parentElement.remove();
+        }
+        
+        // Create new row
+        const row = document.createElement('tr');
+        
+        const lossBadgeClass = hopData.loss_percentage === 0 ? 'bg-success' : 
+                              hopData.loss_percentage < 50 ? 'bg-warning' : 'bg-danger';
+        
+        row.innerHTML = `
+            <td class="fw-bold">${hopData.hop_number}</td>
+            <td>
+                <span class="text-muted">${hopData.ip_address || 'N/A'}</span>
+            </td>
+            <td>
+                <span class="badge ${lossBadgeClass}">${hopData.loss_percentage.toFixed(1)}%</span>
+            </td>
+            <td>${hopData.sent}</td>
+            <td>
+                ${hopData.last_rtt > 0 ? `<span class="text-success">${hopData.last_rtt.toFixed(1)} ms</span>` : '<span class="text-muted">N/A</span>'}
+            </td>
+            <td>
+                ${hopData.avg_rtt > 0 ? `<span class="text-primary">${hopData.avg_rtt.toFixed(1)} ms</span>` : '<span class="text-muted">N/A</span>'}
+            </td>
+            <td>
+                ${hopData.best_rtt > 0 ? `<span class="text-success">${hopData.best_rtt.toFixed(1)} ms</span>` : '<span class="text-muted">N/A</span>'}
+            </td>
+            <td>
+                ${hopData.worst_rtt > 0 ? `<span class="text-warning">${hopData.worst_rtt.toFixed(1)} ms</span>` : '<span class="text-muted">N/A</span>'}
+            </td>
+            <td>
+                ${hopData.stdev_rtt > 0 ? `<span class="text-info">${hopData.stdev_rtt.toFixed(1)} ms</span>` : '<span class="text-muted">N/A</span>'}
+            </td>
+        `;
+        
+        hopsTableBody.appendChild(row);
+    }
+    
+    function updateStatistics() {
+        totalHopsEl.textContent = hopCount;
+        reachableHopsEl.textContent = reachableCount;
+        avgLossEl.textContent = hopCount > 0 ? (totalLoss / hopCount).toFixed(1) + '%' : '0%';
+        avgRttEl.textContent = rttCount > 0 ? (totalRtt / rttCount).toFixed(1) + ' ms' : '0 ms';
+    }
+    
+    function updateProgress(currentHop, maxHops) {
+        const progress = Math.min((currentHop / maxHops) * 100, 100);
+        progressBar.style.width = progress + '%';
+        progressText.textContent = `Hop ${currentHop} of ${maxHops} (${Math.round(progress)}%)`;
+    }
+    
+    function completeMtr(summary) {
+        statusText.textContent = 'Complete';
+        document.querySelector('.spinner-border').style.display = 'none';
+        progressBar.style.width = '100%';
+        progressText.textContent = `Completed - ${hopCount} hops analyzed`;
+        
+        // Update final statistics
+        if (summary) {
+            totalHopsEl.textContent = summary.total_hops;
+            reachableHopsEl.textContent = summary.reachable_hops;
+            avgLossEl.textContent = summary.avg_loss + '%';
+            avgRttEl.textContent = summary.avg_rtt + ' ms';
+        }
+        
+        // Add completion message
+        const completionDiv = document.createElement('div');
+        completionDiv.className = 'text-info mt-2 fw-bold';
+        completionDiv.textContent = '✓ MTR analysis completed successfully';
+        liveOutput.appendChild(completionDiv);
+        
+        stopMtr();
+    }
+    
+    function stopMtr() {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+        }
+        
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+        
+        if (statusText.textContent === 'Running...') {
+            statusText.textContent = 'Stopped';
+            document.querySelector('.spinner-border').style.display = 'none';
+        }
+    }
+    
+    function showError(message) {
+        errorText.textContent = message;
+        errorMessage.style.display = 'block';
+        stopMtr();
+    }
+});
+</script>
+
+    <!-- MTR vs Traceroute Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">MTR vs Traditional Traceroute</h2>
+                    <p class="text-muted mb-3">While traditional traceroute tools send a limited number of packets to each hop and then move on, MTR continuously monitors the entire network path, providing ongoing statistics about network performance. This continuous monitoring approach offers several advantages:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Traditional Traceroute</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-x-circle text-danger me-2"></i>Limited packet sampling</li>
+                                <li class="mb-2"><i class="bi bi-x-circle text-danger me-2"></i>No continuous monitoring</li>
+                                <li class="mb-2"><i class="bi bi-x-circle text-danger me-2"></i>Basic latency measurement</li>
+                                <li class="mb-2"><i class="bi bi-x-circle text-danger me-2"></i>No packet loss statistics</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">MTR (My Traceroute)</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Continuous packet sampling</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Real-time monitoring</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Comprehensive statistics</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Packet loss detection</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MTR Statistics Explained Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Understanding MTR Statistics</h2>
+                    <p class="text-muted mb-3">MTR provides detailed statistics for each hop in the network path. Understanding these metrics is crucial for effective network troubleshooting:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Key Metrics</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-percent text-primary me-2"></i><strong>Loss%</strong> - Packet loss percentage for each hop</li>
+                                <li class="mb-2"><i class="bi bi-clock text-primary me-2"></i><strong>Avg</strong> - Average response time in milliseconds</li>
+                                <li class="bi bi-arrow-up text-primary me-2"></i><strong>Best</strong> - Fastest response time recorded</li>
+                                <li class="mb-2"><i class="bi bi-arrow-down text-primary me-2"></i><strong>Wrst</strong> - Slowest response time recorded</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Additional Metrics</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-graph-up text-primary me-2"></i><strong>StDev</strong> - Standard deviation of response times</li>
+                                <li class="mb-2"><i class="bi bi-hash text-primary me-2"></i><strong>Last</strong> - Most recent response time</li>
+                                <li class="mb-2"><i class="bi bi-arrow-right text-primary me-2"></i><strong>Avg</strong> - Running average of all responses</li>
+                                <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i><strong>Geo</strong> - Geographic location (when available)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use Cases Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Common Use Cases for MTR</h2>
+                    <p class="text-muted mb-3">MTR is widely used by network administrators, system administrators, and IT professionals for various network troubleshooting and monitoring tasks:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Network Troubleshooting</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Identify network bottlenecks and slow hops</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Detect packet loss and network instability</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Diagnose routing problems and misconfigurations</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor network performance over time</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Performance Monitoring</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor ISP performance and service quality</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify CDN and cloud service routing</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Test network connectivity to remote servers</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Analyze network latency and jitter patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MTR Command Line Options Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">MTR Command Line Options</h2>
+                    <p class="text-muted mb-3">MTR offers various command line options for customized network analysis. Here are some commonly used parameters:</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Option</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>-c</code></td>
+                                    <td>Number of pings to send</td>
+                                    <td><code>mtr -c 10 google.com</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>-r</code></td>
+                                    <td>Report mode (no interactive display)</td>
+                                    <td><code>mtr -r google.com</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>-n</code></td>
+                                    <td>No DNS resolution (show IPs only)</td>
+                                    <td><code>mtr -n google.com</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>-i</code></td>
+                                    <td>Interval between pings (seconds)</td>
+                                    <td><code>mtr -i 2 google.com</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>-m</code></td>
+                                    <td>Maximum number of hops</td>
+                                    <td><code>mtr -m 20 google.com</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Why Use Our MTR Tool?</h2>
+                    <p class="text-muted mb-3">Our online MTR tool provides advanced network diagnostics with real-time monitoring capabilities:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For Network Administrators</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Continuous network path monitoring</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Real-time packet loss detection</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Comprehensive latency analysis</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Network performance trending</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For IT Professionals</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>External network perspective</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>ISP performance verification</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Cloud service connectivity testing</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Network troubleshooting assistance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="mtrFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                    What is the difference between MTR and ping?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#mtrFAQ">
+                                <div class="accordion-body">
+                                    While ping tests connectivity to a single destination, MTR combines ping and traceroute functionality to test every hop along the network path. MTR provides continuous monitoring and detailed statistics for each hop, making it more comprehensive for network analysis.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    How do I interpret packet loss in MTR results?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#mtrFAQ">
+                                <div class="accordion-body">
+                                    Packet loss in MTR indicates network problems at specific hops. Look for patterns: if packet loss occurs at a specific hop and continues to subsequent hops, that hop is likely the problem. If packet loss is intermittent, it may indicate network congestion or unstable routing.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    Why do some hops show asterisks (*) in MTR output?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#mtrFAQ">
+                                <div class="accordion-body">
+                                    Asterisks (*) in MTR output indicate that no response was received from that hop within the timeout period. This could mean the router is configured not to respond to ICMP packets, there's packet loss, or the hop is experiencing issues. Some routers prioritize other traffic over ICMP responses.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Traceroute - Free Online Network Path Analysis | NetHub Network Tools{% endblock %}
+{% block title %}Traceroute Online - Trace and Map the Packets Path | NetHub Network Tools{% endblock %}
 
-{% block meta_description %}Free online traceroute tool to trace the network path to any hostname or IP address. Analyze network routing and identify bottlenecks in your connection.{% endblock %}
+{% block meta_description %}Utilize traceroute online to perform an advanced visual traceroute that maps and enriches output with ASN and Geolocation data to better understand the network path. Trace packets from our servers worldwide.{% endblock %}
 
-{% block meta_keywords %}traceroute, network path, routing analysis, network trace, hop analysis, network diagnostics, traceroute online{% endblock %}
+{% block meta_keywords %}traceroute online, trace packets path, network telemetry, ASN data, geolocation mapping, mtr traceroute, network path analysis, visual traceroute, network diagnostics, packet routing{% endblock %}
 
 {% block og_url %}/traceroute{% endblock %}
 
@@ -13,18 +13,37 @@
     <!-- Header -->
     <div class="text-center mb-5">
         <h1 class="display-4 fw-bold text-primary mb-3">
-            <i class="bi bi-diagram-3 me-3"></i>Traceroute
+            <i class="bi bi-diagram-3 me-3"></i>Traceroute Online - Trace and Map the Packets Path
         </h1>
-        <p class="lead text-muted">Trace the network path to any hostname or IP address to analyze routing and identify bottlenecks</p>
+        <p class="lead text-muted">Utilize traceroute online to perform an advanced visual traceroute that maps and enriches output with ASN and Geolocation data to better understand the network path</p>
+    </div>
+
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Advanced Visual Traceroute Tool</h2>
+                    <p class="text-muted mb-3">Utilize <strong>traceroute online</strong> to perform an advanced visual traceroute that maps and enriches output from <code>mtr</code>. With <strong>ASN</strong> and <strong>Geolocation data</strong> to better understand the network path.</p>
+                    
+                    <p class="text-muted mb-3">If you are familiar with the regular <code>traceroute</code> used on Linux operating systems or even Windows (<code>tracert</code>), you will notice that the output of this tool is somewhat different. That is because the tool utilizes the <code>mtr</code> tool to gather additional <strong>network telemetry</strong>. We then parse the results and enrich further with additional network related information.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>About Traceroute Online</h5>
+                        <p class="mb-0">Using traceroute online is different from running it from your own computer. Usually a traceroute will be initiated from your computer when troubleshooting network outages or packet loss. It allows you to see where the outage or packet loss is occurring.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Traceroute Form -->
     <div class="card shadow-lg mb-5">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Traceroute Analysis</h5>
+            <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Traceroute Online Tool</h5>
         </div>
         <div class="card-body">
-            <form method="POST" action="/traceroute" class="row g-3">
+            <form id="tracerouteForm" class="row g-3">
                 <div class="col-md-8">
                     <label for="hostname" class="form-label fw-bold">Hostname or IP Address</label>
                     <input 
@@ -47,99 +66,470 @@
                     </select>
                 </div>
                 <div class="col-12">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-diagram-3 me-2"></i>Start Traceroute
-                    </button>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="streamingMode" checked>
+                            <label class="form-check-label" for="streamingMode">
+                                <i class="bi bi-lightning me-1"></i>Real-time streaming
+                            </label>
+                        </div>
+                        <div>
+                            <button type="submit" id="startBtn" class="btn btn-primary btn-lg">
+                                <i class="bi bi-diagram-3 me-2"></i>Start Traceroute
+                            </button>
+                            <button type="button" id="stopBtn" class="btn btn-danger btn-lg ms-2" style="display: none;">
+                                <i class="bi bi-stop-circle me-2"></i>Stop Traceroute
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Results -->
-    {% if traceroute_results %}
-    <div class="card shadow-lg">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Traceroute Results</h5>
-        </div>
-        <div class="card-body">
-            {% if traceroute_results.hops and traceroute_results.hops|length > 0 %}
-            <div>
-                <h6 class="fw-bold text-primary">Network Path</h6>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Hop</th>
-                                <th>IP Address</th>
-                                <th>Hostname</th>
-                                <th>RTT (ms)</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for hop in traceroute_results.hops %}
-                            <tr>
-                                <td>{{ hop.hop_number }}</td>
-                                <td>{{ hop.ip_address or 'N/A' }}</td>
-                                <td>{{ hop.hostname or 'N/A' }}</td>
-                                <td>{{ hop.rtt + ' ms' if hop.rtt else 'N/A' }}</td>
-                                <td>
-                                    {% if hop.reachable %}
-                                    <span class="badge bg-success">Reachable</span>
-                                    {% else %}
-                                    <span class="badge bg-warning">Timeout</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div id="resultsContainer" style="display: none;">
+        <div class="card shadow-lg">
+            <div class="card-header bg-success text-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Traceroute Results</h5>
+                    <div id="statusIndicator" class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm text-white me-2" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span id="statusText">Starting...</span>
+                    </div>
                 </div>
             </div>
-            {% endif %}
-            
-            {% if traceroute_results.summary %}
-            <div class="mt-4">
-                <h6 class="fw-bold text-primary">Summary</h6>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h6 class="text-muted">Total Hops</h6>
-                            <h4 class="text-primary">{{ traceroute_results.summary.total_hops }}</h4>
+            <div class="card-body">
+                <!-- Progress Bar -->
+                <div class="mb-3">
+                    <div class="progress" style="height: 8px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted" id="progressText">Preparing traceroute...</small>
+                </div>
+                
+                <!-- Real-time Output -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-terminal me-2"></i>Live Output
+                    </h6>
+                    <div id="liveOutput" class="bg-dark text-light p-3 rounded" style="height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px;">
+                        <div class="text-success">Waiting for traceroute to start...</div>
+                    </div>
+                </div>
+                
+                <!-- Summary Stats -->
+                <div id="summaryStats" class="row g-3" style="display: none;">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h6 class="text-muted mb-1">Total Hops</h6>
+                            <h4 class="text-primary mb-0" id="totalHops">0</h4>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h6 class="text-muted">Reachable Hops</h6>
-                            <h4 class="text-success">{{ traceroute_results.summary.reachable_hops }}</h4>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h6 class="text-muted mb-1">Reachable</h6>
+                            <h4 class="text-success mb-0" id="reachableHops">0</h4>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h6 class="text-muted">Average RTT</h6>
-                            <h4 class="text-info">{{ traceroute_results.summary.avg_rtt }} ms</h4>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h6 class="text-muted mb-1">Timeouts</h6>
+                            <h4 class="text-warning mb-0" id="timeoutHops">0</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h6 class="text-muted mb-1">Avg RTT</h6>
+                            <h4 class="text-info mb-0" id="avgRtt">0 ms</h4>
                         </div>
                     </div>
                 </div>
             </div>
-            {% endif %}
-            
-            {% if traceroute_results.output %}
-            <div class="mt-4">
-                <h6 class="fw-bold text-primary">Raw Output</h6>
-                <pre class="bg-dark text-light p-3 rounded"><code>{{ traceroute_results.output }}</code></pre>
-            </div>
-            {% endif %}
         </div>
     </div>
-    {% endif %}
 
     <!-- Error Message -->
-    {% if traceroute_results and traceroute_results.error %}
-    <div class="alert alert-danger mt-4" role="alert">
+    <div id="errorMessage" class="alert alert-danger mt-4" role="alert" style="display: none;">
         <i class="bi bi-exclamation-triangle me-2"></i>
-        <strong>Error:</strong> {{ traceroute_results.error }}
+        <strong>Error:</strong> <span id="errorText"></span>
     </div>
-    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('tracerouteForm');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const liveOutput = document.getElementById('liveOutput');
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const summaryStats = document.getElementById('summaryStats');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    
+    let eventSource = null;
+    let hopCount = 0;
+    let reachableCount = 0;
+    let timeoutCount = 0;
+    let totalRtt = 0;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        startTraceroute();
+    });
+    
+    stopBtn.addEventListener('click', function() {
+        stopTraceroute();
+    });
+    
+    function startTraceroute() {
+        const hostname = document.getElementById('hostname').value.trim();
+        const maxHops = document.getElementById('maxHops').value;
+        const streamingMode = document.getElementById('streamingMode').checked;
+        
+        if (!hostname) {
+            showError('Please enter a hostname or IP address');
+            return;
+        }
+        
+        // Reset state
+        hopCount = 0;
+        reachableCount = 0;
+        timeoutCount = 0;
+        totalRtt = 0;
+        
+        // Update UI
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-block';
+        resultsContainer.style.display = 'block';
+        summaryStats.style.display = 'none';
+        errorMessage.style.display = 'none';
+        
+        // Clear previous output
+        liveOutput.innerHTML = '<div class="text-success">Starting traceroute to ' + hostname + '...</div>';
+        
+        // Update status
+        statusText.textContent = 'Running...';
+        document.querySelector('.spinner-border').style.display = 'inline-block';
+        
+        if (streamingMode) {
+            // Start streaming
+            const url = `/api/traceroute/stream?hostname=${encodeURIComponent(hostname)}&max_hops=${maxHops}`;
+            eventSource = new EventSource(url);
+            
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                switch(data.type) {
+                    case 'start':
+                        progressText.textContent = `Tracing route to ${data.hostname} (max ${data.max_hops} hops)...`;
+                        break;
+                        
+                    case 'hop':
+                        hopCount++;
+                        addHopToOutput(data.line, data.hop_number);
+                        updateProgress();
+                        break;
+                        
+                    case 'complete':
+                        completeTraceroute();
+                        break;
+                        
+                    case 'error':
+                        showError(data.message);
+                        stopTraceroute();
+                        break;
+                }
+            };
+            
+            eventSource.onerror = function(event) {
+                showError('Connection lost or traceroute failed');
+                stopTraceroute();
+            };
+        } else {
+            // Traditional mode - submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/traceroute';
+            
+            const hostnameInput = document.createElement('input');
+            hostnameInput.type = 'hidden';
+            hostnameInput.name = 'hostname';
+            hostnameInput.value = hostname;
+            
+            const maxHopsInput = document.createElement('input');
+            maxHopsInput.type = 'hidden';
+            maxHopsInput.name = 'max_hops';
+            maxHopsInput.value = maxHops;
+            
+            form.appendChild(hostnameInput);
+            form.appendChild(maxHopsInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    
+    function addHopToOutput(line, hopNumber) {
+        // Parse the line to determine if it's reachable
+        const isReachable = !line.includes('*') && !line.includes('Request timed out');
+        const isTimeout = line.includes('*') || line.includes('Request timed out');
+        
+        if (isReachable) {
+            reachableCount++;
+            
+            // Try to extract RTT from the line
+            const rttMatch = line.match(/(\d+(?:\.\d+)?)\s*ms/);
+            if (rttMatch) {
+                const rtt = parseFloat(rttMatch[1]);
+                totalRtt += rtt;
+            }
+        } else if (isTimeout) {
+            timeoutCount++;
+        }
+        
+        // Use innerHTML for better performance than createElement
+        const colorClass = isReachable ? 'text-success' : (isTimeout ? 'text-warning' : 'text-light');
+        const hopText = hopNumber.toString().padStart(2, ' ');
+        
+        liveOutput.innerHTML += `<div class="mb-1 ${colorClass}">${hopText}: ${line}</div>`;
+        
+        // Auto-scroll to bottom (throttled for performance)
+        if (hopNumber % 5 === 0 || hopNumber < 10) {
+            liveOutput.scrollTop = liveOutput.scrollHeight;
+        }
+    }
+    
+    function updateProgress() {
+        const maxHops = parseInt(document.getElementById('maxHops').value);
+        const progress = Math.min((hopCount / maxHops) * 100, 100);
+        progressBar.style.width = progress + '%';
+        progressText.textContent = `Hop ${hopCount} of ${maxHops} (${Math.round(progress)}%)`;
+    }
+    
+    function completeTraceroute() {
+        statusText.textContent = 'Complete';
+        document.querySelector('.spinner-border').style.display = 'none';
+        progressBar.style.width = '100%';
+        progressText.textContent = `Completed - ${hopCount} hops traced`;
+        
+        // Show summary stats
+        summaryStats.style.display = 'block';
+        document.getElementById('totalHops').textContent = hopCount;
+        document.getElementById('reachableHops').textContent = reachableCount;
+        document.getElementById('timeoutHops').textContent = timeoutCount;
+        
+        const avgRtt = reachableCount > 0 ? (totalRtt / reachableCount).toFixed(1) : 0;
+        document.getElementById('avgRtt').textContent = avgRtt + ' ms';
+        
+        // Add completion message
+        const completionDiv = document.createElement('div');
+        completionDiv.className = 'text-info mt-2 fw-bold';
+        completionDiv.textContent = '✓ Traceroute completed successfully';
+        liveOutput.appendChild(completionDiv);
+        
+        stopTraceroute();
+    }
+    
+    function stopTraceroute() {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+        }
+        
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+        
+        if (statusText.textContent === 'Running...') {
+            statusText.textContent = 'Stopped';
+            document.querySelector('.spinner-border').style.display = 'none';
+        }
+    }
+    
+    function showError(message) {
+        errorText.textContent = message;
+        errorMessage.style.display = 'block';
+        stopTraceroute();
+    }
+});
+</script>
+
+    <!-- Mapping Traceroute Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Mapping Traceroute</h2>
+                    <p class="text-muted mb-3">Visualization of network paths using traceroute can be a valuable way to understand the geographic aspects of an Internet connection. The online traceroute takes the mtr raw output, parses it, and plots the results on a world map. If the hops are determined to be only present in the US then the map shown is the USA only.</p>
+                    
+                    <p class="text-muted mb-3">Starting from our server on the east coast of the USA, traceroute online this test will show response times for each responding hop in the path. Please note that geolocation is not an exact science and discrepancies may be found on occasion in the mapped results.</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Geolocation Accuracy</h5>
+                        <p class="mb-0">As you will see from the traceroute mapping the plots between hops all originate from the server that is performing the test. By using this method it is clear to see the response time from the source to the destination hop. Attempting to plot a traceroute on a map similar to what can be seen in the movies is actually quite difficult due to the problem of getting accurate IP address geolocation data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Traceroute Response Times Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Traceroute Response Times</h2>
+                    <p class="text-muted mb-3">The response time chart shows the MTR traceroute data in a chart. Using a chart such as the one shown here clearly shows hops where variation in response times is apparent, possibly due to network instability.</p>
+                    
+                    <p class="text-muted mb-3">Obviously we want our response times to be as small as possible in order to have the best experience when using the Internet. Keep in mind that there are limits to how low a response time can get when pinging the other side of the world. These limits are based on science and physics so upgrading your server will not suffice. A decent response time to the other side of the world is typically in the low 200ms range. While access to Google services are commonly seen under 10ms if you are on a good connection.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Traffic Prioritization</h5>
+                        <p class="mb-0">Did you know routers can prioritise traffic? It is common to give ICMP packets a lower priority than other traffic. If this is the case the response times listed in the traceroute may not accurately depict the application response times. On the other hand if there is a slow hop for ICMP it is likely this router is having a bad day and the application traffic will also be slow through this hop.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Traceroute Tools Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Other Traceroute Tools</h2>
+                    <p class="text-muted mb-3"><code>Tracepath</code>, <code>Tracert</code>, <code>tcptraceroute</code>, <code>traceroute</code> and <code>mtr</code> are all similar tools that test the network path using either <strong>UDP</strong>, <strong>ICMP</strong> or <strong>TCP</strong>. See the wikipedia article for more details on the technical side of traceroute and the tools that we run. Yet another tool that can perform a traceroute is the famous open source port scanner Nmap.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Network Diagnostic Tools</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-diagram-3 text-primary me-2"></i><strong>Tracepath</strong> - Linux network path tracing</li>
+                                <li class="mb-2"><i class="bi bi-diagram-3 text-primary me-2"></i><strong>Tracert</strong> - Windows network path tracing</li>
+                                <li class="mb-2"><i class="bi bi-diagram-3 text-primary me-2"></i><strong>tcptraceroute</strong> - TCP-based path tracing</li>
+                                <li class="mb-2"><i class="bi bi-diagram-3 text-primary me-2"></i><strong>mtr</strong> - My Traceroute with statistics</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Protocol Support</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>UDP</strong> - User Datagram Protocol</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>ICMP</strong> - Internet Control Message Protocol</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>TCP</strong> - Transmission Control Protocol</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Nmap</strong> - Network mapper with traceroute</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attack Surface Mapping Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Attack Surface Mapping</h2>
+                    <p class="text-muted mb-3">Knowing the attack surface is an essential part of securing any network. For in-depth security testing and attack surface mapping, traceroute can help identify network paths and potential entry points.</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading"><i class="bi bi-shield-exclamation me-2"></i>Security Considerations</h5>
+                        <p class="mb-0">Traceroute tools can reveal network topology and routing information that may be useful for security analysis. Use these tools responsibly and only on networks you own or have permission to test.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Why Use Our Traceroute Online Tool?</h2>
+                    <p class="text-muted mb-3">Our traceroute online tool provides advanced network diagnostics with enhanced visualization and data enrichment:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For Network Administrators</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Identify network bottlenecks and routing issues</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor network performance from external perspective</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug connectivity problems and packet loss</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Analyze network topology and routing paths</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For Developers & IT Professionals</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Test application connectivity and latency</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify CDN and cloud service routing</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor third-party service availability</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Understand network geography and ASN data</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="tracerouteFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                    What is the difference between traceroute and mtr?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#tracerouteFAQ">
+                                <div class="accordion-body">
+                                    Traceroute sends packets with increasing TTL values to map the network path, while mtr (My Traceroute) combines traceroute and ping functionality, providing continuous statistics about each hop including packet loss and response times.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    Why use online traceroute instead of local tools?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#tracerouteFAQ">
+                                <div class="accordion-body">
+                                    Online traceroute provides an external perspective on your network connectivity, simulating how users from different locations would experience your service. This is essential for diagnosing issues that might not be apparent from within your local network.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    What do asterisks (*) in traceroute output mean?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#tracerouteFAQ">
+                                <div class="accordion-body">
+                                    Asterisks (*) in traceroute output indicate that no response was received from that hop within the timeout period. This could mean the router is configured not to respond to ICMP packets, there's packet loss, or the hop is experiencing issues.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

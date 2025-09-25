@@ -328,7 +328,8 @@ class NetworkTools:
                     'raw_output': 'dig command not found'
                 }
             
-            cmd = ['dig', '+short', query_type, domain]
+            # Use full dig output for better parsing
+            cmd = ['dig', '+noall', '+answer', '+comments', query_type, domain]
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
             
             if result.returncode == 0:
@@ -360,18 +361,84 @@ class NetworkTools:
     def _parse_dig_output(output, domain, query_type):
         """Parse dig command output"""
         try:
+            import re
             lines = output.strip().split('\n')
             records = []
+            query_time = None
+            status = 'Success'
             
+            # Parse dig output
             for line in lines:
-                if line.strip():
-                    records.append(line.strip())
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Parse query time
+                if 'Query time:' in line:
+                    time_match = re.search(r'Query time: (\d+) msec', line)
+                    if time_match:
+                        query_time = int(time_match.group(1))
+                
+                # Parse status
+                if 'status:' in line:
+                    status_match = re.search(r'status: (\w+)', line)
+                    if status_match:
+                        status = status_match.group(1)
+                
+                # Parse DNS records
+                # Format: domain. TTL IN TYPE value
+                record_match = re.match(r'([^\s]+)\s+(\d+)\s+IN\s+(\w+)\s+(.+)', line)
+                if record_match:
+                    record_name = record_match.group(1).rstrip('.')
+                    ttl = int(record_match.group(2))
+                    record_type = record_match.group(3)
+                    record_value = record_match.group(4).rstrip('.')
+                    
+                    # Clean up record value based on type
+                    if record_type == 'MX':
+                        # MX records: priority value
+                        mx_match = re.match(r'(\d+)\s+(.+)', record_value)
+                        if mx_match:
+                            record_value = f"{mx_match.group(2)} (Priority: {mx_match.group(1)})"
+                    elif record_type == 'SOA':
+                        # SOA records: keep as is but clean up
+                        record_value = record_value.replace(' ', ' ')
+                    elif record_type == 'TXT':
+                        # TXT records: remove quotes
+                        record_value = record_value.strip('"')
+                    
+                    records.append({
+                        'name': record_name,
+                        'type': record_type,
+                        'value': record_value,
+                        'ttl': ttl
+                    })
+            
+            # If no structured records found, try to parse simple output
+            if not records:
+                simple_lines = [line.strip() for line in lines if line.strip() and not line.startswith(';')]
+                for line in simple_lines:
+                    if line and not line.startswith(';'):
+                        records.append({
+                            'name': domain,
+                            'type': query_type,
+                            'value': line,
+                            'ttl': 0
+                        })
+            
+            # Calculate summary
+            summary = {
+                'query_time': query_time or 0,
+                'record_count': len(records),
+                'status': status
+            }
             
             return {
                 'success': True,
                 'domain': domain,
                 'query_type': query_type,
                 'records': records,
+                'summary': summary,
                 'raw_output': output
             }
             

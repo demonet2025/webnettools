@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Certificate Key Matcher - NetHub Network Tools{% endblock %}
-{% block meta_title %}Certificate Key Matcher - Match SSL Certificates with Private Keys{% endblock %}
-{% block meta_description %}Match SSL certificates with their corresponding private keys to verify certificate-key pairs and ensure proper configuration.{% endblock %}
-{% block meta_keywords %}certificate key matcher, SSL key matching, certificate private key, key pair verification, SSL configuration{% endblock %}
+{% block title %}SSL match CSR/Private Key - Certificate Key Matcher Tool | NetHub Network Tools{% endblock %}
+{% block meta_title %}SSL match CSR/Private Key - Certificate Key Matcher Tool{% endblock %}
+{% block meta_description %}Match SSL certificates with their corresponding private keys and CSRs. Verify certificate-key pairs, check SSL configuration, and ensure proper certificate installation. Free SSL certificate key matcher tool.{% endblock %}
+{% block meta_keywords %}SSL match, CSR private key match, certificate key matcher, SSL key matching, certificate private key, key pair verification, SSL configuration, CSR match, SSL certificate match, private key verification, certificate installation, SSL tools{% endblock %}
 {% block og_title %}Certificate Key Matcher - Match SSL Certificates with Private Keys{% endblock %}
 {% block og_description %}Match SSL certificates with their corresponding private keys to verify certificate-key pairs and ensure proper configuration.{% endblock %}
 {% block canonical_url %}/certificate-key-matcher{% endblock %}
@@ -14,9 +14,28 @@
         <!-- Page Header -->
         <div class="text-center mb-5">
             <h1 class="display-4 fw-bold text-primary mb-3">
-                <i class="bi bi-key-fill me-3"></i>Certificate Key Matcher
+                <i class="bi bi-key-fill me-3"></i>SSL match CSR/Private Key
             </h1>
-            <p class="card-text">Match SSL certificates with their corresponding private keys to verify certificate-key pairs and ensure proper configuration</p>
+            <p class="lead text-muted">Match SSL certificates with their corresponding private keys and CSRs to verify certificate-key pairs and ensure proper configuration</p>
+        </div>
+
+        <!-- SEO Content Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">Free SSL Certificate Key Matcher Tool</h2>
+                        <p class="text-muted mb-3"><strong>What it does?</strong> Our SSL certificate key matcher tool allows you to verify that your SSL certificate matches with its corresponding private key and Certificate Signing Request (CSR). This is essential for ensuring proper SSL configuration and certificate installation.</p>
+                        
+                        <p class="text-muted mb-3">When you have an SSL certificate, private key, and CSR, it's crucial to verify that they all belong together. A mismatch can cause SSL configuration issues, certificate installation failures, or security vulnerabilities. Our tool helps you validate these relationships quickly and accurately.</p>
+                        
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading"><i class="bi bi-shield-check me-2"></i>Important Security Note</h5>
+                            <p class="mb-0">Always keep your private key secure and never share it publicly. Our tool processes your data securely and does not store any private key information.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Key Matcher Form -->
@@ -27,36 +46,38 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form id="key-matcher-form">
+                <form method="POST" action="/certificate-key-matcher">
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <label for="certificate-input" class="form-label fw-bold">Certificate (PEM Format)</label>
                             <textarea 
                                 id="certificate-input" 
+                                name="certificate"
                                 class="form-control" 
                                 rows="8" 
                                 placeholder="-----BEGIN CERTIFICATE-----
 MIIFjTCCA3WgAwIBAgIJAK...
 -----END CERTIFICATE-----"
                                 required
-                            ></textarea>
+                            >{{ certificate or '' }}</textarea>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label for="private-key-input" class="form-label fw-bold">Private Key (PEM Format)</label>
                             <textarea 
                                 id="private-key-input" 
+                                name="private_key"
                                 class="form-control" 
                                 rows="8" 
                                 placeholder="-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFA...
 -----END PRIVATE KEY-----"
                                 required
-                            ></textarea>
+                            >{{ private_key or '' }}</textarea>
                         </div>
                     </div>
                     
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg" id="match-btn">
+                        <button type="submit" class="btn btn-primary btn-lg">
                             <i class="bi bi-key-fill me-2"></i>Match Certificate & Key
                         </button>
                     </div>
@@ -65,71 +86,384 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFA...
         </div>
 
         <!-- Results Section -->
-        <div id="results-section" class="d-none">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-success text-white">
+        {% if match_result %}
+            {% if match_result.success %}
+                <!-- Success Results -->
+                <div class="card shadow-lg border-0 mb-5">
+                    <div class="card-header {% if match_result.match %}bg-success{% else %}bg-danger{% endif %} text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-{% if match_result.match %}check-circle{% else %}x-circle{% endif %} me-2"></i>
+                            {% if match_result.match %}Certificate and Key Match!{% else %}Certificate and Key Do Not Match{% endif %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Match Status -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card {% if match_result.match %}border-success{% else %}border-danger{% endif %}">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-{% if match_result.match %}check-circle-fill text-success{% else %}x-circle-fill text-danger{% endif %} mb-3" style="font-size: 3rem;"></i>
+                                        <h5 class="card-title">Match Status</h5>
+                                        <p class="card-text">
+                                            <strong>{% if match_result.match %}✓ MATCHED{% else %}✗ NOT MATCHED{% endif %}</strong>
+                                        </p>
+                                        <p class="text-muted">Key Type: {{ match_result.match_type }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-info">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-info-circle-fill text-info mb-3" style="font-size: 3rem;"></i>
+                                        <h5 class="card-title">Comparison Details</h5>
+                                        <p class="card-text">
+                                            {% if match_result.match_type == 'RSA' %}
+                                                <strong>RSA Key Comparison</strong><br>
+                                                Modulus Match: {% if match_result.comparison_details.modulus_match %}✓{% else %}✗{% endif %}<br>
+                                                Exponent Match: {% if match_result.comparison_details.exponent_match %}✓{% else %}✗{% endif %}
+                                            {% elif match_result.match_type == 'DSA' %}
+                                                <strong>DSA Key Comparison</strong><br>
+                                                Y Value Match: {% if match_result.comparison_details.y_match %}✓{% else %}✗{% endif %}
+                                            {% elif match_result.match_type == 'EC' %}
+                                                <strong>EC Key Comparison</strong><br>
+                                                X Match: {% if match_result.comparison_details.x_match %}✓{% else %}✗{% endif %}<br>
+                                                Y Match: {% if match_result.comparison_details.y_match %}✓{% else %}✗{% endif %}
+                                            {% else %}
+                                                <strong>{{ match_result.match_type }} Key</strong>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Certificate Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h6 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Certificate Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>Subject</strong></td>
+                                                    <td>{{ match_result.certificate_info.subject.commonName or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Issuer</strong></td>
+                                                    <td>{{ match_result.certificate_info.issuer.commonName or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Serial Number</strong></td>
+                                                    <td>{{ match_result.certificate_info.serial_number or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Key Type</strong></td>
+                                                    <td>{{ match_result.certificate_info.public_key_type or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Key Size</strong></td>
+                                                    <td>{{ match_result.certificate_info.public_key_size or 'N/A' }} bits</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Valid From</strong></td>
+                                                    <td>{{ match_result.certificate_info.not_before or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Valid Until</strong></td>
+                                                    <td>{{ match_result.certificate_info.not_after or 'N/A' }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0"><i class="bi bi-key me-2"></i>Private Key Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>Key Type</strong></td>
+                                                    <td>{{ match_result.key_info.key_type or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Key Size</strong></td>
+                                                    <td>{{ match_result.key_info.key_size or 'N/A' }} bits</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Comparison -->
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                <h6 class="mb-0"><i class="bi bi-search me-2"></i>Detailed Comparison</h6>
+                            </div>
+                            <div class="card-body">
+                                <pre class="bg-light p-3 rounded"><code>{{ match_result.comparison_details | tojson(indent=2) }}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Error Results -->
+                <div class="card shadow-lg border-0 mb-5">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Matching Failed
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger" role="alert">
+                            <h6 class="alert-heading">Error Details:</h6>
+                            <p class="mb-0">{{ match_result.error }}</p>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Common Issues:</h6>
+                            <ul>
+                                <li>Ensure both certificate and private key are in PEM format</li>
+                                <li>Check that the private key is not password-protected</li>
+                                <li>Verify that the certificate and key are complete and not truncated</li>
+                                <li>Make sure there are no extra characters or formatting issues</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Welcome Message -->
+            <div class="card shadow-lg border-0 mb-5">
+                <div class="card-header bg-light">
                     <h5 class="card-title mb-0">
-                        <i class="bi bi-check-circle me-2"></i>Key Matching Results
+                        <i class="bi bi-info-circle me-2"></i>How to Use Certificate Key Matcher
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div id="matching-results">
-                        <!-- Results will be populated here -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <i class="bi bi-1-circle text-primary mb-2" style="font-size: 2rem;"></i>
+                                <h6>Paste Certificate</h6>
+                                <p class="text-muted small">Copy and paste your SSL certificate in PEM format</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <i class="bi bi-2-circle text-primary mb-2" style="font-size: 2rem;"></i>
+                                <h6>Paste Private Key</h6>
+                                <p class="text-muted small">Copy and paste the corresponding private key in PEM format</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <i class="bi bi-3-circle text-primary mb-2" style="font-size: 2rem;"></i>
+                                <h6>Click Match</h6>
+                                <p class="text-muted small">Click "Match Certificate & Key" to verify the pair</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- How It Works Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-4">How to Use Our SSL Certificate Key Matcher</h2>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <span class="fw-bold">1</span>
+                                    </div>
+                                    <h5 class="text-primary">Paste SSL Certificate</h5>
+                                    <p class="text-muted small">Paste your SSL certificate in PEM format (starts with -----BEGIN CERTIFICATE-----)</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <span class="fw-bold">2</span>
+                                    </div>
+                                    <h5 class="text-primary">Paste CSR or Private Key</h5>
+                                    <p class="text-muted small">Paste your CSR or private key in PEM format to verify the match</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <span class="fw-bold">3</span>
+                                    </div>
+                                    <h5 class="text-primary">Match & Verify</h5>
+                                    <p class="text-muted small">Click "Match Certificate & Key" to verify the relationship</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Error Section -->
-        <div id="error-section" class="d-none">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-exclamation-triangle me-2"></i>Matching Error
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div id="error-message" class="alert alert-danger mb-0">
-                        <!-- Error message will be populated here -->
+        <!-- Benefits Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">Why Use Our SSL Certificate Key Matcher?</h2>
+                        <p class="text-muted mb-3">Our SSL certificate key matcher tool is essential for system administrators, developers, and security professionals who need to verify SSL configurations:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-primary">For System Administrators</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify certificate-key pairs before installation</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug SSL configuration issues</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Ensure proper certificate installation</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Validate CSR and certificate relationships</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-primary">For Developers</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Test SSL certificate configurations</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify development environment setups</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug certificate-related errors</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Ensure secure application deployment</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Features Section -->
-        <div class="row mt-5">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
-                        <h5 class="card-title mt-3">Key Pair Verification</h5>
-                        <p class="card-text">Verify that the certificate and private key are a valid pair for secure SSL configuration.</p>
+        <!-- What Information Can You Verify Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">What Information Can You Verify?</h2>
+                        <p class="text-muted mb-3">Our SSL certificate key matcher provides comprehensive verification of certificate-key relationships:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-primary">Certificate-Key Matching</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• Public key compatibility</li>
+                                    <li>• Key pair validation</li>
+                                    <li>• Algorithm consistency</li>
+                                    <li>• Key size verification</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-primary">CSR-Certificate Matching</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• Subject information consistency</li>
+                                    <li>• Public key matching</li>
+                                    <li>• Signature algorithm verification</li>
+                                    <li>• SAN (Subject Alternative Names) validation</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-primary">Security Validation</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• Key strength assessment</li>
+                                    <li>• Algorithm security check</li>
+                                    <li>• Certificate format validation</li>
+                                    <li>• Configuration compatibility</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-gear text-primary" style="font-size: 2.5rem;"></i>
-                        <h5 class="card-title mt-3">Configuration Check</h5>
-                        <p class="card-text">Ensure your SSL configuration is correct before deploying to production servers.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-exclamation-triangle text-primary" style="font-size: 2.5rem;"></i>
-                        <h5 class="card-title mt-3">Error Detection</h5>
-                        <p class="card-text">Identify mismatched certificate-key pairs that could cause SSL configuration issues.</p>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                        
+                        <div class="accordion" id="keyMatcherFAQ">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq1">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                        Why do I need to match my certificate with its private key?
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#keyMatcherFAQ">
+                                    <div class="accordion-body">
+                                        Matching your certificate with its private key ensures that they belong together and will work properly when installed on your server. A mismatch will cause SSL configuration errors, certificate installation failures, or security vulnerabilities. This verification is essential before deploying SSL certificates.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq2">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        What's the difference between matching with CSR vs Private Key?
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#keyMatcherFAQ">
+                                    <div class="accordion-body">
+                                        <strong>CSR Matching:</strong> Verifies that the certificate was generated from the same CSR, ensuring subject information and public key match. <strong>Private Key Matching:</strong> Verifies that the certificate's public key corresponds to the private key, ensuring they form a valid key pair. Both are important for different validation purposes.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq3">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                        Is my private key data secure when using this tool?
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#keyMatcherFAQ">
+                                    <div class="accordion-body">
+                                        Yes, your private key data is processed securely. We only analyze the key information for matching purposes and do not store or log any private key content. The data is processed in memory and discarded after the analysis is complete. However, always be cautious when sharing private keys and only use trusted tools.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Vue.js App -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="/static/certificate-key-matcher-app.js"></script>
+{% block extra_head %}
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, #0d6efd, #6610f2);
+        border: none;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #0b5ed7, #5a0fc8);
+        transform: translateY(-1px);
+    }
+</style>
 {% endblock %}

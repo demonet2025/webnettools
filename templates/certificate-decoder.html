@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Certificate Decoder - NetHub Network Tools{% endblock %}
-{% block meta_title %}Certificate Decoder - Decode SSL Certificates Online{% endblock %}
-{% block meta_description %}Decode SSL certificates to extract detailed information including subject, issuer, validity dates, public key details, and certificate chain analysis.{% endblock %}
-{% block meta_keywords %}certificate decoder, SSL certificate decode, certificate analysis, SSL decode, certificate details, public key, certificate chain{% endblock %}
+{% block title %}Certificate Decoder - Decode PEM Encoded SSL Certificates Online | NetHub Network Tools{% endblock %}
+{% block meta_title %}Certificate Decoder - Decode PEM Encoded SSL Certificates Online{% endblock %}
+{% block meta_description %}Use our Certificate Decoder to decode your PEM encoded SSL certificate and verify that it contains the correct information. Decode SSL certificates online to extract subject, issuer, validity dates, and public key details.{% endblock %}
+{% block meta_keywords %}certificate decoder, SSL certificate decode, PEM certificate decoder, certificate analysis, SSL decode, certificate details, public key, certificate chain, certificate viewer, SSL certificate decoder, PEM decoder, certificate information, SSL certificate analysis, certificate verification, SSL tools{% endblock %}
 {% block og_title %}Certificate Decoder - Decode SSL Certificates Online{% endblock %}
 {% block og_description %}Decode SSL certificates to extract detailed information including subject, issuer, validity dates, and public key details.{% endblock %}
 {% block canonical_url %}/certificate-decoder{% endblock %}
@@ -16,7 +16,27 @@
             <h1 class="display-4 fw-bold text-primary mb-3">
                 <i class="bi bi-file-earmark-code me-3"></i>Certificate Decoder
             </h1>
-            <p class="lead text-muted">Decode SSL certificates to extract detailed information including subject, issuer, validity dates, and public key details</p>
+            <p class="lead text-muted">Use this Certificate Decoder to decode your PEM encoded SSL certificate and verify that it contains the correct information</p>
+        </div>
+
+        <!-- SEO Content Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">Free Online SSL Certificate Decoder Tool</h2>
+                        <p class="text-muted mb-3">A PEM encoded certificate is a block of encoded text that contains all of the certificate information and public key. Another simple way to view the information in a certificate on a Windows machine is to just double-click the certificate file. <strong>You can use this certificate viewer by simply pasting the text of your certificate into the box below</strong> and the Certificate Decoder will do the rest.</p>
+                        
+                        <p class="text-muted mb-3">Your certificate should start with <code>"-----BEGIN CERTIFICATE-----"</code> and end with <code>"-----END CERTIFICATE-----"</code>. Once you do the SSL install on your server, you can check to make sure it is installed correctly by using our <a href="/sslchecker">SSL Checker</a>.</p>
+                        
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading"><i class="bi bi-terminal me-2"></i>Command Line Alternative</h5>
+                            <p class="mb-0">If you want to decode certificates on your own computer, run this OpenSSL command:</p>
+                            <code>openssl x509 -in certificate.crt -text -noout</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Certificate Decoder Form -->
@@ -27,18 +47,19 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form id="certificate-decoder-form">
+                <form method="POST" action="/certificate-decoder" id="certificate-decoder-form">
                     <div class="mb-4">
                         <label for="certificate-input" class="form-label fw-bold">Paste Certificate (PEM Format)</label>
                         <textarea 
                             id="certificate-input" 
+                            name="certificate"
                             class="form-control" 
                             rows="10" 
                             placeholder="-----BEGIN CERTIFICATE-----
 MIIFjTCCA3WgAwIBAgIJAK...
 -----END CERTIFICATE-----"
                             required
-                        ></textarea>
+                        >{{ certificate or '' }}</textarea>
                         <div class="form-text">Paste your SSL certificate in PEM format (including BEGIN and END lines)</div>
                     </div>
                     
@@ -52,36 +73,169 @@ MIIFjTCCA3WgAwIBAgIJAK...
         </div>
 
         <!-- Results Section -->
-        <div id="results-section" class="d-none">
-            <div class="card shadow-lg border-0">
+        {% if certificate_result %}
+            {% if certificate_result.success %}
+            <div class="card shadow-lg border-0 mb-5">
                 <div class="card-header bg-success text-white">
                     <h5 class="card-title mb-0">
                         <i class="bi bi-check-circle me-2"></i>Certificate Decoded Successfully
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div id="certificate-results">
-                        <!-- Results will be populated here -->
+                    <!-- Subject Information -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-person-badge me-2"></i>Subject Information
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    {% for key, value in certificate_result.subject.items() %}
+                                    <tr>
+                                        <td class="fw-bold">{{ key }}</td>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Issuer Information -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-building me-2"></i>Issuer Information
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    {% for key, value in certificate_result.issuer.items() %}
+                                    <tr>
+                                        <td class="fw-bold">{{ key }}</td>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Validity Information -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-calendar-check me-2"></i>Validity Information
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Valid From</h6>
+                                        <p class="card-text">{{ certificate_result.validity.not_before }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Valid Until</h6>
+                                        <p class="card-text">{{ certificate_result.validity.not_after }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="alert alert-{% if certificate_result.validity.is_expired %}danger{% elif certificate_result.validity.days_until_expiry <= 30 %}warning{% else %}success{% endif %}">
+                                <strong>Status:</strong> 
+                                {% if certificate_result.validity.is_expired %}
+                                    Certificate has expired
+                                {% elif certificate_result.validity.days_until_expiry <= 30 %}
+                                    Certificate expires in {{ certificate_result.validity.days_until_expiry }} days
+                                {% else %}
+                                    Certificate is valid ({{ certificate_result.validity.days_until_expiry }} days remaining)
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Public Key Information -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-key me-2"></i>Public Key Information
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">Key Type</td>
+                                        <td>{{ certificate_result.public_key.key_type or 'N/A' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Key Size</td>
+                                        <td>{{ certificate_result.public_key.key_size or 'N/A' }} bits</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Algorithm</td>
+                                        <td>{{ certificate_result.public_key.algorithm or 'N/A' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Fingerprints -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-fingerprint me-2"></i>Fingerprints
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">SHA1</td>
+                                        <td><code>{{ certificate_result.fingerprints.sha1 or 'N/A' }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">SHA256</td>
+                                        <td><code>{{ certificate_result.fingerprints.sha256 or 'N/A' }}</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Signature Information -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-shield-check me-2"></i>Signature Information
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">Algorithm</td>
+                                        <td>{{ certificate_result.signature.algorithm or 'N/A' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Error Section -->
-        <div id="error-section" class="d-none">
-            <div class="card shadow-lg border-0">
+            {% else %}
+            <div class="card shadow-lg border-0 mb-5">
                 <div class="card-header bg-danger text-white">
                     <h5 class="card-title mb-0">
                         <i class="bi bi-exclamation-triangle me-2"></i>Decode Error
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div id="error-message" class="alert alert-danger mb-0">
-                        <!-- Error message will be populated here -->
+                    <div class="alert alert-danger mb-0">
+                        <strong>Error:</strong> {{ certificate_result.error }}
                     </div>
                 </div>
             </div>
-        </div>
+            {% endif %}
+        {% endif %}
 
         <!-- Features Section -->
         <div class="row mt-5">
@@ -113,10 +267,132 @@ MIIFjTCCA3WgAwIBAgIJAK...
                 </div>
             </div>
         </div>
+
+        <!-- Benefits Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">Why Use Our Certificate Decoder Tool?</h2>
+                        <p class="text-muted mb-3">Our SSL certificate decoder provides a quick and easy way to examine the contents of any PEM-encoded SSL certificate. This is particularly useful for:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verifying certificate installation</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Checking certificate validity dates</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Examining subject and issuer information</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Validating public key details</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debugging SSL configuration issues</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Analyzing certificate chain structure</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Checking SAN (Subject Alternative Names)</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verifying certificate fingerprints</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Information Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">What Information Can You Extract from a Certificate?</h2>
+                        <p class="text-muted mb-3">When you decode an SSL certificate, you can extract a wealth of information that helps you understand the certificate's purpose, validity, and security characteristics:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-primary">Basic Information</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• Common Name (CN)</li>
+                                    <li>• Subject Alternative Names (SANs)</li>
+                                    <li>• Serial Number</li>
+                                    <li>• Version</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-primary">Validity Details</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• Not Before Date</li>
+                                    <li>• Not After Date</li>
+                                    <li>• Validity Period</li>
+                                    <li>• Days Until Expiration</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-primary">Security Information</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• Public Key Algorithm</li>
+                                    <li>• Key Size</li>
+                                    <li>• Signature Algorithm</li>
+                                    <li>• Fingerprints (SHA1, SHA256)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                        
+                        <div class="accordion" id="certificateDecoderFAQ">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq1">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                        What is a PEM encoded certificate?
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#certificateDecoderFAQ">
+                                    <div class="accordion-body">
+                                        A PEM (Privacy-Enhanced Mail) encoded certificate is a Base64-encoded text format that contains the certificate data. It starts with "-----BEGIN CERTIFICATE-----" and ends with "-----END CERTIFICATE-----". This is the most common format for SSL certificates.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq2">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        How do I get my certificate in PEM format?
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#certificateDecoderFAQ">
+                                    <div class="accordion-body">
+                                        You can export your certificate from your web server, certificate store, or use OpenSSL commands. Most web servers store certificates in PEM format by default. You can also convert from other formats using OpenSSL or our <a href="/ssl-converter">SSL Converter</a> tool.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq3">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                        Is my certificate data secure when using this tool?
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#certificateDecoderFAQ">
+                                    <div class="accordion-body">
+                                        Yes, your certificate data is processed securely. We only decode the certificate information and do not store or log the certificate content. The certificate data is processed in memory and discarded after the analysis is complete.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Vue.js App -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="/static/certificate-decoder-app.js"></script>
 {% endblock %}

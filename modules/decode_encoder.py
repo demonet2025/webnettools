@@ -7,10 +7,80 @@ import base64
 import urllib.parse
 import html
 import json
+import re
 
 
 class DecodeEncoder:
     """Comprehensive Decode/Encode Tool for various formats"""
+
+    @staticmethod
+    def detect_format_and_operation(text):
+        """Detect the most likely format type and operation based on input text"""
+        if not text or not text.strip():
+            return {'format_type': '', 'operation': '', 'confidence': 0}
+        
+        text = text.strip()
+        confidence = 0
+        detected_format = ''
+        detected_operation = ''
+        
+        # Base64 detection
+        if re.match(r'^[A-Za-z0-9+/]*={0,2}$', text) and len(text) % 4 == 0:
+            try:
+                # Try to decode to see if it's valid Base64
+                base64.b64decode(text + '==')  # Add padding if needed
+                detected_format = 'base64'
+                detected_operation = 'decode'
+                confidence = 90
+            except:
+                pass
+        
+        # URL encoding detection
+        if '%' in text and re.search(r'%[0-9A-Fa-f]{2}', text):
+            detected_format = 'url'
+            detected_operation = 'decode'
+            confidence = 85
+        
+        # HTML entities detection
+        if '&' in text and (';' in text or re.search(r'&[a-zA-Z]+;', text) or re.search(r'&#\d+;', text)):
+            detected_format = 'html'
+            detected_operation = 'decode'
+            confidence = 80
+        
+        # Hexadecimal detection
+        if re.match(r'^[0-9A-Fa-f\s]+$', text.replace(' ', '')) and len(text.replace(' ', '')) % 2 == 0:
+            detected_format = 'hex'
+            detected_operation = 'decode'
+            confidence = 75
+        
+        # Binary detection
+        if re.match(r'^[01\s]+$', text) and len(text.replace(' ', '')) % 8 == 0:
+            detected_format = 'binary'
+            detected_operation = 'decode'
+            confidence = 70
+        
+        # JSON detection
+        if (text.startswith('{') and text.endswith('}')) or (text.startswith('[') and text.endswith(']')):
+            try:
+                json.loads(text)
+                detected_format = 'json'
+                detected_operation = 'encode'  # Format JSON
+                confidence = 95
+            except:
+                pass
+        
+        # If no specific format detected, check if it looks like plain text
+        if not detected_format and re.match(r'^[a-zA-Z0-9\s.,!?@#$%^&*()_+\-=\[\]{}|;:"\'<>?/~`]+$', text):
+            # Plain text - suggest encoding
+            detected_format = 'base64'  # Default to Base64 for plain text
+            detected_operation = 'encode'
+            confidence = 60
+        
+        return {
+            'format_type': detected_format,
+            'operation': detected_operation,
+            'confidence': confidence
+        }
 
     @staticmethod
     def base64_encode(text):

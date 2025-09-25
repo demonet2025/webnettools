@@ -7,11 +7,122 @@ import ssl
 import socket
 import hashlib
 import json
+import base64
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 from datetime import datetime
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec
 
 
 class SSLAnalyzer:
     """Simple SSL Certificate Analyzer"""
+
+    @staticmethod
+    def fetch_domain_description(domain):
+        """Fetch domain description from the website's meta tags"""
+        try:
+            # Clean domain name
+            if not domain.startswith(('http://', 'https://')):
+                domain = f"https://{domain}"
+            
+            # Parse domain
+            parsed = urlparse(domain)
+            domain_name = parsed.netloc or parsed.path
+            
+            # Try HTTPS first, then HTTP
+            for protocol in ['https', 'http']:
+                try:
+                    url = f"{protocol}://{domain_name}"
+                    headers = {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    }
+                    
+                    response = requests.get(url, headers=headers, timeout=10, allow_redirects=True)
+                    response.raise_for_status()
+                    
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    
+                    # Extract meta description
+                    meta_desc = soup.find('meta', attrs={'name': 'description'})
+                    description = meta_desc.get('content', '').strip() if meta_desc else ''
+                    
+                    # Extract title
+                    title_tag = soup.find('title')
+                    title = title_tag.get_text().strip() if title_tag else ''
+                    
+                    # Extract Open Graph description as fallback
+                    if not description:
+                        og_desc = soup.find('meta', attrs={'property': 'og:description'})
+                        description = og_desc.get('content', '').strip() if og_desc else ''
+                    
+                    # Extract Twitter description as fallback
+                    if not description:
+                        twitter_desc = soup.find('meta', attrs={'name': 'twitter:description'})
+                        description = twitter_desc.get('content', '').strip() if twitter_desc else ''
+                    
+                    # Limit description length
+                    if len(description) > 300:
+                        description = description[:297] + "..."
+                    
+                    return {
+                        'success': True,
+                        'title': title,
+                        'description': description,
+                        'url': response.url,
+                        'status_code': response.status_code
+                    }
+                    
+                except requests.RequestException:
+                    continue
+            
+            return {
+                'success': False,
+                'error': 'Unable to fetch domain information',
+                'title': '',
+                'description': '',
+                'url': '',
+                'status_code': 0
+            }
+            
+        except Exception as e:
+                  return {
+                      'success': False,
+                      'error': f'Error fetching domain info: {str(e)}',
+                      'title': '',
+                      'description': '',
+                      'url': '',
+                      'status_code': 0
+                  }
+    
+    @staticmethod
+    def _parse_raw_issuer_data(issuer_data):
+        """Parse raw issuer data from various formats"""
+        issuer_info = {}
+        
+        try:
+            if isinstance(issuer_data, (list, tuple)):
+                for item in issuer_data:
+                    if isinstance(item, (list, tuple)) and len(item) >= 1:
+                        # Handle nested structures like ((('countryName', 'US'),), ...)
+                        if isinstance(item[0], (list, tuple)) and len(item[0]) == 2:
+                            key, value = item[0]
+                            issuer_info[key] = value
+                        elif len(item) == 2:
+                            # Direct key-value pair
+                            key, value = item
+                            issuer_info[key] = value
+                    elif isinstance(item, dict):
+                        issuer_info.update(item)
+            elif isinstance(issuer_data, dict):
+                issuer_info.update(issuer_data)
+        except Exception as e:
+            # If all else fails, convert to string
+            issuer_info['raw'] = str(issuer_data)
+            
+        return issuer_info
 
     @staticmethod
     def _resolve_dns(hostname):
@@ -99,15 +210,10 @@ class SSLAnalyzer:
                                 key, value = sub_item
                                 subject_info[key] = value
 
-            # Extract issuer information
+            # Extract issuer information with improved parsing
             issuer_info = {}
             if 'issuer' in cert and cert['issuer']:
-                for item in cert['issuer']:
-                    if isinstance(item, (list, tuple)):
-                        for sub_item in item:
-                            if isinstance(sub_item, (list, tuple)) and len(sub_item) == 2:
-                                key, value = sub_item
-                                issuer_info[key] = value
+                issuer_info = SSLAnalyzer._parse_raw_issuer_data(cert['issuer'])
 
             # Parse dates
             not_before = cert.get('notBefore', '')
@@ -184,10 +290,19 @@ class SSLAnalyzer:
     def _get_certificate_chain(cert):
         """Get certificate chain information"""
         try:
+            # Parse subject and issuer information
+            subject_info = {}
+            if 'subject' in cert and cert['subject']:
+                subject_info = SSLAnalyzer._parse_raw_issuer_data(cert['subject'])
+            
+            issuer_info = {}
+            if 'issuer' in cert and cert['issuer']:
+                issuer_info = SSLAnalyzer._parse_raw_issuer_data(cert['issuer'])
+            
             # This is a simplified version - in reality, you'd need to fetch the full chain
             return [{
-                'subject': cert.get('subject', []),
-                'issuer': cert.get('issuer', []),
+                'subject': subject_info,
+                'issuer': issuer_info,
                 'serial_number': cert.get('serialNumber', 'N/A'),
                 'not_before': cert.get('notBefore', 'N/A'),
                 'not_after': cert.get('notAfter', 'N/A'),
@@ -400,14 +515,10 @@ class SSLDeepAnalyzer:
                             key, value = item[0]
                             subject_info[key] = value
 
-            # Extract issuer information
+            # Extract issuer information with improved parsing
             issuer_info = {}
-            if 'issuer' in cert:
-                for item in cert['issuer']:
-                    if isinstance(item, (list, tuple)) and len(item) > 0:
-                        if isinstance(item[0], (list, tuple)) and len(item[0]) == 2:
-                            key, value = item[0]
-                            issuer_info[key] = value
+            if 'issuer' in cert and cert['issuer']:
+                issuer_info = SSLAnalyzer._parse_raw_issuer_data(cert['issuer'])
 
             # Parse dates
             not_before = cert.get('notBefore', '')
@@ -802,7 +913,7 @@ class CSRDecoder:
                     'public_key': public_key_info,
                     'sans': sans,
                     'signature_algorithm': csr.signature_algorithm_oid._name,
-                    'version': csr.version.name
+                    'version': 'v1'  # CSRs are always version 1
                 },
                 'raw_output': CSRDecoder._format_csr_info(csr)
             }
@@ -912,8 +1023,563 @@ class CSRDecoder:
             
             # Signature algorithm
             output.append(f"Signature Algorithm: {csr.signature_algorithm_oid._name}")
-            output.append(f"Version: {csr.version.name}")
+            output.append(f"Version: v1")  # CSRs are always version 1
             
             return "\n".join(output)
         except Exception as e:
             return f"Error formatting CSR info: {str(e)}"
+
+
+class CertificateDecoder:
+    """Certificate Decoder for PEM format certificates"""
+    
+    @staticmethod
+    def decode_certificate(cert_pem):
+        """Decode a PEM format certificate and extract information"""
+        try:
+            # Remove any extra whitespace and newlines
+            cert_pem = cert_pem.strip()
+            
+            # Load the certificate
+            cert = x509.load_pem_x509_certificate(cert_pem.encode('utf-8'))
+            
+            # Extract basic information
+            result = {
+                'success': True,
+                'subject': CertificateDecoder._extract_subject_info(cert.subject),
+                'issuer': CertificateDecoder._extract_issuer_info(cert.issuer),
+                'validity': CertificateDecoder._extract_validity_info(cert),
+                'public_key': CertificateDecoder._extract_public_key_info(cert.public_key()),
+                'signature': CertificateDecoder._extract_signature_info(cert),
+                'extensions': CertificateDecoder._extract_extensions_info(cert),
+                'fingerprints': CertificateDecoder._extract_fingerprints(cert)
+            }
+            
+            return result
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f"Failed to decode certificate: {str(e)}"
+            }
+    
+    @staticmethod
+    def _extract_subject_info(subject):
+        """Extract subject information from certificate"""
+        subject_info = {}
+        
+        for attribute in subject:
+            oid_name = attribute.oid._name if hasattr(attribute.oid, '_name') else str(attribute.oid)
+            subject_info[oid_name] = attribute.value
+            
+        return subject_info
+    
+    @staticmethod
+    def _extract_issuer_info(issuer):
+        """Extract issuer information from certificate with comprehensive parsing"""
+        issuer_info = {}
+        
+        try:
+            # Handle cryptography library issuer objects
+            if hasattr(issuer, '__iter__'):
+                for attribute in issuer:
+                    if hasattr(attribute, 'oid') and hasattr(attribute, 'value'):
+                        oid_name = attribute.oid._name if hasattr(attribute.oid, '_name') else str(attribute.oid)
+                        issuer_info[oid_name] = attribute.value
+            else:
+                # Handle raw issuer data (tuples, lists, etc.)
+                issuer_info = SSLAnalyzer._parse_raw_issuer_data(issuer)
+        except Exception as e:
+            # Fallback: try to parse as raw data
+            issuer_info = SSLAnalyzer._parse_raw_issuer_data(issuer)
+            
+        return issuer_info
+    
+    @staticmethod
+    def _extract_validity_info(cert):
+        """Extract validity information from certificate"""
+        not_before = cert.not_valid_before
+        not_after = cert.not_valid_after
+        now = datetime.now()
+        
+        days_until_expiry = (not_after - now).days
+        
+        return {
+            'not_before': not_before.strftime('%Y-%m-%d %H:%M:%S UTC'),
+            'not_after': not_after.strftime('%Y-%m-%d %H:%M:%S UTC'),
+            'days_until_expiry': days_until_expiry,
+            'is_valid': now >= not_before and now <= not_after,
+            'is_expired': now > not_after
+        }
+    
+    @staticmethod
+    def _extract_public_key_info(public_key):
+        """Extract public key information"""
+        try:
+            key_info = {
+                'algorithm': type(public_key).__name__,
+                'key_size': None,
+                'key_type': None
+            }
+            
+            if isinstance(public_key, rsa.RSAPublicKey):
+                key_info['key_size'] = public_key.key_size
+                key_info['key_type'] = 'RSA'
+            elif isinstance(public_key, dsa.DSAPublicKey):
+                key_info['key_size'] = public_key.key_size
+                key_info['key_type'] = 'DSA'
+            elif isinstance(public_key, ec.EllipticCurvePublicKey):
+                key_info['key_size'] = public_key.curve.key_size
+                key_info['key_type'] = 'EC'
+            
+            return key_info
+        except Exception as e:
+            return {'error': f"Failed to extract public key info: {str(e)}"}
+    
+    @staticmethod
+    def _extract_signature_info(cert):
+        """Extract signature information"""
+        try:
+            return {
+                'algorithm': cert.signature_algorithm_oid._name if hasattr(cert.signature_algorithm_oid, '_name') else str(cert.signature_algorithm_oid),
+                'signature': base64.b64encode(cert.signature).decode('utf-8')
+            }
+        except Exception as e:
+            return {'error': f"Failed to extract signature info: {str(e)}"}
+    
+    @staticmethod
+    def _extract_extensions_info(cert):
+        """Extract certificate extensions information"""
+        extensions = {}
+        
+        try:
+            for ext in cert.extensions:
+                ext_name = ext.oid._name if hasattr(ext.oid, '_name') else str(ext.oid)
+                extensions[ext_name] = {
+                    'critical': ext.critical,
+                    'value': str(ext.value)
+                }
+        except Exception as e:
+            extensions['error'] = f"Failed to extract extensions: {str(e)}"
+            
+        return extensions
+    
+    @staticmethod
+    def _extract_fingerprints(cert):
+        """Extract certificate fingerprints"""
+        try:
+            # Get certificate in DER format
+            cert_der = cert.public_bytes(serialization.Encoding.DER)
+            
+            # Calculate fingerprints
+            sha1_fingerprint = hashlib.sha1(cert_der).hexdigest().upper()
+            sha256_fingerprint = hashlib.sha256(cert_der).hexdigest().upper()
+            
+            return {
+                'sha1': sha1_fingerprint,
+                'sha256': sha256_fingerprint
+            }
+        except Exception as e:
+            return {'error': f"Failed to calculate fingerprints: {str(e)}"}
+
+
+class CertificateKeyMatcher:
+    """Certificate Key Matcher for verifying certificate-key pairs"""
+    
+    @staticmethod
+    def match_certificate_key(certificate_pem, private_key_pem):
+        """Match a certificate with its private key"""
+        try:
+            # Parse the certificate
+            cert = x509.load_pem_x509_certificate(certificate_pem.encode('utf-8'))
+            
+            # Parse the private key
+            private_key = serialization.load_pem_private_key(
+                private_key_pem.encode('utf-8'),
+                password=None
+            )
+            
+            # Get the public key from the certificate
+            cert_public_key = cert.public_key()
+            
+            # Get the public key from the private key
+            private_key_public = private_key.public_key()
+            
+            # Compare the public keys
+            match_result = CertificateKeyMatcher._compare_public_keys(cert_public_key, private_key_public)
+            
+            # Extract additional information
+            cert_info = CertificateKeyMatcher._extract_certificate_info(cert)
+            key_info = CertificateKeyMatcher._extract_key_info(private_key)
+            
+            return {
+                'success': True,
+                'match': match_result['match'],
+                'match_type': match_result['match_type'],
+                'certificate_info': cert_info,
+                'key_info': key_info,
+                'comparison_details': match_result['details']
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f"Failed to match certificate and key: {str(e)}"
+            }
+    
+    @staticmethod
+    def _compare_public_keys(cert_public_key, private_key_public):
+        """Compare two public keys to determine if they match"""
+        try:
+            # Get the public numbers for RSA keys
+            if isinstance(cert_public_key, rsa.RSAPublicKey) and isinstance(private_key_public, rsa.RSAPublicKey):
+                cert_numbers = cert_public_key.public_numbers()
+                key_numbers = private_key_public.public_numbers()
+                
+                return {
+                    'match': cert_numbers.n == key_numbers.n and cert_numbers.e == key_numbers.e,
+                    'match_type': 'RSA',
+                    'details': {
+                        'cert_modulus': str(cert_numbers.n)[:50] + '...',
+                        'key_modulus': str(key_numbers.n)[:50] + '...',
+                        'cert_exponent': cert_numbers.e,
+                        'key_exponent': key_numbers.e,
+                        'modulus_match': cert_numbers.n == key_numbers.n,
+                        'exponent_match': cert_numbers.e == key_numbers.e
+                    }
+                }
+            
+            # For other key types, we can add more comparisons
+            elif isinstance(cert_public_key, dsa.DSAPublicKey) and isinstance(private_key_public, dsa.DSAPublicKey):
+                cert_numbers = cert_public_key.public_numbers()
+                key_numbers = private_key_public.public_numbers()
+                
+                return {
+                    'match': (cert_numbers.y == key_numbers.y and 
+                             cert_numbers.parameter_numbers.p == key_numbers.parameter_numbers.p and
+                             cert_numbers.parameter_numbers.q == key_numbers.parameter_numbers.q and
+                             cert_numbers.parameter_numbers.g == key_numbers.parameter_numbers.g),
+                    'match_type': 'DSA',
+                    'details': {
+                        'cert_y': str(cert_numbers.y)[:50] + '...',
+                        'key_y': str(key_numbers.y)[:50] + '...',
+                        'y_match': cert_numbers.y == key_numbers.y
+                    }
+                }
+            
+            elif isinstance(cert_public_key, ec.EllipticCurvePublicKey) and isinstance(private_key_public, ec.EllipticCurvePublicKey):
+                cert_numbers = cert_public_key.public_numbers()
+                key_numbers = private_key_public.public_numbers()
+                
+                return {
+                    'match': cert_numbers.x == key_numbers.x and cert_numbers.y == key_numbers.y,
+                    'match_type': 'EC',
+                    'details': {
+                        'cert_x': str(cert_numbers.x)[:50] + '...',
+                        'key_x': str(key_numbers.x)[:50] + '...',
+                        'cert_y': str(cert_numbers.y)[:50] + '...',
+                        'key_y': str(key_numbers.y)[:50] + '...',
+                        'x_match': cert_numbers.x == key_numbers.x,
+                        'y_match': cert_numbers.y == key_numbers.y
+                    }
+                }
+            
+            else:
+                return {
+                    'match': False,
+                    'match_type': 'Unknown',
+                    'details': {
+                        'cert_type': type(cert_public_key).__name__,
+                        'key_type': type(private_key_public).__name__,
+                        'type_match': type(cert_public_key) == type(private_key_public)
+                    }
+                }
+                
+        except Exception as e:
+            return {
+                'match': False,
+                'match_type': 'Error',
+                'details': {'error': str(e)}
+            }
+    
+    @staticmethod
+    def _extract_certificate_info(cert):
+        """Extract information from the certificate"""
+        try:
+            subject_info = CertificateKeyMatcher._extract_subject_info(cert.subject)
+            issuer_info = CertificateKeyMatcher._extract_issuer_info(cert.issuer)
+            
+            return {
+                'subject': subject_info,
+                'issuer': issuer_info,
+                'serial_number': str(cert.serial_number),
+                'version': cert.version.name,
+                'signature_algorithm': cert.signature_algorithm_oid._name,
+                'not_before': cert.not_valid_before.strftime('%Y-%m-%d %H:%M:%S UTC'),
+                'not_after': cert.not_valid_after.strftime('%Y-%m-%d %H:%M:%S UTC'),
+                'public_key_type': type(cert.public_key()).__name__,
+                'public_key_size': CertificateKeyMatcher._get_key_size(cert.public_key())
+            }
+        except Exception as e:
+            return {'error': f"Failed to extract certificate info: {str(e)}"}
+    
+    @staticmethod
+    def _extract_key_info(private_key):
+        """Extract information from the private key"""
+        try:
+            return {
+                'key_type': type(private_key).__name__,
+                'key_size': CertificateKeyMatcher._get_key_size(private_key.public_key())
+            }
+        except Exception as e:
+            return {'error': f"Failed to extract key info: {str(e)}"}
+    
+    @staticmethod
+    def _extract_subject_info(subject):
+        """Extract subject information from certificate"""
+        subject_info = {}
+        for attribute in subject:
+            oid_name = attribute.oid._name if hasattr(attribute.oid, '_name') else str(attribute.oid)
+            subject_info[oid_name] = attribute.value
+        return subject_info
+    
+    @staticmethod
+    def _extract_issuer_info(issuer):
+        """Extract issuer information from certificate"""
+        issuer_info = {}
+        for attribute in issuer:
+            oid_name = attribute.oid._name if hasattr(attribute.oid, '_name') else str(attribute.oid)
+            issuer_info[oid_name] = attribute.value
+        return issuer_info
+    
+    @staticmethod
+    def _get_key_size(public_key):
+        """Get the key size for different key types"""
+        try:
+            if isinstance(public_key, rsa.RSAPublicKey):
+                return public_key.key_size
+            elif isinstance(public_key, dsa.DSAPublicKey):
+                return public_key.key_size
+            elif isinstance(public_key, ec.EllipticCurvePublicKey):
+                return public_key.curve.key_size
+            else:
+                return "Unknown"
+        except:
+            return "Unknown"
+
+
+class SSLConverter:
+    """SSL Certificate Format Converter"""
+    
+    @staticmethod
+    def convert_certificate(input_data, input_format, output_format, password=None):
+        """Convert certificate between different formats"""
+        try:
+            # Parse input based on format
+            if input_format == 'pem':
+                cert = x509.load_pem_x509_certificate(input_data.encode('utf-8'))
+            elif input_format == 'der':
+                # DER data should be base64 encoded, decode it first
+                der_data = base64.b64decode(input_data)
+                cert = x509.load_der_x509_certificate(der_data)
+            elif input_format == 'pkcs7':
+                # PKCS#7 is a container format, extract the first certificate
+                from cryptography.hazmat.primitives.serialization import pkcs7
+                pkcs7_data = base64.b64decode(input_data)
+                pkcs7_obj = pkcs7.load_der_pkcs7_certificates(pkcs7_data)
+                if not pkcs7_obj:
+                    raise ValueError("No certificates found in PKCS#7 data")
+                cert = pkcs7_obj[0]
+            elif input_format == 'pkcs12':
+                # PKCS#12 contains both certificate and private key
+                from cryptography.hazmat.primitives.serialization import pkcs12
+                pkcs12_data = base64.b64decode(input_data)
+                pkcs12_obj = pkcs12.load_pkcs12(pkcs12_data, password.encode('utf-8') if password else None)
+                cert = pkcs12_obj.cert.certificate
+            else:
+                raise ValueError(f"Unsupported input format: {input_format}")
+            
+            # Convert to output format
+            if output_format == 'pem':
+                output_data = cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
+            elif output_format == 'der':
+                output_data = base64.b64encode(cert.public_bytes(serialization.Encoding.DER)).decode('utf-8')
+            elif output_format == 'pkcs7':
+                # Create PKCS#7 container with the certificate
+                from cryptography.hazmat.primitives.serialization import pkcs7
+                pkcs7_data = pkcs7.PKCS7SignatureBuilder().add_certificate(cert).sign(
+                    serialization.Encoding.DER, 
+                    hashes.SHA256()
+                )
+                output_data = base64.b64encode(pkcs7_data).decode('utf-8')
+            elif output_format == 'pkcs12':
+                # PKCS#12 requires both certificate and private key
+                raise ValueError("PKCS#12 output requires both certificate and private key")
+            else:
+                raise ValueError(f"Unsupported output format: {output_format}")
+            
+            return {
+                'success': True,
+                'output_data': output_data,
+                'input_format': input_format,
+                'output_format': output_format,
+                'certificate_info': SSLConverter._extract_cert_info(cert)
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f"Conversion failed: {str(e)}"
+            }
+    
+    @staticmethod
+    def convert_private_key(input_data, input_format, output_format, password=None):
+        """Convert private key between different formats"""
+        try:
+            # Parse input based on format
+            if input_format == 'pem':
+                private_key = serialization.load_pem_private_key(
+                    input_data.encode('utf-8'),
+                    password.encode('utf-8') if password else None
+                )
+            elif input_format == 'der':
+                der_data = base64.b64decode(input_data)
+                private_key = serialization.load_der_private_key(
+                    der_data,
+                    password.encode('utf-8') if password else None
+                )
+            elif input_format == 'pkcs12':
+                from cryptography.hazmat.primitives.serialization import pkcs12
+                pkcs12_data = base64.b64decode(input_data)
+                pkcs12_obj = pkcs12.load_pkcs12(pkcs12_data, password.encode('utf-8') if password else None)
+                private_key = pkcs12_obj.key
+            else:
+                raise ValueError(f"Unsupported input format: {input_format}")
+            
+            # Convert to output format
+            if output_format == 'pem':
+                output_data = private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.PKCS8,
+                    encryption_algorithm=serialization.NoEncryption()
+                ).decode('utf-8')
+            elif output_format == 'der':
+                output_data = base64.b64encode(private_key.private_bytes(
+                    encoding=serialization.Encoding.DER,
+                    format=serialization.PrivateFormat.PKCS8,
+                    encryption_algorithm=serialization.NoEncryption()
+                )).decode('utf-8')
+            elif output_format == 'pkcs12':
+                # PKCS#12 requires both certificate and private key
+                raise ValueError("PKCS#12 output requires both certificate and private key")
+            else:
+                raise ValueError(f"Unsupported output format: {output_format}")
+            
+            return {
+                'success': True,
+                'output_data': output_data,
+                'input_format': input_format,
+                'output_format': output_format,
+                'key_info': SSLConverter._extract_key_info(private_key)
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f"Private key conversion failed: {str(e)}"
+            }
+    
+    @staticmethod
+    def convert_certificate_and_key(cert_data, key_data, input_format, output_format, password=None):
+        """Convert certificate and private key together (for PKCS#12)"""
+        try:
+            # Parse certificate
+            if input_format == 'pem':
+                cert = x509.load_pem_x509_certificate(cert_data.encode('utf-8'))
+                private_key = serialization.load_pem_private_key(
+                    key_data.encode('utf-8'),
+                    password.encode('utf-8') if password else None
+                )
+            else:
+                raise ValueError(f"Unsupported input format for combined conversion: {input_format}")
+            
+            # Convert to output format
+            if output_format == 'pkcs12':
+                from cryptography.hazmat.primitives.serialization import pkcs12
+                pkcs12_data = pkcs12.serialize_key_and_certificates(
+                    b"",  # No friendly name
+                    private_key,
+                    cert,
+                    None,  # No additional certificates
+                    serialization.NoEncryption()
+                )
+                output_data = base64.b64encode(pkcs12_data).decode('utf-8')
+            else:
+                raise ValueError(f"Unsupported output format for combined conversion: {output_format}")
+            
+            return {
+                'success': True,
+                'output_data': output_data,
+                'input_format': input_format,
+                'output_format': output_format,
+                'certificate_info': SSLConverter._extract_cert_info(cert),
+                'key_info': SSLConverter._extract_key_info(private_key)
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f"Combined conversion failed: {str(e)}"
+            }
+    
+    @staticmethod
+    def _extract_cert_info(cert):
+        """Extract certificate information"""
+        try:
+            subject_info = {}
+            for attribute in cert.subject:
+                oid_name = attribute.oid._name if hasattr(attribute.oid, '_name') else str(attribute.oid)
+                subject_info[oid_name] = attribute.value
+            
+            issuer_info = {}
+            for attribute in cert.issuer:
+                oid_name = attribute.oid._name if hasattr(attribute.oid, '_name') else str(attribute.oid)
+                issuer_info[oid_name] = attribute.value
+            
+            return {
+                'subject': subject_info,
+                'issuer': issuer_info,
+                'serial_number': str(cert.serial_number),
+                'version': cert.version.name,
+                'signature_algorithm': cert.signature_algorithm_oid._name,
+                'not_before': cert.not_valid_before.strftime('%Y-%m-%d %H:%M:%S UTC'),
+                'not_after': cert.not_valid_after.strftime('%Y-%m-%d %H:%M:%S UTC')
+            }
+        except Exception as e:
+            return {'error': f"Failed to extract certificate info: {str(e)}"}
+    
+    @staticmethod
+    def _extract_key_info(private_key):
+        """Extract private key information"""
+        try:
+            return {
+                'key_type': type(private_key).__name__,
+                'key_size': SSLConverter._get_key_size(private_key.public_key())
+            }
+        except Exception as e:
+            return {'error': f"Failed to extract key info: {str(e)}"}
+    
+    @staticmethod
+    def _get_key_size(public_key):
+        """Get the key size for different key types"""
+        try:
+            if isinstance(public_key, rsa.RSAPublicKey):
+                return public_key.key_size
+            elif isinstance(public_key, dsa.DSAPublicKey):
+                return public_key.key_size
+            elif isinstance(public_key, ec.EllipticCurvePublicKey):
+                return public_key.curve.key_size
+            else:
+                return "Unknown"
+        except:
+            return "Unknown"

@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block title %}Online Port Checker - Check Open Ports (TCP & UDP Ports) | NetHub Network Tools{% endblock %}
+
+{% block meta_description %}Free online port checker to identify open and closed ports. Scan TCP and UDP ports, check port forwarding setup, and verify network connectivity with our advanced port scanner tool.{% endblock %}
+
+{% block meta_keywords %}port checker, online port scanner, open ports, closed ports, TCP ports, UDP ports, port forwarding, network connectivity, port scan, port tester, network security, port availability{% endblock %}
+
+{% block og_url %}/nmap{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-shield-check me-3"></i>Online Port Checker
+        </h1>
+        <p class="lead text-muted">Check open ports (TCP & UDP ports) and verify port forwarding setup with our advanced port scanner tool</p>
+    </div>
+
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Free Port Checker Online - Check Open Ports (TCP & UDP Ports)</h2>
+                    <p class="text-muted mb-3">Simply leverage our port checker, designed to identify open and closed ports. It combines traditional TCP and UDP scanning techniques to ensure 100% accurate results. This helps you understand your network's connectivity status and flag potential vulnerabilities.</p>
+                    
+                    <p class="text-muted mb-3">Think of our Port Checker as a highly advanced investigator for your computer's front doors – the ports. It's like having a super-smart assistant that goes door-to-door — checking if each door (port) is open, closed, or even locked.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>How Port Scanning Works</h5>
+                        <p class="mb-0">A port scanner sends a TCP or UDP network packet to ask about the port's current status. The three types of responses are: <strong>Open/Accepted</strong> (port is available), <strong>Closed/Not Listening</strong> (port is in use), or <strong>Filtered/Dropped/Blocked</strong> (port blocked all traffic).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nmap Form -->
+    <div class="card shadow-lg mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>Port Scan Configuration</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/nmap" class="row g-3">
+                <div class="col-md-6">
+                    <label for="hostname" class="form-label fw-bold">Hostname or IP Address</label>
+                    <input 
+                        type="text" 
+                        id="hostname" 
+                        name="hostname"
+                        value="{{ hostname or '' }}"
+                        class="form-control form-control-lg" 
+                        placeholder="example.com or 192.168.1.1" 
+                        required
+                    >
+                </div>
+                <div class="col-md-6">
+                    <label for="scanType" class="form-label fw-bold">Scan Type</label>
+                    <select id="scanType" name="scan_type" class="form-select form-select-lg">
+                        <option value="basic" {% if scan_type == 'basic' %}selected{% endif %}>Basic Scan (Fast)</option>
+                        <option value="full" {% if scan_type == 'full' %}selected{% endif %}>Full Scan (Comprehensive)</option>
+                        <option value="quick" {% if scan_type == 'quick' %}selected{% endif %}>Quick Scan (Top Ports)</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Scan Types:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Basic Scan:</strong> SYN scan with OS detection and service versioning</li>
+                            <li><strong>Full Scan:</strong> Comprehensive scan with vulnerability detection</li>
+                            <li><strong>Quick Scan:</strong> Fast scan of most common ports</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-shield-check me-2"></i>Start Port Scan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    {% if nmap_results %}
+    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);">
+        <div class="card-header border-0" style="background: transparent;">
+            <div class="d-flex align-items-center">
+                <div class="p-2 rounded-circle me-3" style="background: rgba(13, 110, 253, 0.1);">
+                    <i class="bi bi-shield-check" style="color: #6c757d; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold" style="color: #6c757d;">Port Scan Results</h5>
+                    <small style="color: #adb5bd;">Network security analysis for {{ nmap_results.host }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            {% if nmap_results.success %}
+                <!-- Host Information -->
+                {% if nmap_results.host_info %}
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-pc-display me-2"></i>Host Information
+                    </h6>
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        {{ nmap_results.host_info }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- OS Information -->
+                {% if nmap_results.os_info %}
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-cpu me-2"></i>Operating System
+                    </h6>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {{ nmap_results.os_info }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Port Statistics -->
+                {% if nmap_results.ports %}
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(13, 110, 253, 0.1);">
+                                <i class="bi bi-shield-check" style="color: #0d6efd; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Total Ports</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #0d6efd;">{{ nmap_results.ports|length }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(25, 135, 84, 0.1);">
+                                <i class="bi bi-check-circle" style="color: #198754; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Open Ports</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #198754;">{{ nmap_results.ports|selectattr('state', 'equalto', 'open')|list|length }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(255, 193, 7, 0.1);">
+                                <i class="bi bi-exclamation-triangle" style="color: #ffc107; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Filtered Ports</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #ffc107;">{{ nmap_results.ports|selectattr('state', 'equalto', 'filtered')|list|length }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(220, 53, 69, 0.1);">
+                                <i class="bi bi-x-circle" style="color: #dc3545; font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="mb-1" style="color: #6c757d;">Closed Ports</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #dc3545;">{{ nmap_results.ports|selectattr('state', 'equalto', 'closed')|list|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Port Details Table -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-list-ul me-2"></i>Port Details
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Port</th>
+                                    <th>Protocol</th>
+                                    <th>State</th>
+                                    <th>Service</th>
+                                    <th>Risk Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for port in nmap_results.ports %}
+                                <tr>
+                                    <td class="fw-bold">{{ port.port }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ port.protocol|upper }}</span>
+                                    </td>
+                                    <td>
+                                        {% if port.state == 'open' %}
+                                            <span class="badge bg-success">Open</span>
+                                        {% elif port.state == 'filtered' %}
+                                            <span class="badge bg-warning">Filtered</span>
+                                        {% elif port.state == 'closed' %}
+                                            <span class="badge bg-danger">Closed</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ port.state|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="fw-semibold">{{ port.service }}</span>
+                                    </td>
+                                    <td>
+                                        {% if port.state == 'open' %}
+                                            {% if port.port in [21, 22, 23, 25, 53, 80, 110, 143, 443, 993, 995] %}
+                                                <span class="badge bg-warning">Medium</span>
+                                            {% elif port.port in [135, 139, 445, 1433, 3389, 5432, 3306] %}
+                                                <span class="badge bg-danger">High</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Low</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-secondary">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>No ports found:</strong> The scan completed but no ports were detected.
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Scan Failed:</strong> {{ nmap_results.error }}
+                </div>
+            {% endif %}
+            
+            <!-- Raw Output -->
+            {% if nmap_results.raw_output %}
+            <div class="mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                    <i class="bi bi-terminal me-2"></i>Raw Nmap Output
+                </h6>
+                <pre class="bg-dark text-light p-3 rounded"><code>{{ nmap_results.raw_output }}</code></pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Security Recommendations -->
+    {% if nmap_results and nmap_results.success and nmap_results.ports %}
+    <div class="card border-0 shadow-sm mt-4" style="background: linear-gradient(135deg, #fff3cd 0%, #ffffff 100%);">
+        <div class="card-header border-0" style="background: transparent;">
+            <div class="d-flex align-items-center">
+                <div class="p-2 rounded-circle me-3" style="background: rgba(255, 193, 7, 0.1);">
+                    <i class="bi bi-shield-exclamation" style="color: #ffc107; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold" style="color: #856404;">Security Recommendations</h5>
+                    <small style="color: #6c5700;">Best practices for network security</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="fw-bold text-warning mb-3">Open Ports Found</h6>
+                    <ul class="list-unstyled">
+                        {% for port in nmap_results.ports %}
+                            {% if port.state == 'open' %}
+                                <li class="mb-2">
+                                    <i class="bi bi-circle-fill text-danger me-2" style="font-size: 0.5rem;"></i>
+                                    <strong>Port {{ port.port }}/{{ port.protocol }}:</strong> {{ port.service }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-bold text-warning mb-3">Security Tips</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Close unnecessary ports</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Use firewall rules</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Keep services updated</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor network traffic</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Use strong authentication</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- What Is a Port Scanner Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">What Is a Port Scanner (Port Tester)?</h2>
+                    <p class="text-muted mb-3">According to the SANS Institute, port scanning is one of the most popular techniques hackers use to discover vulnerabilities and exploit services to break into systems.</p>
+                    
+                    <p class="text-muted mb-3">A port scanner is a network scanner that quickly finds the open ports on a computer network. The open port check tool displays which port on a network are available to communicate.</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Security Note</h5>
+                        <p class="mb-0">Port scanning can be used for both legitimate network administration and malicious purposes. Always ensure you have permission to scan the target network and use these tools responsibly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Use Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">How to Use Our Port Checker?</h2>
+                    <p class="text-muted mb-3">Our Port checker boasts a powerful yet intuitive user interface, making scanning any port easier. Access our port checker and then follow this method to perform a quick port test:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <span class="fw-bold">1</span>
+                                </div>
+                                <h5 class="text-primary">Enter Domain/IP</h5>
+                                <p class="text-muted small">Specify the domain name or IP Address in the search bar whose ports you must check</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <span class="fw-bold">2</span>
+                                </div>
+                                <h5 class="text-primary">Select Port Type</h5>
+                                <p class="text-muted small">Choose from common ports, custom ports, or specific port ranges to scan</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <span class="fw-bold">3</span>
+                                </div>
+                                <h5 class="text-primary">Start Scanning</h5>
+                                <p class="text-muted small">Click "Check" to run our online port checker and view results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Common Ports Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Common Ports</h2>
+                    <p class="text-muted mb-3">Here are the most commonly scanned ports according to the Nmap database:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Server & Web Ports</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>21</strong> - FTP (File Transfer Protocol)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>22</strong> - SSH (Secure Shell)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>25</strong> - SMTP (Simple Mail Transfer Protocol)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>53</strong> - DNS (Domain Name System)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>80</strong> - HTTP (Hypertext Transfer Protocol)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>110</strong> - POP3 (Post Office Protocol 3)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>143</strong> - IMAP (Internet Message Access Protocol)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>443</strong> - SSL / HTTPS (Hypertext Transfer Protocol Secure)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Database & Remote Access</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>135</strong> - RPC (Remote Procedure Call)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>139</strong> - NetBIOS</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>445</strong> - SMB (Server Message Block)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>1433</strong> - MSSQL</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>3306</strong> - MySQL</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>3389</strong> - Remote Desktop</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>5900</strong> - VNC</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>8080</strong> - HTTP-Proxy</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Benefits of Using Our Port Checker Tool</h2>
+                    <p class="text-muted mb-3">Here are some common scenarios where you might use the Port Checker Tool:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Testing & Troubleshooting</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Test port availability and accessibility</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Troubleshoot connectivity issues</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify port forwarding configuration</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug server configuration</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Security & Administration</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Security assessment and vulnerability detection</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Test firewall rules and configurations</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor network security posture</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Identify unnecessary open ports</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="portScannerFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                    What are ports in networking?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#portScannerFAQ">
+                                <div class="accordion-body">
+                                    In networking, a port is like a designated entrance on a computer or device where data can flow in or out. It's a way for different applications and services to communicate with each other over a network. Ports facilitate computers to differentiate among different kinds of traffic.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    What is the difference between TCP and UDP ports?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#portScannerFAQ">
+                                <div class="accordion-body">
+                                    TCP ports are used for reliable, ordered, and error-checked communication between applications. At the same time, UDP ports offer faster but less reliable communication, making them suitable for tasks where speed is more important than accuracy.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    Are open ports a security risk?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#portScannerFAQ">
+                                <div class="accordion-body">
+                                    Yes. Open ports can be a security risk if they are not properly secured. Hackers might exploit open ports to gain unauthorized access to a network or device. Monitoring and securing open ports to maintain network security regularly is important.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

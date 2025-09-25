@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Ping Test - Free Online Ping Tool | NetHub Network Tools{% endblock %}
+{% block title %}Remote Ping Test / Ping Online - Free ICMP Diagnostics Tool | NetHub Network Tools{% endblock %}
 
-{% block meta_description %}Free online ping tool to test network connectivity and latency. Ping any hostname or IP address to check if it's reachable and measure response times.{% endblock %}
+{% block meta_description %}Free remote ping tool to instantly ping your server from outside your network. Get full ICMP diagnostics showing ping and echo reply for each ICMP packet. Test if your server is down or reachable.{% endblock %}
 
-{% block meta_keywords %}ping test, ping online, network ping, ping tool, latency test, connectivity test, ping checker, network diagnostics{% endblock %}
+{% block meta_keywords %}remote ping test, ping online, ICMP diagnostics, server ping, network connectivity test, ping tool, server monitoring, uptime test, ping checker, network diagnostics, remote ping tool{% endblock %}
 
 {% block og_url %}/ping{% endblock %}
 
@@ -13,32 +13,52 @@
     <!-- Header -->
     <div class="text-center mb-5">
         <h1 class="display-4 fw-bold text-primary mb-3">
-            <i class="bi bi-broadcast me-3"></i>Ping Test
+            <i class="bi bi-broadcast me-3"></i>Remote Ping Test / Ping Online
         </h1>
-        <p class="lead text-muted">Test network connectivity and measure latency to any hostname or IP address</p>
+        <p class="lead text-muted">Free remote ping tool to instantly ping your server from outside your network with full ICMP diagnostics</p>
+    </div>
+
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Free Remote Ping Tool</h2>
+                    <p class="text-muted mb-3">Is your server down? Need to know if a website or server can be reached over the internet? Use our free <strong>remote ping</strong> tool to <strong>instantly ping your server</strong> from outside your network.</p>
+                    
+                    <p class="text-muted mb-3">The ping will provide full <strong>ICMP diagnostics</strong> showing the ping and echo reply for each ICMP packet - originating from our monitoring servers worldwide.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>How Remote Ping Works</h5>
+                        <p class="mb-0">Our remote ping tool sends ICMP echo request packets to your target server and measures the response time. This helps you determine if your server is reachable and how fast it responds to network requests.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Ping Form -->
     <div class="card shadow-lg mb-5">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-broadcast me-2"></i>Ping Test</h5>
+            <h5 class="mb-0"><i class="bi bi-broadcast me-2"></i>Remote Ping Test</h5>
         </div>
         <div class="card-body">
             <form method="POST" action="/ping" class="row g-3">
                 <div class="col-md-8">
-                    <label for="hostname" class="form-label fw-bold">Hostname or IP Address</label>
+                    <label for="hostname" class="form-label fw-bold">Hostname or IP</label>
                     <input 
                         type="text" 
                         id="hostname" 
                         name="hostname"
                         value="{{ hostname or '' }}"
                         class="form-control form-control-lg" 
-                        placeholder="example.com or 8.8.8.8" 
+                        placeholder="Full domain name or IP address of the server / website to ping" 
                         required
                     >
+                    <div class="form-text">Full domain name or IP address of the server / website to ping</div>
                 </div>
                 <div class="col-md-4">
-                    <label for="count" class="form-label fw-bold">Count</label>
+                    <label for="count" class="form-label fw-bold">Packet Count</label>
                     <select id="count" name="count" class="form-select form-select-lg">
                         <option value="4" {% if count == 4 %}selected{% endif %}>4 packets</option>
                         <option value="8" {% if count == 8 %}selected{% endif %}>8 packets</option>
@@ -48,7 +68,7 @@
                 </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-broadcast me-2"></i>Start Ping Test
+                        <i class="bi bi-play-circle me-2"></i>Start Remote PING
                     </button>
                 </div>
             </form>
@@ -57,15 +77,15 @@
 
     <!-- Results -->
     {% if ping_results %}
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-gradient-success text-white border-0">
+    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);">
+        <div class="card-header border-0" style="background: transparent;">
             <div class="d-flex align-items-center">
-                <div class="p-2 bg-white bg-opacity-20 rounded-circle me-3">
-                    <i class="bi bi-check-circle text-white"></i>
+                <div class="p-2 rounded-circle me-3" style="background: rgba(13, 110, 253, 0.1);">
+                    <i class="bi bi-check-circle" style="color: #6c757d; font-size: 1.2rem;"></i>
                 </div>
                 <div>
-                    <h5 class="mb-0 fw-bold">Ping Results</h5>
-                    <small class="opacity-75">Network connectivity analysis</small>
+                    <h5 class="mb-0 fw-bold" style="color: #6c757d;">Ping Results</h5>
+                    <small style="color: #adb5bd;">Network connectivity analysis</small>
                 </div>
             </div>
         </div>
@@ -73,62 +93,72 @@
             <!-- Statistics Cards -->
             <div class="row g-4 mb-4">
                 <div class="col-lg-3 col-md-6">
-                    <div class="text-center p-4 bg-light rounded-3">
-                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-send text-primary" style="font-size: 1.5rem;"></i>
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(13, 110, 253, 0.1);">
+                            <i class="bi bi-send" style="color: #0d6efd; font-size: 1.5rem;"></i>
                         </div>
-                        <h6 class="text-muted mb-1">Packets Sent</h6>
-                        <h3 class="text-primary mb-0 fw-bold">{{ ping_results.stats.packets_sent }}</h3>
+                        <h6 class="mb-1" style="color: #6c757d;">Packets Sent</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #0d6efd;">{{ ping_results.stats.packets_sent }}</h3>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="text-center p-4 bg-light rounded-3">
-                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(25, 135, 84, 0.1);">
+                            <i class="bi bi-check-circle" style="color: #198754; font-size: 1.5rem;"></i>
                         </div>
-                        <h6 class="text-muted mb-1">Packets Received</h6>
-                        <h3 class="text-success mb-0 fw-bold">{{ ping_results.stats.packets_received }}</h3>
+                        <h6 class="mb-1" style="color: #6c757d;">Packets Received</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #198754;">{{ ping_results.stats.packets_received }}</h3>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="text-center p-4 bg-light rounded-3">
-                        <div class="bg-{% if ping_results.stats.packet_loss == 0 %}success{% elif ping_results.stats.packet_loss < 5 %}warning{% else %}danger{% endif %} bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-exclamation-triangle text-{% if ping_results.stats.packet_loss == 0 %}success{% elif ping_results.stats.packet_loss < 5 %}warning{% else %}danger{% endif %}" style="font-size: 1.5rem;"></i>
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(25, 135, 84, 0.1);">
+                            <i class="bi bi-exclamation-triangle" style="color: #198754; font-size: 1.5rem;"></i>
                         </div>
-                        <h6 class="text-muted mb-1">Packet Loss</h6>
-                        <h3 class="text-{% if ping_results.stats.packet_loss == 0 %}success{% elif ping_results.stats.packet_loss < 5 %}warning{% else %}danger{% endif %} mb-0 fw-bold">{{ ping_results.stats.packet_loss }}%</h3>
+                        <h6 class="mb-1" style="color: #6c757d;">Packet Loss</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #198754;">{{ ping_results.stats.packet_loss }}%</h3>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="text-center p-4 bg-light rounded-3">
-                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-speedometer2 text-info" style="font-size: 1.5rem;"></i>
+                    <div class="text-center p-4 rounded-3" style="background: #f8f9fa;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: rgba(13, 110, 253, 0.1);">
+                            <i class="bi bi-speedometer2" style="color: #0d6efd; font-size: 1.5rem;"></i>
                         </div>
-                        <h6 class="text-muted mb-1">Average RTT</h6>
-                        <h3 class="text-info mb-0 fw-bold">{{ ping_results.stats.avg_time }} ms</h3>
+                        <h6 class="mb-1" style="color: #6c757d;">Average RTT</h6>
+                        <h3 class="mb-0 fw-bold" style="color: #0d6efd;">{{ ping_results.stats.avg_time }} ms</h3>
                     </div>
                 </div>
             </div>
             
+            {% if ping_results.raw_output %}
+            <div class="mt-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-terminal me-2" style="color: #0d6efd;"></i>
+                    <h6 class="fw-bold mb-0" style="color: #0d6efd;">Raw Output</h6>
+                </div>
+                <pre class="bg-dark text-light p-3 rounded"><code>{{ ping_results.raw_output }}</code></pre>
+            </div>
+            {% endif %}
+            
             {% if ping_results.ping_results and ping_results.ping_results|length > 0 %}
             <div class="mt-4">
                 <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-list-ul text-primary me-2"></i>
-                    <h6 class="fw-bold text-primary mb-0">Ping Responses</h6>
+                    <i class="bi bi-list-ul me-2" style="color: #0d6efd;"></i>
+                    <h6 class="fw-bold mb-0" style="color: #0d6efd;">Ping Responses</h6>
                 </div>
                 <div class="row g-3">
                     {% for response_time in ping_results.ping_results %}
                     <div class="col-lg-4 col-md-6">
-                        <div class="card border-0 bg-light h-100">
+                        <div class="card border-0 h-100" style="background: #f8f9fa;">
                             <div class="card-body p-3 text-center">
-                                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
-                                    <i class="bi bi-check text-success"></i>
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px; background: rgba(25, 135, 84, 0.1);">
+                                    <i class="bi bi-check" style="color: #198754;"></i>
                                 </div>
-                                <h6 class="mb-1">Packet #{{ loop.index }}</h6>
-                                <p class="mb-1 fw-semibold text-success">
+                                <h6 class="mb-1" style="color: #6c757d;">Packet #{{ loop.index }}</h6>
+                                <p class="mb-1 fw-semibold" style="color: #198754;">
                                     {{ response_time }} ms
                                 </p>
-                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                <span class="badge border" style="background: rgba(25, 135, 84, 0.1); color: #198754; border-color: rgba(25, 135, 84, 0.25) !important;">
                                     Success
                                 </span>
                             </div>
@@ -136,16 +166,6 @@
                     </div>
                     {% endfor %}
                 </div>
-            </div>
-            {% endif %}
-            
-            {% if ping_results.raw_output %}
-            <div class="mt-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-terminal text-primary me-2"></i>
-                    <h6 class="fw-bold text-primary mb-0">Raw Output</h6>
-                </div>
-                <pre class="bg-dark text-light p-3 rounded"><code>{{ ping_results.raw_output }}</code></pre>
             </div>
             {% endif %}
         </div>
@@ -159,5 +179,161 @@
         <strong>Error:</strong> {{ ping_results.error }}
     </div>
     {% endif %}
+
+    <!-- How to Use Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-4">How to Use Our Remote Ping Tool</h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <span class="fw-bold">1</span>
+                                </div>
+                                <h5 class="text-primary">Enter Target</h5>
+                                <p class="text-muted small">Enter the hostname or IP address you want to ping</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <span class="fw-bold">2</span>
+                                </div>
+                                <h5 class="text-primary">Select Count</h5>
+                                <p class="text-muted small">Choose how many ping packets to send (4-32)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <span class="fw-bold">3</span>
+                                </div>
+                                <h5 class="text-primary">Get Results</h5>
+                                <p class="text-muted small">View detailed ICMP diagnostics and response times</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Why Use Our Remote Ping Tool?</h2>
+                    <p class="text-muted mb-3">Our free remote ping tool provides essential network diagnostics for system administrators, developers, and IT professionals:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For System Administrators</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Test server connectivity from external networks</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor network latency and response times</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Diagnose network connectivity issues</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify server uptime and availability</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">For Developers & Webmasters</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Test website and API endpoint reachability</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Measure network performance from different locations</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug connectivity problems quickly</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify DNS resolution and routing</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Free Uptime Tools</h2>
+                    <p class="text-muted mb-3">In addition to our remote ping tool, we offer a comprehensive suite of free network monitoring and diagnostic tools:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-broadcast text-primary me-2"></i><strong>Remote Ping Online Test</strong> - Test server connectivity</li>
+                                <li class="mb-2"><i class="bi bi-shield-check text-primary me-2"></i><strong>Test TLS/SSL Web Servers</strong> - Verify SSL certificates</li>
+                                <li class="mb-2"><i class="bi bi-globe text-primary me-2"></i><strong>IPv6 HTTP Request Test</strong> - Test IPv6 connectivity</li>
+                                <li class="mb-2"><i class="bi bi-search text-primary me-2"></i><strong>DNS Lookup / Query</strong> - Resolve domain names</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-envelope text-primary me-2"></i><strong>SMTP Test / Mail Server Test</strong> - Test email servers</li>
+                                <li class="mb-2"><i class="bi bi-download text-primary me-2"></i><strong>FTP Server Test</strong> - Test file transfer servers</li>
+                                <li class="mb-2"><i class="bi bi-shield text-primary me-2"></i><strong>Free Web Server Security Scan</strong> - Security analysis</li>
+                                <li class="mb-2"><i class="bi bi-envelope-at text-primary me-2"></i><strong>POP3 Test</strong> - Test email retrieval</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="pingFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                    What is a remote ping test?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#pingFAQ">
+                                <div class="accordion-body">
+                                    A remote ping test sends ICMP echo request packets from our monitoring servers to your target server and measures the response time. This helps determine if your server is reachable from external networks and how fast it responds to network requests.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    Why use a remote ping instead of local ping?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#pingFAQ">
+                                <div class="accordion-body">
+                                    Remote ping tests provide an external perspective on your server's connectivity, simulating how users from different locations would experience your service. This is essential for diagnosing issues that might not be apparent from within your local network.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    What do the ping results tell me?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#pingFAQ">
+                                <div class="accordion-body">
+                                    Ping results show response times for each packet, average response time, packet loss percentage, and overall connectivity status. Low response times indicate good performance, while high response times or packet loss may indicate network issues or server problems.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

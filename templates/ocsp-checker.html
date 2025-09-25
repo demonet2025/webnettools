@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% block title %}OCSP Status Checker - Check Certificate Revocation Status Online | NetHub Network Tools{% endblock %}
+{% block meta_title %}OCSP Status Checker - Check Certificate Revocation Status Online{% endblock %}
+{% block meta_description %}Check SSL certificate revocation status using OCSP (Online Certificate Status Protocol). Submit your base64 encoded certificate or CSR to verify if the certificate has been revoked by the Certificate Authority.{% endblock %}
+{% block meta_keywords %}OCSP checker, OCSP status checker, certificate revocation check, OCSP responder, SSL certificate status, certificate revocation, OCSP protocol, SSL security, certificate validation, OCSP online{% endblock %}
+{% block og_title %}OCSP Status Checker - Check Certificate Revocation Status Online{% endblock %}
+{% block og_description %}Check SSL certificate revocation status using OCSP (Online Certificate Status Protocol). Submit your certificate to verify revocation status.{% endblock %}
+{% block canonical_url %}/ocsp-checker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="bi bi-shield-check me-3"></i>OCSP Status Checker
+            </h1>
+            <p class="lead text-muted">Check SSL certificate revocation status using OCSP (Online Certificate Status Protocol)</p>
+        </div>
+
+        <!-- SEO Content Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">Free OCSP Status Checker Tool</h2>
+                        <p class="text-muted mb-3">Our OCSP Status Checker allows you to verify if an SSL certificate has been revoked by its Certificate Authority (CA). OCSP (Online Certificate Status Protocol) is a real-time method for checking certificate revocation status, providing more up-to-date information than Certificate Revocation Lists (CRLs).</p>
+                        
+                        <p class="text-muted mb-3">Submit your base64 encoded certificate or CSR in the field below, and we will attempt to query the corresponding OCSP responder to get the revocation status. This is essential for maintaining SSL security and ensuring certificates haven't been compromised.</p>
+                        
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>How OCSP Works</h5>
+                            <p class="mb-0">OCSP allows real-time checking of certificate revocation status by querying the Certificate Authority's OCSP responder. This provides immediate verification of whether a certificate is still valid or has been revoked.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OCSP Checker Form -->
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-shield-check me-2"></i>OCSP Status Checker
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/ocsp-checker" id="ocsp-form">
+                    <div class="mb-4">
+                        <label for="certificate" class="form-label fw-bold">Certificate*</label>
+                        <textarea 
+                            id="certificate" 
+                            name="certificate" 
+                            class="form-control" 
+                            rows="8" 
+                            placeholder="-----BEGIN CERTIFICATE-----&#10;MIIDXTCCAkWgAwIBAgIJAKoK/Ovj8uUzMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV&#10;BAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX&#10;aWRnaXRzIFB0eSBMdGQwHhcNMTIwOTEyMjE1MjAyWhcNMTUwOTEyMjE1MjAyWjBF&#10;-----END CERTIFICATE-----"
+                            required
+                        >{{ certificate_input }}</textarea>
+                        <div class="form-text">Submit your base64 encoded CSR or certificate in the field above. We will attempt to query the corresponding OCSP responder to get the revocation status.</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="checkBtn">
+                            <i class="bi bi-search me-2"></i>Check OCSP Status
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        {% if ocsp_results %}
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header {% if ocsp_results.success %}bg-success{% else %}bg-danger{% endif %} text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-{% if ocsp_results.success %}check-circle{% else %}x-circle{% endif %} me-2"></i>OCSP Check Results
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if ocsp_results.success %}
+                    <!-- Certificate Information -->
+                    {% if ocsp_results.certificate_info %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">Certificate Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Subject:</strong></td>
+                                            <td>
+                                                {% if ocsp_results.certificate_info.subject.commonName %}
+                                                    {{ ocsp_results.certificate_info.subject.commonName }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Issuer:</strong></td>
+                                            <td>
+                                                {% if ocsp_results.certificate_info.issuer.organizationName %}
+                                                    {{ ocsp_results.certificate_info.issuer.organizationName }}
+                                                {% elif ocsp_results.certificate_info.issuer.commonName %}
+                                                    {{ ocsp_results.certificate_info.issuer.commonName }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Serial Number:</strong></td>
+                                            <td>{{ ocsp_results.certificate_info.serial_number }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Version:</strong></td>
+                                            <td>{{ ocsp_results.certificate_info.version }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Valid From:</strong></td>
+                                            <td>{{ ocsp_results.certificate_info.not_before }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Valid Until:</strong></td>
+                                            <td>{{ ocsp_results.certificate_info.not_after }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Days Until Expiry:</strong></td>
+                                            <td>
+                                                {% if ocsp_results.certificate_info.days_until_expiry is not none %}
+                                                    {% if ocsp_results.certificate_info.days_until_expiry > 30 %}
+                                                        <span class="text-success">{{ ocsp_results.certificate_info.days_until_expiry }} days</span>
+                                                    {% elif ocsp_results.certificate_info.days_until_expiry > 0 %}
+                                                        <span class="text-warning">{{ ocsp_results.certificate_info.days_until_expiry }} days</span>
+                                                    {% else %}
+                                                        <span class="text-danger">Expired</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% if ocsp_results.certificate_info.san_domains %}
+                                        <tr>
+                                            <td><strong>SAN Domains:</strong></td>
+                                            <td>{{ ocsp_results.certificate_info.san_domains|join(', ') }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- OCSP Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">OCSP Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>OCSP URL:</strong></td>
+                                            <td>
+                                                {% if ocsp_results.ocsp_url %}
+                                                    <a href="{{ ocsp_results.ocsp_url }}" target="_blank" class="text-break">{{ ocsp_results.ocsp_url }}</a>
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Checked At:</strong></td>
+                                            <td>{{ ocsp_results.checked_at }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    {% if ocsp_results.ocsp_status %}
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>OCSP Status:</strong></td>
+                                            <td>
+                                                {% if ocsp_results.ocsp_status.status == 'good' %}
+                                                    <span class="badge bg-success">Good (Not Revoked)</span>
+                                                {% elif ocsp_results.ocsp_status.status == 'revoked' %}
+                                                    <span class="badge bg-danger">Revoked</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">{{ ocsp_results.ocsp_status.status|title }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Response Time:</strong></td>
+                                            <td>{{ ocsp_results.ocsp_status.response_time }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Responder ID:</strong></td>
+                                            <td>{{ ocsp_results.ocsp_status.responder_id }}</td>
+                                        </tr>
+                                    </table>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OCSP Status Details -->
+                    {% if ocsp_results.ocsp_status and ocsp_results.ocsp_status.note %}
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">OCSP Response Details</h6>
+                        <p class="mb-0">{{ ocsp_results.ocsp_status.note }}</p>
+                    </div>
+                    {% endif %}
+
+                {% else %}
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">Error</h5>
+                        <p class="mb-0">{{ ocsp_results.error }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- How It Works Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-4">How to Use Our OCSP Status Checker</h2>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <span class="fw-bold">1</span>
+                                    </div>
+                                    <h5 class="text-primary">Paste Certificate</h5>
+                                    <p class="text-muted small">Paste your SSL certificate in PEM or base64 format</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <span class="fw-bold">2</span>
+                                    </div>
+                                    <h5 class="text-primary">Click Check</h5>
+                                    <p class="text-muted small">Our tool will query the OCSP responder for revocation status</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <span class="fw-bold">3</span>
+                                    </div>
+                                    <h5 class="text-primary">Review Results</h5>
+                                    <p class="text-muted small">Get detailed OCSP response and certificate information</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-3">Why Use Our OCSP Status Checker?</h2>
+                        <p class="text-muted mb-3">OCSP checking is essential for maintaining SSL security and ensuring certificates haven't been compromised:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-primary">For Security Professionals</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Verify certificate revocation status</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Detect compromised certificates</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Ensure SSL security compliance</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Monitor certificate health</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-primary">For System Administrators</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Validate certificate installations</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Debug SSL configuration issues</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Check certificate revocation</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Maintain security standards</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 text-primary mb-4">Frequently Asked Questions</h2>
+                        
+                        <div class="accordion" id="ocspFAQ">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq1">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                        What is OCSP and why is it important?
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#ocspFAQ">
+                                    <div class="accordion-body">
+                                        OCSP (Online Certificate Status Protocol) is a real-time method for checking certificate revocation status. It's important because it provides immediate verification of whether a certificate is still valid or has been revoked by the Certificate Authority, helping maintain SSL security.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq2">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        What certificate formats are supported?
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#ocspFAQ">
+                                    <div class="accordion-body">
+                                        Our OCSP checker supports both PEM format (with -----BEGIN CERTIFICATE----- headers) and base64 encoded certificates. You can also submit Certificate Signing Requests (CSRs) for OCSP checking.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq3">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                        What does the OCSP status mean?
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#ocspFAQ">
+                                    <div class="accordion-body">
+                                        <strong>Good:</strong> The certificate is valid and not revoked. <strong>Revoked:</strong> The certificate has been revoked by the CA and should not be trusted. <strong>Unknown:</strong> The OCSP responder could not determine the status of the certificate.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, #0d6efd, #6610f2);
+        border: none;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #0b5ed7, #5a0fc8);
+        transform: translateY(-1px);
+    }
+    .table-sm td {
+        padding: 0.5rem;
+        vertical-align: middle;
+    }
+    .text-break {
+        word-break: break-all;
+    }
+</style>
+{% endblock %}

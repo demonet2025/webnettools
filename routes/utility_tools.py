@@ -10,15 +10,154 @@ from modules.subnet_calculator import SubnetCalculator
 # Create blueprint
 utility_tools_bp = Blueprint('utility_tools', __name__)
 
-@utility_tools_bp.route('/decode-encode')
+@utility_tools_bp.route('/decode-encode', methods=['GET', 'POST'])
 def decode_encode():
     """Decode/Encode tool page"""
-    return render_template('decode-encode.html')
+    results = {}
+    input_text = ''
+    operation = ''
+    format_type = ''
+    detection = {}
+    
+    if request.method == 'POST':
+        input_text = request.form.get('input_text', '').strip()
+        operation = request.form.get('operation', '')
+        format_type = request.form.get('format_type', '')
+        
+        # Auto-detect format and operation if not provided
+        if input_text and not operation and not format_type:
+            detection = DecodeEncoder.detect_format_and_operation(input_text)
+            format_type = detection.get('format_type', '')
+            operation = detection.get('operation', '')
+        
+        if input_text and operation and format_type:
+            # Process the encoding/decoding based on format and operation
+            if format_type == 'base64':
+                if operation == 'encode':
+                    results = DecodeEncoder.base64_encode(input_text)
+                elif operation == 'decode':
+                    results = DecodeEncoder.base64_decode(input_text)
+            elif format_type == 'url':
+                if operation == 'encode':
+                    results = DecodeEncoder.url_encode(input_text)
+                elif operation == 'decode':
+                    results = DecodeEncoder.url_decode(input_text)
+            elif format_type == 'html':
+                if operation == 'encode':
+                    results = DecodeEncoder.html_encode(input_text)
+                elif operation == 'decode':
+                    results = DecodeEncoder.html_decode(input_text)
+            elif format_type == 'hex':
+                if operation == 'encode':
+                    results = DecodeEncoder.hex_encode(input_text)
+                elif operation == 'decode':
+                    results = DecodeEncoder.hex_decode(input_text)
+            elif format_type == 'binary':
+                if operation == 'encode':
+                    results = DecodeEncoder.binary_encode(input_text)
+                elif operation == 'decode':
+                    results = DecodeEncoder.binary_decode(input_text)
+            elif format_type == 'json':
+                if operation == 'encode':
+                    results = DecodeEncoder.json_encode(input_text)
+                elif operation == 'decode':
+                    results = DecodeEncoder.json_decode(input_text)
+    
+    return render_template('decode-encode.html',
+                         results=results,
+                         input_text=input_text,
+                         operation=operation,
+                         format_type=format_type,
+                         detection=detection)
 
-@utility_tools_bp.route('/subnet-calculator')
+@utility_tools_bp.route('/subnet-calculator', methods=['GET', 'POST'])
 def subnet_calculator():
     """IP Subnet Calculator tool page"""
-    return render_template('subnet-calculator.html')
+    ipv4_results = None
+    ipv6_results = None
+    ipv4_address = None
+    ipv4_subnet = None
+    ipv4_custom = None
+    ipv6_address = None
+    ipv6_prefix = None
+    
+    if request.method == 'POST':
+        # Handle IPv4 calculation
+        if 'ipv4_address' in request.form:
+            ipv4_address = request.form.get('ipv4_address', '').strip()
+            ipv4_subnet = request.form.get('ipv4_subnet', '').strip()
+            ipv4_custom = request.form.get('ipv4_custom', '').strip()
+            
+            if ipv4_address:
+                cidr = None
+                if ipv4_custom:
+                    try:
+                        cidr = int(ipv4_custom)
+                    except ValueError:
+                        pass
+                elif ipv4_subnet:
+                    try:
+                        cidr = int(ipv4_subnet.replace('/', ''))
+                    except ValueError:
+                        pass
+                
+                if cidr is not None:
+                    raw_result = SubnetCalculator.calculate_ipv4_subnet(ipv4_address, cidr=cidr)
+                    if raw_result.get('success'):
+                        # Flatten the nested structure for template
+                        ipv4_results = {
+                            'success': True,
+                            'network_address': raw_result['network_info']['network_address'],
+                            'broadcast_address': raw_result['network_info']['broadcast_address'],
+                            'subnet_mask': raw_result['network_info']['subnet_mask'],
+                            'wildcard_mask': raw_result['network_info']['wildcard_mask'],
+                            'cidr_notation': raw_result['network_info']['cidr_notation'],
+                            'ip_class': raw_result['network_info']['ip_class'],
+                            'total_hosts': raw_result['host_info']['total_hosts'],
+                            'usable_hosts': raw_result['host_info']['usable_hosts'],
+                            'first_host': raw_result['host_info']['first_host'],
+                            'last_host': raw_result['host_info']['last_host'],
+                            'raw_output': raw_result['raw_output']
+                        }
+                    else:
+                        ipv4_results = raw_result
+        
+        # Handle IPv6 calculation
+        elif 'ipv6_address' in request.form:
+            ipv6_address = request.form.get('ipv6_address', '').strip()
+            ipv6_prefix = request.form.get('ipv6_prefix', '').strip()
+            
+            if ipv6_address and ipv6_prefix:
+                try:
+                    prefix_length = int(ipv6_prefix.replace('/', ''))
+                    raw_result = SubnetCalculator.calculate_ipv6_subnet(ipv6_address, prefix_length)
+                    if raw_result.get('success'):
+                        # Flatten the nested structure for template
+                        ipv6_results = {
+                            'success': True,
+                            'network_address': raw_result['network_info']['network_address'],
+                            'first_address': raw_result['host_info']['first_host'],
+                            'last_address': raw_result['host_info']['last_host'],
+                            'compressed_network': raw_result['network_info']['network_address'],
+                            'expanded_network': raw_result['network_info']['network_address'],
+                            'prefix_length': f"/{raw_result['network_info']['prefix_length']}",
+                            'total_addresses': raw_result['host_info']['total_hosts'],
+                            'address_type': 'Global Unicast' if raw_result['network_info']['network_address'].startswith('2001:') else 'Other',
+                            'raw_output': raw_result['raw_output']
+                        }
+                    else:
+                        ipv6_results = raw_result
+                except ValueError:
+                    pass
+    
+    return render_template('subnet-calculator.html',
+                         ipv4_results=ipv4_results,
+                         ipv6_results=ipv6_results,
+                         ipv4_address=ipv4_address,
+                         ipv4_subnet=ipv4_subnet,
+                         ipv4_custom=ipv4_custom,
+                         ipv6_address=ipv6_address,
+                         ipv6_prefix=ipv6_prefix)
 
 # API Routes for Utility Tools
 @utility_tools_bp.route('/api/decode/base64-encode', methods=['POST'])

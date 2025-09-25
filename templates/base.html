@@ -98,9 +98,11 @@
                     <ul class="dropdown-menu" aria-labelledby="sslDropdown">
                         <li><a class="dropdown-item {% if request.endpoint == 'ssl_checker' %}active{% endif %}" href="/sslchecker">SSL Checker</a></li>
                         <li><a class="dropdown-item {% if request.endpoint == 'deep_ssl_checker' %}active{% endif %}" href="/deep-ssl-checker">Deep SSL Analysis</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'ssl_bulk_checker' %}active{% endif %}" href="/ssl-bulk-checker">SSL Bulk Checker</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'ocsp_checker' %}active{% endif %}" href="/ocsp-checker">OCSP Checker</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item {% if request.endpoint == 'csr_decoder' %}active{% endif %}" href="/csr-decoder">CSR Decoder</a></li>
                         <li><a class="dropdown-item {% if request.endpoint == 'certificate_decoder' %}active{% endif %}" href="/certificate-decoder">Certificate Decoder</a></li>
+                        <li><a class="dropdown-item {% if request.endpoint == 'csr_decoder' %}active{% endif %}" href="/csr-decoder">CSR Decoder</a></li>
                         <li><a class="dropdown-item {% if request.endpoint == 'certificate_key_matcher' %}active{% endif %}" href="/certificate-key-matcher">Key Matcher</a></li>
                         <li><a class="dropdown-item {% if request.endpoint == 'ssl_converter' %}active{% endif %}" href="/ssl-converter">SSL Converter</a></li>
                     </ul>
