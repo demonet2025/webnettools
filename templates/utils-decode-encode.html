@@ -266,7 +266,7 @@
             <h3><i class="bi bi-globe me-2"></i>All Formats Converter</h3>
             <span class="badge bg-light text-dark">Universal</span>
         </div>
-        <form method="POST" action="/decode-encode">
+        <form method="POST" action="/utils-decode-encode">
             <div class="input-group">
                 <label for="allFormatsText">Enter text to convert</label>
                 <textarea id="allFormatsText" name="input_text" placeholder="Enter text to convert in any format..." required>{{ input_text or '' }}</textarea>
@@ -326,7 +326,7 @@
             <h3><i class="bi bi-file-earmark-code me-2"></i>Base64</h3>
             <span class="badge bg-info">Binary-to-Text</span>
         </div>
-        <form method="POST" action="/decode-encode">
+        <form method="POST" action="/utils-decode-encode">
             <input type="hidden" name="format_type" value="base64">
             <input type="hidden" name="operation" value="">
             <div class="input-group">
@@ -369,7 +369,7 @@
             <h3><i class="bi bi-link-45deg me-2"></i>URL Encoding</h3>
             <span class="badge bg-warning">Percent-Encoding</span>
         </div>
-        <form method="POST" action="/decode-encode">
+        <form method="POST" action="/utils-decode-encode">
             <input type="hidden" name="format_type" value="url">
             <input type="hidden" name="operation" value="">
             <div class="input-group">
@@ -412,7 +412,7 @@
             <h3><i class="bi bi-code-square me-2"></i>HTML Entities</h3>
             <span class="badge bg-success">Character References</span>
         </div>
-        <form method="POST" action="/decode-encode">
+        <form method="POST" action="/utils-decode-encode">
             <input type="hidden" name="format_type" value="html">
             <input type="hidden" name="operation" value="">
             <div class="input-group">
@@ -455,7 +455,7 @@
             <h3><i class="bi bi-hash me-2"></i>Hexadecimal</h3>
             <span class="badge bg-secondary">Base-16</span>
         </div>
-        <form method="POST" action="/decode-encode">
+        <form method="POST" action="/utils-decode-encode">
             <input type="hidden" name="format_type" value="hex">
             <input type="hidden" name="operation" value="">
             <div class="input-group">
@@ -498,7 +498,7 @@
             <h3><i class="bi bi-0-circle me-2"></i>Binary</h3>
             <span class="badge bg-dark">Base-2</span>
         </div>
-        <form method="POST" action="/decode-encode">
+        <form method="POST" action="/utils-decode-encode">
             <input type="hidden" name="format_type" value="binary">
             <input type="hidden" name="operation" value="">
             <div class="input-group">
@@ -541,7 +541,7 @@
             <h3><i class="bi bi-filetype-json me-2"></i>JSON</h3>
             <span class="badge bg-danger">Data Format</span>
         </div>
-        <form method="POST" action="/decode-encode">
+        <form method="POST" action="/utils-decode-encode">
             <input type="hidden" name="format_type" value="json">
             <input type="hidden" name="operation" value="">
             <div class="input-group">
