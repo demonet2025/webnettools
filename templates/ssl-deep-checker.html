@@ -694,35 +694,6 @@
         <p class="lead text-muted">Check the status of any website's SSL certificate with our free SSL checker. Get detailed SSL certificate information including issuer, expiration date, chain validation, and security analysis.</p>
     </div>
 
-    <!-- SEO Content Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="h4 text-primary mb-3">
-                        {% if ssl_results and ssl_results.hostname %}
-                            SSL Certificate Analysis for {{ ssl_results.hostname }}
-                        {% else %}
-                            Free Online SSL Certificate Analysis Tool
-                        {% endif %}
-                    </h2>
-                    {% if ssl_results and ssl_results.hostname %}
-                        <p class="text-muted mb-3">We have analyzed the SSL certificate for <strong>{{ ssl_results.hostname }}</strong> and found that it has a valid SSL certificate. SSL certificates are essential for website security and ensure that data transmitted between the user and the website is encrypted and secure.</p>
-                        
-                        <p class="text-muted mb-3">The SSL certificate for {{ ssl_results.hostname }} was issued by <strong>{{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else ssl_results.certificate.issuer.organizationName if ssl_results.certificate.issuer.organizationName else 'Unknown Authority' }}</strong> and is valid until <strong>{{ ssl_results.certificate.not_after if ssl_results.certificate.not_after else 'Unknown' }}</strong>. This certificate provides secure HTTPS communication for the website.</p>
-                        
-                        <p class="text-muted mb-0"><strong>Our SSL certificate analysis tool provides comprehensive security assessment for {{ ssl_results.hostname }}, making it valuable for cybersecurity experts, website developers, and network administrators.</strong></p>
-                    {% else %}
-                        <p class="text-muted mb-3">We have developed this online SSL certificate lookup to help our users quickly check the status of SSL certificates for any website. SSL certificates need to be installed on all websites so that they can use the HTTPS communication protocol. These certificates are essential for website security.</p>
-                        
-                        <p class="text-muted mb-3">Our SSL lookup allows you to enter the URL of any domain and quickly find whether it has an SSL certificate or not, when it (if present) was issued, who the issuer was, and so on. Our tool not only confirms the presence or absence of an SSL certificate but also provides a range of other useful information related to it.</p>
-                        
-                        <p class="text-muted mb-0"><strong>A reliable SSL certificate checker like ours can be very useful for cybersecurity experts, website developers, and network administrators.</strong></p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="row">
         <!-- Right Sidebar (20%) - Appears first in HTML -->
@@ -853,70 +824,6 @@
     </div>
 
 
-    <!-- Benefits Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="h4 text-primary mb-3">What is the Benefit of Using Our Tool to Check SSL Certificates?</h2>
-                    <p class="text-muted mb-3">According to online sources, one of the simplest ways to check if a website has an SSL certificate or not is to see its URL. Websites that have an SSL certificate start with "https" and not "http."</p>
-                    
-                    <p class="text-muted mb-3">However, this is not a valid method, considering that sometimes domains with "https" can fail to renew their certificates. When that happens, they may become inaccessible or unsafe to visit.</p>
-                    
-                    <p class="text-muted mb-0"><strong>Using our tool to check SSL certificates is a much better way than simply inspecting the URL.</strong> You can get updated information about them, such as when they were issued, the date till which they will remain valid, etc. You also don't have to visit the website yourself to see if a notice pops up.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Details Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="h4 text-primary mb-3">What Details Can You Acquire Using Our SSL Checker Online?</h2>
-                    <p class="text-muted mb-3">Once you enter the domain name and start the process, you will see a lot of different details, which are listed below. Here is a brief guide to understanding all of those details.</p>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><strong>Host:</strong> This field contains the domain that you have entered</li>
-                                <li class="mb-2"><strong>URL:</strong> This field contains the exact URL</li>
-                                <li class="mb-2"><strong>Issued For:</strong> This field indicates which site the SSL certificate is issued for</li>
-                                <li class="mb-2"><strong>Issued By:</strong> This field indicates which authority has issued the SSL certificate</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><strong>SSL Compression:</strong> This field indicates whether the SSL certificate is compressed or not</li>
-                                <li class="mb-2"><strong>SSL Chain Validation:</strong> This field indicates whether the SSL certificate chain is valid or not</li>
-                                <li class="mb-2"><strong>Hash:</strong> A unique identifier of the certificate</li>
-                                <li class="mb-2"><strong>Public Key:</strong> Used in the process of certificate encryption</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <p class="text-muted mt-3 mb-0"><strong>PEM</strong> is a file format that is used to carry certificate info and encryption keys. All of these details give you more and more information about your SSL certificate.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SSL Certificate and Chain Explanation -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="h4 text-primary mb-3">Understand More About SSL Certificate and SSL Chain</h2>
-                    <p class="text-muted mb-3">To get a better grasp of the importance and utility of our test SSL certificate tool, we recommend learning more about SSL certificates and SSL chain validation.</p>
-                    
-                    <p class="text-muted mb-3"><strong>SSL certificates</strong> are digital certificates issued by CAs (Certification Authorities) that verify the authenticity of a website. In other words, the certificates tell the Internet and its users that the website is who it purports to be and is not fake or malicious. The CAs of a domain are specified in its CAA records.</p>
-                    
-                    <p class="text-muted mb-0">An <strong>SSL chain</strong>, on the other hand, is basically a chain of all the different CAs that are responsible for relaying the certificate from the root authority to the website. In this chain, there can sometimes be intermediary authorities that simply carry the certificate onto the website and don't create it themselves. <strong>This is yet another reason why our tool is so helpful</strong> - you can see the various intermediaries involved in the certification process all in one place.</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Basic Results (Server-side rendered) -->
     {% if ssl_results %}
@@ -1329,6 +1236,101 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- SEO Content Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">
+                        {% if ssl_results and ssl_results.hostname %}
+                            SSL Certificate Analysis for {{ ssl_results.hostname }}
+                        {% else %}
+                            Free Online SSL Certificate Analysis Tool
+                        {% endif %}
+                    </h2>
+                    {% if ssl_results and ssl_results.hostname %}
+                        <p class="text-muted mb-3">We have analyzed the SSL certificate for <strong>{{ ssl_results.hostname }}</strong> and found that it has a valid SSL certificate. SSL certificates are essential for website security and ensure that data transmitted between the user and the website is encrypted and secure.</p>
+                        
+                        <p class="text-muted mb-3">The SSL certificate for {{ ssl_results.hostname }} was issued by <strong>{{ ssl_results.certificate.issuer.commonName if ssl_results.certificate.issuer.commonName else ssl_results.certificate.issuer.organizationName if ssl_results.certificate.issuer.organizationName else 'Unknown Authority' }}</strong> and is valid until <strong>{{ ssl_results.certificate.not_after if ssl_results.certificate.not_after else 'Unknown' }}</strong>. This certificate provides secure HTTPS communication for the website.</p>
+                        
+                        <p class="text-muted mb-0"><strong>Our SSL certificate analysis tool provides comprehensive security assessment for {{ ssl_results.hostname }}, making it valuable for cybersecurity experts, website developers, and network administrators.</strong></p>
+                    {% else %}
+                        <p class="text-muted mb-3">We have developed this online SSL certificate lookup to help our users quickly check the status of SSL certificates for any website. SSL certificates need to be installed on all websites so that they can use the HTTPS communication protocol. These certificates are essential for website security.</p>
+                        
+                        <p class="text-muted mb-3">Our SSL lookup allows you to enter the URL of any domain and quickly find whether it has an SSL certificate or not, when it (if present) was issued, who the issuer was, and so on. Our tool not only confirms the presence or absence of an SSL certificate but also provides a range of other useful information related to it.</p>
+                        
+                        <p class="text-muted mb-0"><strong>A reliable SSL certificate checker like ours can be very useful for cybersecurity experts, website developers, and network administrators.</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">What is the Benefit of Using Our Tool to Check SSL Certificates?</h2>
+                    <p class="text-muted mb-3">According to online sources, one of the simplest ways to check if a website has an SSL certificate or not is to see its URL. Websites that have an SSL certificate start with "https" and not "http."</p>
+                    
+                    <p class="text-muted mb-3">However, this is not a valid method, considering that sometimes domains with "https" can fail to renew their certificates. When that happens, they may become inaccessible or unsafe to visit.</p>
+                    
+                    <p class="text-muted mb-0"><strong>Using our tool to check SSL certificates is a much better way than simply inspecting the URL.</strong> You can get updated information about them, such as when they were issued, the date till which they will remain valid, etc. You also don't have to visit the website yourself to see if a notice pops up.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">What Details Can You Acquire Using Our SSL Checker Online?</h2>
+                    <p class="text-muted mb-3">Once you enter the domain name and start the process, you will see a lot of different details, which are listed below. Here is a brief guide to understanding all of those details.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>Host:</strong> This field contains the domain that you have entered</li>
+                                <li class="mb-2"><strong>URL:</strong> This field contains the exact URL</li>
+                                <li class="mb-2"><strong>Issued For:</strong> This field indicates which site the SSL certificate is issued for</li>
+                                <li class="mb-2"><strong>Issued By:</strong> This field indicates which authority has issued the SSL certificate</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>SSL Compression:</strong> This field indicates whether the SSL certificate is compressed or not</li>
+                                <li class="mb-2"><strong>SSL Chain Validation:</strong> This field indicates whether the SSL certificate chain is valid or not</li>
+                                <li class="mb-2"><strong>Hash:</strong> A unique identifier of the certificate</li>
+                                <li class="mb-2"><strong>Public Key:</strong> Used in the process of certificate encryption</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted mt-3 mb-0"><strong>PEM</strong> is a file format that is used to carry certificate info and encryption keys. All of these details give you more and more information about your SSL certificate.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SSL Certificate and Chain Explanation -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 text-primary mb-3">Understand More About SSL Certificate and SSL Chain</h2>
+                    <p class="text-muted mb-3">To get a better grasp of the importance and utility of our test SSL certificate tool, we recommend learning more about SSL certificates and SSL chain validation.</p>
+                    
+                    <p class="text-muted mb-3"><strong>SSL certificates</strong> are digital certificates issued by CAs (Certification Authorities) that verify the authenticity of a website. In other words, the certificates tell the Internet and its users that the website is who it purports to be and is not fake or malicious. The CAs of a domain are specified in its CAA records.</p>
+                    
+                    <p class="text-muted mb-0">An <strong>SSL chain</strong>, on the other hand, is basically a chain of all the different CAs that are responsible for relaying the certificate from the root authority to the website. In this chain, there can sometimes be intermediary authorities that simply carry the certificate onto the website and don't create it themselves. <strong>This is yet another reason why our tool is so helpful</strong> - you can see the various intermediaries involved in the certification process all in one place.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
