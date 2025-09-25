@@ -737,7 +737,7 @@
                     <div class="card-body">
                         <div class="list-group list-group-flush">
                             {% for search in recent_searches %}
-                            <a href="/deep-ssl-checker/{{ search.domain }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <a href="/ssl-deep-checker/{{ search.domain }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                 <div>
                                     <div class="fw-semibold">{{ search.domain[:3] }}***.{{ search.domain.split('.')[-1] }}</div>
                                     <small class="text-muted">{{ search.domain }}</small>
@@ -829,7 +829,7 @@
             </div>
         </div>
         <div class="card-body p-4">
-            <form method="POST" action="/deep-ssl-checker" class="row g-3">
+            <form method="POST" action="/ssl-deep-checker" class="row g-3">
                 <div class="col-12">
                     <label for="hostname" class="form-label fw-bold">Domain or URL</label>
                     <input 
